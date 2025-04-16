@@ -96,7 +96,7 @@ export function useChat({
         setUnread(messages.filter((e) => e.sender === 'peer' && e.seen === undefined).length);
     }, [setUnread, messages]);
 
-    const displayTypingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+    const displayTypingTimeoutRef = useRef<NodeJS.Timeout | undefined>();
     const displayTyping = useCallback((show: boolean) => {
         setTyping(show);
         if (show) {

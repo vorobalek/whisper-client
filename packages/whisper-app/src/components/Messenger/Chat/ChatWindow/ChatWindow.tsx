@@ -120,9 +120,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     {messages.map((message) => {
                         return (
                             <Message
-                                ref={(el) => {
-                                    messageDivRefs.current.set(`${message.timestamp}-${message.sender}`, el);
-                                }}
+                                ref={(el) => messageDivRefs.current.set(`${message.timestamp}-${message.sender}`, el)}
                                 key={
                                     message.id * 10 +
                                     (message.sender === 'system' ? 0 : message.sender === 'you' ? 1 : 2)
