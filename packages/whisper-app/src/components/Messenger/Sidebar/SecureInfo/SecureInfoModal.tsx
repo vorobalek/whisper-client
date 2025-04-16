@@ -34,6 +34,14 @@ const SecureInfoModal: React.FC<SecureInfoModalProps> = ({ visible, onClose }) =
                             transmitted with end-to-end encryption.
                         </p>
                         <p>
+                            No registration or disclosure of personal data is required. Dual peer-to-peer channels are
+                            established for reliability and to circumvent regional restrictions, with seamless fallback
+                            to relay servers if direct P2P is unavailable. The protocol is trustless by design: neither
+                            backend nor relay servers nor counterparties can compromise your privacy. Private messages
+                            are unlinkable — no one can determine sender or recipient, and messages contain no
+                            identifying marks.
+                        </p>
+                        <p>
                             The Whisper server only stores your public signature key and, if you consent, your push
                             subscription. It relays data without retention or modification.
                         </p>
