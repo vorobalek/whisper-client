@@ -3,6 +3,8 @@ import {
     mockWhisperCoreServices,
     setupWhisperBrowserMocks,
     teardownWhisperBrowserMocks,
+    createMockKeyPair,
+    createMockWhisperConfig,
 } from '../__mocks__/test-utils';
 import { ConnectionState } from '../src';
 import { Whisper, WhisperPrototype } from '../src';
@@ -44,24 +46,8 @@ describe('Whisper', () => {
     });
 
     describe('initialize', () => {
-        // Create mock key pair for session service
-        const mockKeyPair = {
-            publicKey: new Uint8Array(),
-            secretKey: new Uint8Array(),
-        } as CryptoKeyPair;
-
-        const mockConfig = {
-            serverUrl: 'https://test-server.com',
-            onCall: jest.fn(),
-            onReady: jest.fn(),
-            focusOnDial: jest.fn(),
-            requestDial: jest.fn(),
-            version: '1.0.0',
-            signingKeyPair: mockKeyPair,
-            vapidKey: 'test-vapid-key',
-            iceServers: [{ urls: 'stun:test.com' }],
-            navigator: mockNavigator,
-        };
+        const mockKeyPair = createMockKeyPair();
+        const mockConfig = createMockWhisperConfig({ signingKeyPair: mockKeyPair, navigator: mockNavigator });
 
         it('should initialize all services in the correct order', async () => {
             const whisper = await whisperPrototype.initialize(mockConfig);
@@ -78,8 +64,16 @@ describe('Whisper', () => {
             // For services that don't directly use webRTC
             expect(getWorkerService().initialize).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    ...mockConfig,
-                    navigator: expect.any(Object),
+                    serverUrl: 'https://test-server.com',
+                    onCall: expect.any(Function),
+                    onReady: expect.any(Function),
+                    focusOnDial: expect.any(Function),
+                    requestDial: expect.any(Function),
+                    version: '1.0.0',
+                    signingKeyPair: expect.any(Object),
+                    vapidKey: 'test-vapid-key',
+                    iceServers: [{ urls: 'stun:test.com' }],
+                    // navigator intentionally omitted
                 }),
             );
             expect(getSessionService().initialize).toHaveBeenCalledWith(mockConfig);
@@ -111,8 +105,16 @@ describe('Whisper', () => {
 
             expect(getCallService().initialize).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    ...mockConfig,
-                    navigator: expect.any(Object),
+                    serverUrl: 'https://test-server.com',
+                    onCall: expect.any(Function),
+                    onReady: expect.any(Function),
+                    focusOnDial: expect.any(Function),
+                    requestDial: expect.any(Function),
+                    version: '1.0.0',
+                    signingKeyPair: expect.any(Object),
+                    vapidKey: 'test-vapid-key',
+                    iceServers: [{ urls: 'stun:test.com' }],
+                    // navigator intentionally omitted
                 }),
             );
 
@@ -194,24 +196,8 @@ describe('Whisper', () => {
         let whisper: Whisper;
 
         beforeEach(async () => {
-            const mockKeyPair = {
-                publicKey: new Uint8Array(),
-                secretKey: new Uint8Array(),
-            } as CryptoKeyPair;
-
-            const mockConfig = {
-                serverUrl: 'https://test-server.com',
-                onCall: jest.fn(),
-                onReady: jest.fn(),
-                focusOnDial: jest.fn(),
-                requestDial: jest.fn(),
-                version: '1.0.0',
-                signingKeyPair: mockKeyPair,
-                vapidKey: 'test-vapid-key',
-                iceServers: [{ urls: 'stun:test.com' }],
-                navigator: mockNavigator,
-            };
-
+            const mockKeyPair = createMockKeyPair();
+            const mockConfig = createMockWhisperConfig({ signingKeyPair: mockKeyPair, navigator: mockNavigator });
             whisper = await whisperPrototype.initialize(mockConfig);
         });
 

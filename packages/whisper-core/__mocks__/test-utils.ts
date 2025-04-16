@@ -1,6 +1,31 @@
-// @ts-nocheck
 // Common mocks for whisper-core tests
 import type { WorkerService } from '../src/services/worker-service';
+
+// Minimal interfaces for strict typing of mocks
+interface MockRTCDataChannel {
+    id: string;
+    label: string;
+    readyState: string;
+    onopen: jest.Mock<any, any>;
+    onmessage: jest.Mock<any, any>;
+    close: jest.Mock<any, any>;
+    send: jest.Mock<any, any>;
+}
+
+interface MockRTCPeerConnection {
+    createDataChannel: jest.Mock<any, any>;
+    createOffer: jest.Mock<any, any>;
+    createAnswer: jest.Mock<any, any>;
+    setLocalDescription: jest.Mock<any, any>;
+    setRemoteDescription: jest.Mock<any, any>;
+    addIceCandidate: jest.Mock<any, any>;
+    onicecandidate: jest.Mock<any, any>;
+    ondatachannel: jest.Mock<any, any>;
+    onconnectionstatechange: jest.Mock<any, any>;
+    close: jest.Mock<any, any>;
+    getStats: jest.Mock<any, any>;
+    remoteDescription: any;
+}
 
 export function createMockLogger() {
     return {
@@ -36,35 +61,62 @@ export function createMockSessionService() {
     };
 }
 
-export function createMockBase64(encodeMap?: Record<string, string>) {
-    return {
-        encode: jest.fn((data: Uint8Array) => {
-            if (encodeMap) {
+export function createMockBase64(arg: any = {}) {
+    // Backward compatibility: if arg has keys other than encode/decode, treat as encodeMap
+    if (typeof arg === 'object' && arg !== null && !('encode' in arg) && !('decode' in arg)) {
+        const encodeMap = arg;
+        return {
+            encode: jest.fn((data: Uint8Array) => {
                 const key = Array.from(data).join(',');
                 if (encodeMap[key]) return encodeMap[key];
-            }
-            return 'encoded-data';
-        }),
-        decode: jest.fn(),
+                return 'encoded-data';
+            }),
+            decode: jest.fn(),
+        };
+    }
+    // New API
+    return {
+        encode: arg.encode || jest.fn((data: Uint8Array) => 'encoded-data'),
+        decode: arg.decode || jest.fn(),
     };
 }
 
-export function createMockUtf8() {
+export function createMockUtf8({ encode, decode }: { encode?: any; decode?: any } = {}) {
     return {
-        encode: jest.fn(),
-        decode: jest.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
+        encode: encode || jest.fn(),
+        decode: decode || jest.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
     };
 }
 
-export function createMockCryptography() {
+export function createMockCryptography(
+    overrides: Partial<{
+        generateEncryptionKeyPair: () => any;
+        generateSharedSymmetricKey: () => any;
+        encrypt: (data: any) => any;
+        decrypt: (data: any) => any;
+        sign: () => any;
+        verifySignature: () => any;
+        generateSigningKeyPair: () => any;
+    }> = {},
+) {
     return {
-        sign: jest.fn().mockReturnValue(new Uint8Array([10, 11, 12])),
-        verifySignature: jest.fn(),
-        generateSigningKeyPair: jest.fn(),
-        generateEncryptionKeyPair: jest.fn(),
-        generateSharedSymmetricKey: jest.fn(),
-        encrypt: jest.fn(),
-        decrypt: jest.fn(),
+        generateEncryptionKeyPair:
+            overrides.generateEncryptionKeyPair ||
+            jest.fn(() => ({
+                publicKey: new Uint8Array([1, 2, 3]),
+                secretKey: new Uint8Array([4, 5, 6]),
+            })),
+        generateSharedSymmetricKey: overrides.generateSharedSymmetricKey || jest.fn(() => new Uint8Array([7, 8, 9])),
+        encrypt: overrides.encrypt || jest.fn((data) => data),
+        decrypt: overrides.decrypt || jest.fn((data) => data),
+        sign: overrides.sign || jest.fn(() => new Uint8Array([10, 11, 12])),
+        verifySignature: overrides.verifySignature || jest.fn(() => true),
+        generateSigningKeyPair:
+            overrides.generateSigningKeyPair ||
+            jest.fn(() => ({
+                publicKey: new Uint8Array([13, 14, 15]),
+                secretKey: new Uint8Array([16, 17, 18]),
+            })),
     };
 }
 
@@ -103,14 +155,14 @@ export function createMockPushConfig(overrides = {}) {
     };
 }
 
-export function createMockWebRTC() {
+export function createMockWebRTC(): any {
     class MockPeerConnection {
         static generateCertificate = jest.fn().mockResolvedValue({});
         constructor(_config?: any) {}
     }
     return {
-        PeerConnection: MockPeerConnection as unknown as typeof RTCPeerConnection,
-        DataChannel: jest.fn() as unknown as typeof RTCDataChannel,
+        PeerConnection: MockPeerConnection as any,
+        DataChannel: jest.fn() as any,
     };
 }
 
@@ -416,7 +468,7 @@ export function createMockConnection(overrides: Partial<any> = {}) {
     };
 }
 
-export function createMockDataChannel(overrides: Partial<any> = {}) {
+export function createMockDataChannel(overrides: Partial<MockRTCDataChannel> = {}): MockRTCDataChannel {
     return {
         id: 'data-channel-id',
         label: 'mock-data-channel',
@@ -429,7 +481,10 @@ export function createMockDataChannel(overrides: Partial<any> = {}) {
     };
 }
 
-export function createMockPeerConnection(overrides: Partial<any> = {}, mockDataChannel?: any) {
+export function createMockPeerConnection(
+    overrides: Partial<MockRTCPeerConnection> = {},
+    mockDataChannel?: MockRTCDataChannel,
+): MockRTCPeerConnection {
     return {
         createDataChannel: jest.fn(() => mockDataChannel || createMockDataChannel()),
         createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
@@ -460,7 +515,33 @@ export function createMockPeerConnection(overrides: Partial<any> = {}, mockDataC
                 ],
             ]),
         ),
-        remoteDescription: null as RTCSessionDescription | null,
+        remoteDescription: null,
+        ...overrides,
+    };
+}
+
+// Factory for creating a mock CryptoKeyPair
+export function createMockKeyPair(overrides = {}) {
+    return {
+        publicKey: new Uint8Array([1, 2, 3]),
+        secretKey: new Uint8Array([4, 5, 6]),
+        ...overrides,
+    };
+}
+
+// Factory for creating a mock Whisper config
+export function createMockWhisperConfig(overrides = {}) {
+    return {
+        serverUrl: 'https://test-server.com',
+        onCall: jest.fn(),
+        onReady: jest.fn(),
+        focusOnDial: jest.fn(),
+        requestDial: jest.fn(),
+        version: '1.0.0',
+        signingKeyPair: createMockKeyPair(),
+        vapidKey: 'test-vapid-key',
+        iceServers: [{ urls: 'stun:test.com' }],
+        navigator: { serviceWorker: {} },
         ...overrides,
     };
 }
