@@ -332,7 +332,7 @@ export function useWhisper(
     const [connections, setConnections] = useState<
         Array<{ id: number; publicKey: string; name: string | undefined; order: number }>
     >([]);
-    const connectionsRef = useRef<Map<number, Connection>>();
+    const connectionsRef = useRef<Map<number, Connection> | undefined>(undefined);
 
     const _initConnections = useCallback(
         (connections: Array<{ id: number; publicKey: string; name: string | undefined; order: number }>) => {
