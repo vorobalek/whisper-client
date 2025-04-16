@@ -5,13 +5,11 @@
     padding: 8px;
     display: flex;
     flex-wrap: wrap;
-    max-width: 250px;
     width: auto;
     justify-content: center;
     gap: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    /* Обеспечиваем, чтобы на малых экранах меню не было слишком большим */
     max-width: min(250px, calc(100vw - 20px));
 }
 
@@ -32,7 +30,6 @@
     padding: 0;
 }
 
-/* На малых экранах уменьшаем размер эмодзи */
 @media (max-width: 480px) {
     .reaction-button {
         font-size: 18px;

@@ -5,10 +5,8 @@ import { ChatWindowMessageType } from './Chat/ChatWindow';
 import './Messenger.css';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import { useSpring, animated } from '@react-spring/web';
-import { useDrag } from '@use-gesture/react';
 import { ConnectionState } from '@whisper/core';
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 type MessengerProps = {
     publicKey?: string;
@@ -198,76 +196,8 @@ const Messenger: React.FC<MessengerProps> = ({
         [deleteConnection],
     );
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [{ x }, api] = useSpring(() => ({ x: 0 }));
-
-    const bind = useDrag(
-        ({ down, movement: [mx], direction: [xDir], velocity: [vx], cancel }) => {
-            // Only enable swiping for mobile devices
-            const isMobile = window.innerWidth <= 768;
-            if (!isMobile) return;
-
-            const isSwipingRight = xDir > 0;
-            const isSwipingLeft = xDir < 0;
-
-            // Swipe threshold values
-            const SWIPE_THRESHOLD = 100;
-            const VELOCITY_THRESHOLD = 0.5;
-
-            // Swipe from chat to sidebar (left to right)
-            if (!showSidebar && isSwipingRight) {
-                // If swipe is complete or velocity is high enough
-                if (!down && (mx > SWIPE_THRESHOLD || vx > VELOCITY_THRESHOLD)) {
-                    setShowSidebar(true);
-                    api.start({ x: 0, immediate: false });
-                    cancel();
-                }
-                // Still swiping, show visual feedback
-                else {
-                    api.start({
-                        x: down ? Math.min(mx, SWIPE_THRESHOLD * 1.5) : 0,
-                        immediate: down,
-                    });
-                }
-            }
-            // Swipe from sidebar to chat (right to left) when we have active connections
-            else if (showSidebar && isSwipingLeft && activeConnectionId !== undefined) {
-                // If swipe is complete or velocity is high enough
-                if (!down && (mx < -SWIPE_THRESHOLD || vx < -VELOCITY_THRESHOLD)) {
-                    setShowSidebar(false);
-                    api.start({ x: 0, immediate: false });
-                    cancel();
-                }
-                // Still swiping, show visual feedback
-                else {
-                    api.start({
-                        x: down ? Math.max(mx, -SWIPE_THRESHOLD * 1.5) : 0,
-                        immediate: down,
-                    });
-                }
-            }
-            // Return to original position if swipe not completed
-            else if (!down) {
-                api.start({ x: 0 });
-            }
-        },
-        {
-            axis: 'x',
-            filterTaps: true,
-            rubberband: true,
-        },
-    );
-
     return (
-        <animated.div
-            className='messenger'
-            {...bind()}
-            ref={containerRef}
-            style={{
-                touchAction: 'pan-y',
-                transform: x.to((x) => `translateX(${x}px)`),
-            }}
-        >
+        <div className='messenger'>
             <Navbar
                 title={showSidebar ? 'Go to Chat ==>' : '<== Back to Connect'}
                 unread={showSidebar ? undefined : unread}
@@ -299,7 +229,7 @@ const Messenger: React.FC<MessengerProps> = ({
                     );
                 }
             })}
-        </animated.div>
+        </div>
     );
 };
 
