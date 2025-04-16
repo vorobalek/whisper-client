@@ -464,3 +464,29 @@ export function createMockPeerConnection(overrides: Partial<any> = {}, mockDataC
         ...overrides,
     };
 }
+
+// Factory for creating a mock CryptoKeyPair
+export function createMockKeyPair(overrides = {}) {
+    return {
+        publicKey: new Uint8Array([1, 2, 3]),
+        secretKey: new Uint8Array([4, 5, 6]),
+        ...overrides,
+    };
+}
+
+// Factory for creating a mock Whisper config
+export function createMockWhisperConfig(overrides = {}) {
+    return {
+        serverUrl: 'https://test-server.com',
+        onCall: jest.fn(),
+        onReady: jest.fn(),
+        focusOnDial: jest.fn(),
+        requestDial: jest.fn(),
+        version: '1.0.0',
+        signingKeyPair: createMockKeyPair(),
+        vapidKey: 'test-vapid-key',
+        iceServers: [{ urls: 'stun:test.com' }],
+        navigator: { serviceWorker: {} },
+        ...overrides,
+    };
+}

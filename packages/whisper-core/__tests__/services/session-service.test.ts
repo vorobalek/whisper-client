@@ -1,4 +1,4 @@
-import { createMockLogger, createMockBase64 } from '../../__mocks__/test-utils';
+import { createMockLogger, createMockBase64, createMockKeyPair } from '../../__mocks__/test-utils';
 import { getSessionService, SessionServiceConfig } from '../../src/services/session-service';
 import { Base64 } from '../../src/utils/base64';
 import { CryptoKeyPair } from '../../src/utils/cryptography';
@@ -19,10 +19,7 @@ describe('SessionService', () => {
     beforeEach(() => {
         mockLogger = createMockLogger();
         mockBase64 = createMockBase64({ '1,2,3': 'encoded-public-key' });
-        mockKeyPair = {
-            publicKey: new Uint8Array([1, 2, 3]),
-            secretKey: new Uint8Array([4, 5, 6]),
-        };
+        mockKeyPair = createMockKeyPair();
         sessionService = getSessionService(mockLogger, mockBase64);
     });
 
