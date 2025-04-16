@@ -13,6 +13,9 @@ import {
     createMockDataChannel,
     createMockPeerConnection,
     createMockWebRTC,
+    createMockBase64,
+    createMockUtf8,
+    createMockCryptography,
 } from '../../../__mocks__/test-utils';
 
 describe('ConnectionSaga (Edge Cases)', () => {
@@ -30,7 +33,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         mockTimeService = createMockTimeService();
         mockCallService = createMockCallService();
         mockSessionService = createMockSessionService();
-        mockBase64 = {
+        mockBase64 = createMockBase64({
             encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
             decode: jest.fn((str) => {
                 if (str.startsWith('encoded-')) {
@@ -38,12 +41,12 @@ describe('ConnectionSaga (Edge Cases)', () => {
                 }
                 return new Uint8Array(Buffer.from(str, 'base64'));
             }),
-        };
-        mockUtf8 = {
+        });
+        mockUtf8 = createMockUtf8({
             encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
             decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
-        };
-        mockCryptography = {
+        });
+        mockCryptography = createMockCryptography({
             generateEncryptionKeyPair: jest.fn(() => ({
                 publicKey: new Uint8Array([1, 2, 3]),
                 secretKey: new Uint8Array([4, 5, 6]),
@@ -57,7 +60,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
                 publicKey: new Uint8Array([13, 14, 15]),
                 secretKey: new Uint8Array([16, 17, 18]),
             })),
-        };
+        });
     });
 
     it('should ignore setDescription when remote description is already set', async () => {

@@ -36,41 +36,56 @@ export function createMockSessionService() {
     };
 }
 
-export function createMockBase64(encodeMap?: Record<string, string>) {
-    return {
-        encode: jest.fn((data: Uint8Array) => {
-            if (encodeMap) {
+export function createMockBase64(arg: any = {}) {
+    // Backward compatibility: if arg has keys other than encode/decode, treat as encodeMap
+    if (typeof arg === 'object' && arg !== null && !('encode' in arg) && !('decode' in arg)) {
+        const encodeMap = arg;
+        return {
+            encode: jest.fn((data: Uint8Array) => {
                 const key = Array.from(data).join(',');
                 if (encodeMap[key]) return encodeMap[key];
-            }
-            return 'encoded-data';
-        }),
-        decode: jest.fn(),
+                return 'encoded-data';
+            }),
+            decode: jest.fn(),
+        };
+    }
+    // New API
+    return {
+        encode: arg.encode || jest.fn((data: Uint8Array) => 'encoded-data'),
+        decode: arg.decode || jest.fn(),
     };
 }
 
-export function createMockUtf8() {
+export function createMockUtf8({ encode, decode }: { encode?: any; decode?: any } = {}) {
     return {
-        encode: jest.fn(),
-        decode: jest.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
+        encode: encode || jest.fn(),
+        decode: decode || jest.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
     };
 }
 
-export function createMockCryptography() {
+export function createMockCryptography(overrides: Partial<{
+    generateEncryptionKeyPair: () => any;
+    generateSharedSymmetricKey: () => any;
+    encrypt: (data: any) => any;
+    decrypt: (data: any) => any;
+    sign: () => any;
+    verifySignature: () => any;
+    generateSigningKeyPair: () => any;
+}> = {}) {
     return {
-        sign: jest.fn().mockReturnValue(new Uint8Array([10, 11, 12])),
-        verifySignature: jest.fn(),
-        generateSigningKeyPair: jest.fn(() => ({
+        generateEncryptionKeyPair: overrides.generateEncryptionKeyPair || jest.fn(() => ({
             publicKey: new Uint8Array([1, 2, 3]),
             secretKey: new Uint8Array([4, 5, 6]),
         })),
-        generateEncryptionKeyPair: jest.fn(() => ({
-            publicKey: new Uint8Array([1, 2, 3]),
-            secretKey: new Uint8Array([4, 5, 6]),
+        generateSharedSymmetricKey: overrides.generateSharedSymmetricKey || jest.fn(() => new Uint8Array([7, 8, 9])),
+        encrypt: overrides.encrypt || jest.fn((data) => data),
+        decrypt: overrides.decrypt || jest.fn((data) => data),
+        sign: overrides.sign || jest.fn(() => new Uint8Array([10, 11, 12])),
+        verifySignature: overrides.verifySignature || jest.fn(() => true),
+        generateSigningKeyPair: overrides.generateSigningKeyPair || jest.fn(() => ({
+            publicKey: new Uint8Array([13, 14, 15]),
+            secretKey: new Uint8Array([16, 17, 18]),
         })),
-        generateSharedSymmetricKey: jest.fn(() => new Uint8Array([1, 2, 3])),
-        encrypt: jest.fn(() => new Uint8Array([42])),
-        decrypt: jest.fn(),
     };
 }
 
