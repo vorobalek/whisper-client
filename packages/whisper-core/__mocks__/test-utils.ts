@@ -60,10 +60,16 @@ export function createMockCryptography() {
     return {
         sign: jest.fn().mockReturnValue(new Uint8Array([10, 11, 12])),
         verifySignature: jest.fn(),
-        generateSigningKeyPair: jest.fn(),
-        generateEncryptionKeyPair: jest.fn(),
-        generateSharedSymmetricKey: jest.fn(),
-        encrypt: jest.fn(),
+        generateSigningKeyPair: jest.fn(() => ({
+            publicKey: new Uint8Array([1, 2, 3]),
+            secretKey: new Uint8Array([4, 5, 6]),
+        })),
+        generateEncryptionKeyPair: jest.fn(() => ({
+            publicKey: new Uint8Array([1, 2, 3]),
+            secretKey: new Uint8Array([4, 5, 6]),
+        })),
+        generateSharedSymmetricKey: jest.fn(() => new Uint8Array([1, 2, 3])),
+        encrypt: jest.fn(() => new Uint8Array([42])),
         decrypt: jest.fn(),
     };
 }
@@ -103,14 +109,14 @@ export function createMockPushConfig(overrides = {}) {
     };
 }
 
-export function createMockWebRTC() {
+export function createMockWebRTC(): any {
     class MockPeerConnection {
         static generateCertificate = jest.fn().mockResolvedValue({});
         constructor(_config?: any) {}
     }
     return {
-        PeerConnection: MockPeerConnection as unknown as typeof RTCPeerConnection,
-        DataChannel: jest.fn() as unknown as typeof RTCDataChannel,
+        PeerConnection: MockPeerConnection as any,
+        DataChannel: jest.fn() as any,
     };
 }
 

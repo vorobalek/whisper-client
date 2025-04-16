@@ -5,101 +5,71 @@ import {
     getConnectionSaga,
 } from '../../../src/services/connection/connection-saga';
 import { newError } from '../../../src/utils/new-error';
+import {
+    createMockLogger,
+    createMockTimeService,
+    createMockCallService,
+    createMockSessionService,
+    createMockDataChannel,
+    createMockPeerConnection,
+    createMockWebRTC,
+} from '../../../__mocks__/test-utils';
 
 describe('ConnectionSaga (Edge Cases)', () => {
-    // Mocks and dependencies (copied from main file)
-    const mockLogger = {
-        debug: jest.fn(),
-        log: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        trace: jest.fn(),
-    };
-    const mockTimeService = {
-        get serverTime() {
-            return 123456789;
-        },
-    };
-    const mockCallService = {
-        dial: jest.fn().mockResolvedValue(undefined),
-        offer: jest.fn().mockResolvedValue(undefined),
-        answer: jest.fn().mockResolvedValue(undefined),
-        ice: jest.fn().mockResolvedValue(undefined),
-        initialize: jest.fn().mockResolvedValue(undefined),
-        update: jest.fn().mockResolvedValue(undefined),
-        close: jest.fn().mockResolvedValue(undefined),
-    };
-    const mockSessionService = {
-        signingPublicKeyBase64: 'mock-signing-public-key',
-        signingPublicKeyBase64Safe: 'mock-signing-public-key-safe',
-        signingKeyPair: {
-            publicKey: new Uint8Array([1, 2, 3]),
-            secretKey: new Uint8Array([4, 5, 6]),
-        },
-        initialize: jest.fn().mockResolvedValue(undefined),
-    };
-    const mockBase64 = {
-        encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
-        decode: jest.fn((str) => {
-            if (str.startsWith('encoded-')) {
-                return Buffer.from(str.substring(8), 'hex');
-            }
-            return new Uint8Array(Buffer.from(str, 'base64'));
-        }),
-    };
-    const mockUtf8 = {
-        encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
-        decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
-    };
-    const mockCryptography = {
-        generateEncryptionKeyPair: jest.fn(() => ({
-            publicKey: new Uint8Array([1, 2, 3]),
-            secretKey: new Uint8Array([4, 5, 6]),
-        })),
-        generateSharedSymmetricKey: jest.fn(() => new Uint8Array([7, 8, 9])),
-        encrypt: jest.fn((data) => data),
-        decrypt: jest.fn((data) => data),
-        sign: jest.fn(() => new Uint8Array([10, 11, 12])),
-        verifySignature: jest.fn(() => true),
-        generateSigningKeyPair: jest.fn(() => ({
-            publicKey: new Uint8Array([13, 14, 15]),
-            secretKey: new Uint8Array([16, 17, 18]),
-        })),
-    };
+    let mockLogger: any;
+    let mockTimeService: any;
+    let mockCallService: any;
+    let mockSessionService: any;
+    let mockBase64: any;
+    let mockUtf8: any;
+    let mockCryptography: any;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        mockLogger = createMockLogger();
+        mockTimeService = createMockTimeService();
+        mockCallService = createMockCallService();
+        mockSessionService = createMockSessionService();
+        mockBase64 = {
+            encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
+            decode: jest.fn((str) => {
+                if (str.startsWith('encoded-')) {
+                    return Buffer.from(str.substring(8), 'hex');
+                }
+                return new Uint8Array(Buffer.from(str, 'base64'));
+            }),
+        };
+        mockUtf8 = {
+            encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
+            decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
+        };
+        mockCryptography = {
+            generateEncryptionKeyPair: jest.fn(() => ({
+                publicKey: new Uint8Array([1, 2, 3]),
+                secretKey: new Uint8Array([4, 5, 6]),
+            })),
+            generateSharedSymmetricKey: jest.fn(() => new Uint8Array([7, 8, 9])),
+            encrypt: jest.fn((data) => data),
+            decrypt: jest.fn((data) => data),
+            sign: jest.fn(() => new Uint8Array([10, 11, 12])),
+            verifySignature: jest.fn(() => true),
+            generateSigningKeyPair: jest.fn(() => ({
+                publicKey: new Uint8Array([13, 14, 15]),
+                secretKey: new Uint8Array([16, 17, 18]),
+            })),
+        };
     });
 
     it('should ignore setDescription when remote description is already set', async () => {
-        // Setup similar to other tests
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
-
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(new Map()),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
-
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        // Setup mocks using test-utils factories
+        const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
+        const mockPeerConnection = createMockPeerConnection(
+            { getStats: jest.fn().mockResolvedValue(new Map()) },
+            mockDataChannel,
+        );
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -115,8 +85,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
         );
 
@@ -157,13 +126,10 @@ describe('ConnectionSaga (Edge Cases)', () => {
     }, 10000);
 
     it('should directly test handling of empty messages in the saga', () => {
-        // Setup mocks for the dependencies needed by the send method
-        const mockDataChannel = {
-            send: jest.fn(),
-        };
+        const mockDataChannel = { send: jest.fn() };
+        const mockWebRTC = createMockWebRTC();
 
-        // Create the original saga implementation
-        const saga = getConnectionSaga(
+        const saga: any = getConnectionSaga(
             'mock-remote-public-key',
             'incoming',
             mockLogger,
@@ -173,39 +139,21 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            {},
-            [], // iceServers
+            mockWebRTC as any,
+            [],
         );
 
-        // We need to patch the private methods to make the test work
-        // The key issue: we need to make sure our patched methods are called by the real implementation
+        saga.getSharedSymmetricKey = () => new Uint8Array([1, 2, 3]);
+        saga.getRtcSendDataChannel = () => mockDataChannel;
 
-        // Create a patched version of the saga object
-        const patchedSaga = Object.create(saga);
-
-        // Create a spy on logger.debug to track the empty message log
-        const debugSpy = jest.spyOn(mockLogger, 'debug');
-
-        // Patch the methods used by send() to avoid errors
-        patchedSaga.getSharedSymmetricKey = () => new Uint8Array([1, 2, 3]);
-        patchedSaga.getRtcSendDataChannel = () => mockDataChannel;
-
-        // Test the real send() method with an empty message
-        patchedSaga.send('');
-
-        // Verify the logger was called with the expected message about an empty message
-        expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining("Message is empty and won't be sent"));
+        saga.send('');
+        expect(mockLogger.debug).toHaveBeenCalledWith(
+            expect.stringContaining('Message is empty'),
+        );
         expect(mockDataChannel.send).not.toHaveBeenCalled();
 
-        // Now test with a whitespace-only message
-        patchedSaga.send('   ');
-
-        // Verify behavior with whitespace
+        saga.send('   ');
         expect(mockDataChannel.send).not.toHaveBeenCalled();
-
-        // Clean up mocks
-        debugSpy.mockRestore();
     });
 
     it('should handle empty messages correctly', async () => {
@@ -254,9 +202,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             ),
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         const saga = getConnectionSaga(
             publicKey,
@@ -268,8 +216,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
         );
 
@@ -343,9 +290,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             ),
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the connection saga
         const publicKey = 'mock-relay-public-key';
@@ -361,8 +308,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
             1000, // Use shorter timeout
         );
@@ -423,9 +369,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             ),
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -441,8 +387,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
             1000, // Short timeout for testing
         );
@@ -511,8 +456,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            {},
+            createMockWebRTC(),
         );
 
         // Clear any previous debug calls
@@ -574,9 +518,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             remoteDescription: null as RTCSessionDescription | null,
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -592,8 +536,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
         );
 
@@ -663,9 +606,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             remoteDescription: { type: 'answer', sdp: 'mock-sdp' } as RTCSessionDescription,
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -681,8 +624,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
         );
 
@@ -749,9 +691,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
             remoteDescription: null as RTCSessionDescription | null,
         };
 
-        const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
-        };
+        const mockWebRTC = createMockWebRTC();
+        // Override PeerConnection to use our mockPeerConnection
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
 
         // Create the saga
         const publicKey = 'mock-remote-public-key';
@@ -767,8 +709,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockBase64,
             mockUtf8,
             mockCryptography,
-            // @ts-ignore
-            mockWebRTC,
+            mockWebRTC as any,
             [], // iceServers
         );
 
