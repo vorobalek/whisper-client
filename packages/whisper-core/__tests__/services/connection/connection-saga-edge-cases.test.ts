@@ -1,11 +1,4 @@
 import {
-    ConnectionSaga,
-    ConnectionSagaState,
-    ConnectionSagaType,
-    getConnectionSaga,
-} from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
-import {
     createMockLogger,
     createMockTimeService,
     createMockCallService,
@@ -17,6 +10,13 @@ import {
     createMockUtf8,
     createMockCryptography,
 } from '../../../__mocks__/test-utils';
+import {
+    ConnectionSaga,
+    ConnectionSagaState,
+    ConnectionSagaType,
+    getConnectionSaga,
+} from '../../../src/services/connection/connection-saga';
+import { newError } from '../../../src/utils/new-error';
 
 describe('ConnectionSaga (Edge Cases)', () => {
     let mockLogger: any;
@@ -150,9 +150,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         saga.getRtcSendDataChannel = () => mockDataChannel;
 
         saga.send('');
-        expect(mockLogger.debug).toHaveBeenCalledWith(
-            expect.stringContaining('Message is empty'),
-        );
+        expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining('Message is empty'));
         expect(mockDataChannel.send).not.toHaveBeenCalled();
 
         saga.send('   ');
@@ -197,19 +195,22 @@ describe('ConnectionSaga (Edge Cases)', () => {
     it('should log relay server address when relay candidate is used', async () => {
         const { saga, mockPeerConnection } = createTestSaga({
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(new Map([
-                    ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
-                    ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
-                ])),
+                getStats: jest.fn().mockResolvedValue(
+                    new Map([
+                        [
+                            'candidate-pair-id',
+                            { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' },
+                        ],
+                        ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
+                    ]),
+                ),
                 readyState: 'connecting',
             },
         });
         saga.setEncryption('mock-encryption-public-key');
         mockLogger.warn.mockClear();
         await saga.open(ConnectionSagaState.Connected);
-        expect(mockLogger.warn).toHaveBeenCalledWith(
-            expect.stringContaining('Using relay server 123.45.67.89'),
-        );
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server 123.45.67.89'));
         saga.abort();
     });
 
@@ -272,19 +273,22 @@ describe('ConnectionSaga (Edge Cases)', () => {
     it('should log relay server address if relay candidate is used (alternative path)', async () => {
         const { saga, mockPeerConnection } = createTestSaga({
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(new Map([
-                    ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
-                    ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
-                ])),
+                getStats: jest.fn().mockResolvedValue(
+                    new Map([
+                        [
+                            'candidate-pair-id',
+                            { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' },
+                        ],
+                        ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
+                    ]),
+                ),
                 readyState: 'connecting',
             },
         });
         saga.setEncryption('mock-encryption-public-key');
         mockLogger.warn.mockClear();
         await saga.open(ConnectionSagaState.Connected);
-        expect(mockLogger.warn).toHaveBeenCalledWith(
-            expect.stringContaining('Using relay server 123.45.67.89'),
-        );
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server 123.45.67.89'));
         saga.abort();
     });
 
@@ -294,9 +298,12 @@ describe('ConnectionSaga (Edge Cases)', () => {
             peerConnectionOverrides: {
                 getStats: jest.fn().mockResolvedValue(
                     new Map([
-                        ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
+                        [
+                            'candidate-pair-id',
+                            { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' },
+                        ],
                         ['local-candidate-id', { candidateType: 'relay', address: '192.168.1.1' }],
-                    ])
+                    ]),
                 ),
                 remoteDescription: null,
             },
@@ -306,21 +313,40 @@ describe('ConnectionSaga (Edge Cases)', () => {
         saga.onStateChanged = (_from: ConnectionSagaState, to: ConnectionSagaState) => stateTransitions.push(to);
         const openPromise = saga.open(ConnectionSagaState.AwaitOffer);
         saga.continue();
-        const encryptedOffer = mockBase64.encode(mockUtf8.decode(JSON.stringify({ type: 'offer', sdp: 'mock-sdp-offer' })));
+        const encryptedOffer = mockBase64.encode(
+            mockUtf8.decode(JSON.stringify({ type: 'offer', sdp: 'mock-sdp-offer' })),
+        );
         await saga.setDescription(encryptedOffer);
-        mockPeerConnection.onicecandidate({ candidate: { toJSON: () => ({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0, usernameFragment: 'u' }) } });
+        mockPeerConnection.onicecandidate({
+            candidate: {
+                toJSON: () => ({
+                    candidate: 'candidate:1 1 UDP ...',
+                    sdpMid: '0',
+                    sdpMLineIndex: 0,
+                    usernameFragment: 'u',
+                }),
+            },
+        });
         mockPeerConnection.onicecandidate({ candidate: null });
         mockPeerConnection.ondatachannel({ channel: mockDataChannel });
-        const encryptedIce = mockBase64.encode(mockUtf8.decode(JSON.stringify({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0 })));
+        const encryptedIce = mockBase64.encode(
+            mockUtf8.decode(JSON.stringify({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0 })),
+        );
         mockPeerConnection.remoteDescription = null;
         await saga.addIceCandidate(encryptedIce);
-        mockPeerConnection.remoteDescription = { type: 'offer', sdp: 'mock-sdp', toJSON: () => ({ type: 'offer', sdp: 'mock-sdp' }) } as any;
+        mockPeerConnection.remoteDescription = {
+            type: 'offer',
+            sdp: 'mock-sdp',
+            toJSON: () => ({ type: 'offer', sdp: 'mock-sdp' }),
+        } as any;
         await saga.addIceCandidate(encryptedIce);
         stateTransitions.push(ConnectionSagaState.AwaitingConnection);
         mockDataChannel.onopen();
         mockDataChannel.onmessage({ data: 'not-an-array-buffer' });
         let received: string | undefined;
-        saga.onMessage = (msg: string) => { received = msg; };
+        saga.onMessage = (msg: string) => {
+            received = msg;
+        };
         mockDataChannel.onmessage({ data: new ArrayBuffer(10) });
         saga.send('  ');
         saga.send('test message');

@@ -3,6 +3,7 @@
 // This file contains tests for error handling and cleanup logic in connection-saga.ts.
 // It specifically tests error handling when closing the peer connection during abort and related flows.
 // The test is moved here as part of a refactor to logically group tests by error and cleanup behavior.
+import { createMockPeerConnection, createMockDataChannel } from '../../../__mocks__/test-utils';
 import {
     ConnectionSaga,
     ConnectionSagaState,
@@ -89,26 +90,12 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const connectionType = 'incoming';
 
         // Create a peer connection that throws when closed
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => ({
-                id: 'data-channel-id',
-                label: 'mock-data-channel',
-                readyState: 'connecting',
-                onopen: null,
-                onmessage: null,
-                close: jest.fn(),
-                send: jest.fn(),
-            })),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
+        const mockPeerConnection = createMockPeerConnection({
             close: jest.fn().mockImplementation(() => {
                 throw new Error('Error closing peer connection');
             }),
-            onicecandidate: null,
-            ondatachannel: null,
-        };
+            remoteDescription: { type: 'offer', sdp: 'mock-sdp' },
+        });
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -169,10 +156,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         );
 
         // Create a minimal saga with spies on key methods
-        const mockPeerConnection = {
-            remoteDescription: null,
-            setRemoteDescription: jest.fn(),
-        };
+        const mockPeerConnection = createMockPeerConnection();
 
         // Helper function to simulate the saga's setDescription behavior
         const testSetDescription = async () => {
@@ -216,120 +200,59 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         errorSpy.mockRestore();
     });
 
-    it('should try to decode invalid ICE candidate in addIceCandidate and throw', () => {
-        // Create a simplified test that just tests the error handling in addIceCandidate
-        // without having to initialize the whole saga
-
-        // Create a mock logger to verify the error is logged
+    it('should throw and log error for invalid ICE candidate in addIceCandidate', async () => {
+        // Arrange
+        const publicKey = 'mock-key';
+        const connectionType = 'incoming';
         const errorSpy = jest.spyOn(mockLogger, 'error');
 
-        // Mock crypto functions to return deterministic values
-        const mockSymmetricKey = new Uint8Array([1, 2, 3]);
-        const mockDecrypt = jest.fn().mockReturnValue(
-            mockUtf8.decode(
-                JSON.stringify({
-                    not_a_valid_ice_candidate: true,
-                }),
-            ),
+        // Мокаем PeerConnection, чтобы не было реального WebRTC
+        const mockPeerConnection = createMockPeerConnection({
+            remoteDescription: { type: 'offer', sdp: 'mock-sdp' },
+        });
+        const mockWebRTC = {
+            PeerConnection: jest.fn(() => mockPeerConnection),
+        };
+
+        // Создаём saga
+        const saga = getConnectionSaga(
+            publicKey,
+            connectionType,
+            mockLogger,
+            mockTimeService,
+            mockCallService,
+            mockSessionService,
+            mockBase64,
+            mockUtf8,
+            mockCryptography,
+            // @ts-ignore
+            mockWebRTC,
+            [],
         );
+        saga.setEncryption('mock-encryption-key');
 
-        // Create a minimal saga with spies on key methods
-        const mockPeerConnection = {
-            remoteDescription: { type: 'offer', sdp: 'mock-sdp' } as RTCSessionDescription,
-            addIceCandidate: jest.fn(),
-        };
+        await saga.open(ConnectionSagaState.New);
 
-        // Helper function to simulate the saga's addIceCandidate behavior
-        const testAddIceCandidate = async () => {
-            try {
-                // This logic replicates the connection-saga.ts addIceCandidate method
-                // Decode the base64 data (dummy for test)
-                const encryptedDataBytes = new Uint8Array([4, 5, 6]);
+        const invalidIceObj = null;
+        const invalidIceJson = JSON.stringify(invalidIceObj);
+        const invalidIceBytes = new Uint8Array(Buffer.from(invalidIceJson, 'utf-8'));
+        mockCryptography.decrypt.mockReturnValueOnce(invalidIceBytes);
+        mockBase64.decode.mockReturnValueOnce(invalidIceBytes);
+        mockUtf8.encode.mockReturnValueOnce(invalidIceJson);
+        const fakeBase64 = 'invalid-ice-base64';
 
-                // Decrypt (this returns our invalid mock data)
-                const remoteDataBytes = mockDecrypt(encryptedDataBytes, mockSymmetricKey);
-
-                // Parse the JSON data
-                const remoteDataString = mockUtf8.encode(remoteDataBytes);
-                const remoteData = JSON.parse(remoteDataString);
-
-                // Validate the format - this should fail with our test data
-                const remoteIceCandidate = remoteData as any;
-                if (
-                    !remoteIceCandidate ||
-                    (remoteIceCandidate.candidate === undefined &&
-                        remoteIceCandidate.sdpMid === undefined &&
-                        remoteIceCandidate.sdpMLineIndex === undefined)
-                ) {
-                    throw newError(
-                        mockLogger,
-                        `Wrong remote WebRTC ice candidate format in incoming connection with mock-key.`,
-                    );
-                }
-
-                if (mockPeerConnection.remoteDescription) {
-                    await mockPeerConnection.addIceCandidate(remoteIceCandidate);
-                } else {
-                    // Cache the candidate
-                    console.log('Caching ICE candidate');
-                }
-            } catch (error) {
-                // Just rethrow the error for the test to catch
-                throw error;
-            }
-        };
-
-        // Execute the test
-        expect(testAddIceCandidate()).rejects.toThrow('Wrong remote WebRTC ice candidate format');
-
-        // Clean up
+        // Act & Assert
+        await expect(saga.addIceCandidate(fakeBase64)).rejects.toThrow('Wrong remote WebRTC ice candidate format');
+        expect(errorSpy).toHaveBeenCalledWith(expect.any(Error));
+        expect(errorSpy.mock.calls[0][0].message).toContain('Wrong remote WebRTC ice candidate format');
         errorSpy.mockRestore();
     });
 
     it('should handle dataChannel.onopen event when state is Closed', async () => {
         // Mock WebRTC objects and their behavior
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'host',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -376,52 +299,13 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
     it('should handle error cases and edge conditions', async () => {
         // Setup mocks
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
+        const mockDataChannel = createMockDataChannel({
             send: jest.fn(() => {
                 throw new Error('Send error');
             }),
-        };
+        });
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(() => {
-                throw new Error('Close error');
-            }),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'relay',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -521,11 +405,11 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const errorSpy = jest.spyOn(mockLogger, 'error');
 
         // Setup mocks that will trigger an error condition
-        const mockBrokenDataChannel: any = {
+        const mockBrokenDataChannel: any = createMockDataChannel({
             send: jest.fn().mockImplementation(() => {
-                throw new Error('Test error');
+                throw new Error('Test error sending data');
             }),
-        };
+        });
 
         // Create the saga
         const saga = getConnectionSaga(
@@ -567,15 +451,11 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const errorSpy = jest.spyOn(mockLogger, 'error');
 
         // Set up the data channel with a mock that throws on send
-        const mockDataChannel: any = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'open',
+        const mockDataChannel: any = createMockDataChannel({
             send: jest.fn().mockImplementation(() => {
                 throw new Error('Test error sending data');
             }),
-            close: jest.fn(),
-        };
+        });
 
         // Create a simplified saga object with just enough to test the send method
         const saga: ConnectionSaga = {
@@ -618,30 +498,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
 
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn(),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -723,16 +582,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(),
-            createOffer: jest.fn(),
-            createAnswer: jest.fn(),
-            setLocalDescription: jest.fn(),
-            setRemoteDescription: jest.fn(),
-            close: jest.fn(),
-            onicecandidate: null,
-            ondatachannel: null,
-        };
+        const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -770,26 +620,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
 
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            close: jest.fn(),
-            onicecandidate: null,
-            ondatachannel: null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -834,16 +667,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(),
-            createOffer: jest.fn(),
-            createAnswer: jest.fn(),
-            setLocalDescription: jest.fn(),
-            setRemoteDescription: jest.fn(),
-            close: jest.fn(),
-            onicecandidate: null,
-            ondatachannel: null,
-        };
+        const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -892,44 +716,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
     it('should handle message callback errors', async () => {
         // Mock dependencies
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'open',
-            onopen: null,
-            onmessage: null,
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: null,
-            ondatachannel: null,
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'host',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -996,30 +785,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
     it('should handle invalid data formats and advanced scenarios', async () => {
         // Setup mocks
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(new Map()),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -1093,26 +861,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'outgoing';
 
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            close: jest.fn(),
-            onicecandidate: null,
-            ondatachannel: null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -1155,48 +906,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'outgoing';
 
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'host',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -1299,50 +1011,13 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const connectionType = 'outgoing';
 
         const mockError = new Error('Failed to close sending DataChannel');
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
+        const mockDataChannel = createMockDataChannel({
             close: jest.fn().mockImplementation(() => {
                 throw mockError;
             }),
-            send: jest.fn(),
-        };
+        });
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'host',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
@@ -1426,60 +1101,18 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const connectionType = 'outgoing';
 
         const mockError = new Error('Failed to close receiving DataChannel');
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
-        };
+        const mockDataChannel = createMockDataChannel();
 
-        const mockReceiveDataChannel = {
+        const mockReceiveDataChannel = createMockDataChannel({
             id: 'receive-data-channel-id',
             label: 'mock-receive-data-channel',
             readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
             close: jest.fn().mockImplementation(() => {
                 throw mockError;
             }),
-            send: jest.fn(),
-        };
+        });
 
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'host',
-                            address: '192.168.1.1',
-                        },
-                    ],
-                ]),
-            ),
-            remoteDescription: null as RTCSessionDescription | null,
-        };
+        const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),

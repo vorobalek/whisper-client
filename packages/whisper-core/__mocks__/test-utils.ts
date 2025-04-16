@@ -88,29 +88,35 @@ export function createMockUtf8({ encode, decode }: { encode?: any; decode?: any 
     };
 }
 
-export function createMockCryptography(overrides: Partial<{
-    generateEncryptionKeyPair: () => any;
-    generateSharedSymmetricKey: () => any;
-    encrypt: (data: any) => any;
-    decrypt: (data: any) => any;
-    sign: () => any;
-    verifySignature: () => any;
-    generateSigningKeyPair: () => any;
-}> = {}) {
+export function createMockCryptography(
+    overrides: Partial<{
+        generateEncryptionKeyPair: () => any;
+        generateSharedSymmetricKey: () => any;
+        encrypt: (data: any) => any;
+        decrypt: (data: any) => any;
+        sign: () => any;
+        verifySignature: () => any;
+        generateSigningKeyPair: () => any;
+    }> = {},
+) {
     return {
-        generateEncryptionKeyPair: overrides.generateEncryptionKeyPair || jest.fn(() => ({
-            publicKey: new Uint8Array([1, 2, 3]),
-            secretKey: new Uint8Array([4, 5, 6]),
-        })),
+        generateEncryptionKeyPair:
+            overrides.generateEncryptionKeyPair ||
+            jest.fn(() => ({
+                publicKey: new Uint8Array([1, 2, 3]),
+                secretKey: new Uint8Array([4, 5, 6]),
+            })),
         generateSharedSymmetricKey: overrides.generateSharedSymmetricKey || jest.fn(() => new Uint8Array([7, 8, 9])),
         encrypt: overrides.encrypt || jest.fn((data) => data),
         decrypt: overrides.decrypt || jest.fn((data) => data),
         sign: overrides.sign || jest.fn(() => new Uint8Array([10, 11, 12])),
         verifySignature: overrides.verifySignature || jest.fn(() => true),
-        generateSigningKeyPair: overrides.generateSigningKeyPair || jest.fn(() => ({
-            publicKey: new Uint8Array([13, 14, 15]),
-            secretKey: new Uint8Array([16, 17, 18]),
-        })),
+        generateSigningKeyPair:
+            overrides.generateSigningKeyPair ||
+            jest.fn(() => ({
+                publicKey: new Uint8Array([13, 14, 15]),
+                secretKey: new Uint8Array([16, 17, 18]),
+            })),
     };
 }
 
@@ -475,7 +481,10 @@ export function createMockDataChannel(overrides: Partial<MockRTCDataChannel> = {
     };
 }
 
-export function createMockPeerConnection(overrides: Partial<MockRTCPeerConnection> = {}, mockDataChannel?: MockRTCDataChannel): MockRTCPeerConnection {
+export function createMockPeerConnection(
+    overrides: Partial<MockRTCPeerConnection> = {},
+    mockDataChannel?: MockRTCDataChannel,
+): MockRTCPeerConnection {
     return {
         createDataChannel: jest.fn(() => mockDataChannel || createMockDataChannel()),
         createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),

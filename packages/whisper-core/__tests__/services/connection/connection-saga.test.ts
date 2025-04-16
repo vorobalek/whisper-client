@@ -1,11 +1,4 @@
 import {
-    ConnectionSaga,
-    ConnectionSagaState,
-    ConnectionSagaType,
-    getConnectionSaga,
-} from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
-import {
     createMockLogger,
     createMockTimeService,
     createMockCallService,
@@ -14,8 +7,15 @@ import {
     createMockUtf8,
     createMockCryptography,
     createMockPeerConnection,
-    createMockDataChannel
+    createMockDataChannel,
 } from '../../../__mocks__/test-utils';
+import {
+    ConnectionSaga,
+    ConnectionSagaState,
+    ConnectionSagaType,
+    getConnectionSaga,
+} from '../../../src/services/connection/connection-saga';
+import { newError } from '../../../src/utils/new-error';
 
 describe('ConnectionSaga', () => {
     let mockLogger: ReturnType<typeof createMockLogger>;
