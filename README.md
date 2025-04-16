@@ -10,23 +10,26 @@
 
 ## ✨ Features
 
--   ***Multiple dialogs*** (multi-peer support)
--   ***Replies***
--   ***Emoji reactions***
--   ***Typing indication***
--   ***Message status indicators*** (sent / delivered / read)
--   ***Push notifications*** (with user consent)
--   ***Encrypted local storage*** (password-protected, never leaves your device)
--   ***End-to-end encrypted WebRTC data channels***
--   ***QR code sharing and scanning*** for public keys
--   ***Version update notifications***
--   ***Full transparency of protocol and cryptography*** (see privacy info popup)
--   ***Full test coverage and source code are available***
--   ***No registration or disclosure of any personal data required***
--   ***Dual peer-to-peer channels*** (incoming/outgoing) for enhanced reliability and to circumvent regional restrictions
--   ***Seamless fallback to relay servers*** when direct P2P connection is not possible
--   ***Zero trust required*** — neither backend servers, relay servers, nor counterparties can compromise message confidentiality; security is enforced at the protocol level
--   ***Private messages are unlinkable*** — it is impossible to determine the sender or recipient, and transmitted messages contain no identifying marks
+-   **_Multiple dialogs_** (multi-peer support)
+-   **_Replies_**
+-   **_Emoji reactions_**
+-   **_Typing indication_**
+-   **_Message status indicators_** (sent / delivered / read)
+-   **_Push notifications_** (with user consent)
+-   **_Encrypted local storage_** (password-protected, never leaves your device)
+-   **_End-to-end encrypted WebRTC data channels_**
+-   **_QR code sharing and scanning_** for public keys
+-   **_Version update notifications_**
+-   **_Full transparency of protocol and cryptography_** (see privacy info popup)
+-   **_Full test coverage and source code are available_**
+-   **_No registration or disclosure of any personal data required_**
+-   **_Dual peer-to-peer channels_** (incoming/outgoing) for enhanced reliability and to circumvent regional
+    restrictions
+-   **_Seamless fallback to relay servers_** when direct P2P connection is not possible
+-   **_Zero trust required_** — neither backend servers, relay servers, nor counterparties can compromise message
+    confidentiality; security is enforced at the protocol level
+-   **_Private messages are unlinkable_** — it is impossible to determine the sender or recipient, and transmitted
+    messages contain no identifying marks
 
 ---
 
@@ -55,11 +58,14 @@ protocol is designed for **maximum privacy, security, and user control**.
 >
 > -   All data transfers are time-sensitive, signed, and verified by both server and recipient.
 > -   Private messages use end-to-end encryption with a unique key refreshed on each reconnection.
-> -   Chat history and your private signature key are stored encrypted, protected by your password, and never leave your device.
+> -   Chat history and your private signature key are stored encrypted, protected by your password, and never leave your
+>     device.
 > -   All WebRTC data is transmitted with end-to-end encryption.
-> -   The Whisper server only stores your public signature key and, if you consent, your push subscription. It relays data without retention or modification.
+> -   The Whisper server only stores your public signature key and, if you consent, your push subscription. It relays
+>     data without retention or modification.
 > -   All communication with the server is over HTTPS.
-> -   **No registration, no personal data collection, and no trust required — privacy and unlinkability are enforced by design.**
+> -   **No registration, no personal data collection, and no trust required — privacy and unlinkability are enforced by
+>     design.**
 
 > See the [Whisper Protocol Diagram (SVG)](docs/Whisper%20Proto.svg) for a technical overview.
 
@@ -69,12 +75,19 @@ protocol is designed for **maximum privacy, security, and user control**.
 
 The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provides:
 
--   **Key Generation**: Each user generates a signing key pair (for authentication and integrity) — this is your persistent identity and "account." Encryption key pairs, in contrast, are generated for every new connection or reconnection to a peer, ensuring that end-to-end encryption keys are always fresh and never reused.
--   **Registration**: Users register their public signing key and (optionally) push subscription with the server. All registration data is signed and time-sensitive.
--   **Connection Establishment**: Peer-to-peer connections are established using WebRTC, with signaling and authentication handled via the server. All signaling messages are also signed and time-sensitive.
--   **End-to-End Encryption**: Each session uses a unique, ephemeral encryption key derived via Diffie-Hellman, never stored or transmitted.
--   **Message Exchange**: All messages are encrypted and signed. The server only relays encrypted payloads and never has the ability to modify, or inspect this content.
--   **Push Notifications**: Optional push notifications are supported via VAPID and Web Push, with subscriptions stored only if the user consents.
+-   **Key Generation**: Each user generates a signing key pair (for authentication and integrity) — this is your
+    persistent identity and "account." Encryption key pairs, in contrast, are generated for every new connection or
+    reconnection to a peer, ensuring that end-to-end encryption keys are always fresh and never reused.
+-   **Registration**: Users register their public signing key and (optionally) push subscription with the server. All
+    registration data is signed and time-sensitive.
+-   **Connection Establishment**: Peer-to-peer connections are established using WebRTC, with signaling and
+    authentication handled via the server. All signaling messages are also signed and time-sensitive.
+-   **End-to-End Encryption**: Each session uses a unique, ephemeral encryption key derived via Diffie-Hellman, never
+    stored or transmitted.
+-   **Message Exchange**: All messages are encrypted and signed. The server only relays encrypted payloads and never has
+    the ability to modify, or inspect this content.
+-   **Push Notifications**: Optional push notifications are supported via VAPID and Web Push, with subscriptions stored
+    only if the user consents.
 
 ---
 
