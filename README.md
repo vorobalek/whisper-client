@@ -8,24 +8,29 @@
 
 ---
 
-## Features
+## ✨ Features
 
--   Multiple dialogs (multi-peer support)
--   Replies and message threading
--   Emoji reactions
--   Typing indicators
--   Message status indicators (sent / delivered / read)
--   Push notifications (with user consent)
--   Encrypted local storage (password-protected, never leaves your device)
--   End-to-end encrypted WebRTC data channels
--   QR code sharing and scanning for public keys
--   Version update notifications
--   Full protocol and cryptography transparency (see privacy info popup)
--   Full source code and test coverage available
+-   ***Multiple dialogs*** (multi-peer support)
+-   ***Replies***
+-   ***Emoji reactions***
+-   ***Typing indication***
+-   ***Message status indicators*** (sent / delivered / read)
+-   ***Push notifications*** (with user consent)
+-   ***Encrypted local storage*** (password-protected, never leaves your device)
+-   ***End-to-end encrypted WebRTC data channels***
+-   ***QR code sharing and scanning*** for public keys
+-   ***Version update notifications***
+-   ***Full transparency of protocol and cryptography*** (see privacy info popup)
+-   ***Full test coverage and source code are available***
+-   ***No registration or disclosure of any personal data required***
+-   ***Dual peer-to-peer channels*** (incoming/outgoing) for enhanced reliability and to circumvent regional restrictions
+-   ***Seamless fallback to relay servers*** when direct P2P connection is not possible
+-   ***Zero trust required*** — neither backend servers, relay servers, nor counterparties can compromise message confidentiality; security is enforced at the protocol level
+-   ***Private messages are unlinkable*** — it is impossible to determine the sender or recipient, and transmitted messages contain no identifying marks
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
 Planned features (all to be implemented without compromising the core privacy and security principles):
 
@@ -40,46 +45,40 @@ Planned features (all to be implemented without compromising the core privacy an
 
 ---
 
-## Overview
+## 🛡️ Overview
 
 **Whisper** is a privacy-first, end-to-end encrypted messenger protocol and reference application. All cryptographic
 operations are performed client-side, ensuring that your private data and keys never leave your device unencrypted. The
-protocol is designed for maximum privacy, security, and user control.
+protocol is designed for **maximum privacy, security, and user control**.
 
--   All data transfers are time-sensitive, signed, and verified by both server and recipient.
--   Private messages use end-to-end encryption with a unique key refreshed on each reconnection.
--   Chat history and your private signature key are stored encrypted, protected by your password, and never leave your
-    device.
--   All WebRTC data is transmitted with end-to-end encryption.
--   The Whisper server only stores your public signature key and, if you consent, your push subscription. It relays data
-    without retention or modification.
--   All communication with the server is over HTTPS.
+> **Key Privacy Guarantees:**
+>
+> -   All data transfers are time-sensitive, signed, and verified by both server and recipient.
+> -   Private messages use end-to-end encryption with a unique key refreshed on each reconnection.
+> -   Chat history and your private signature key are stored encrypted, protected by your password, and never leave your device.
+> -   All WebRTC data is transmitted with end-to-end encryption.
+> -   The Whisper server only stores your public signature key and, if you consent, your push subscription. It relays data without retention or modification.
+> -   All communication with the server is over HTTPS.
+> -   **No registration, no personal data collection, and no trust required — privacy and unlinkability are enforced by design.**
 
 > See the [Whisper Protocol Diagram (SVG)](docs/Whisper%20Proto.svg) for a technical overview.
 
 ---
 
-## Protocol Description
+## 🔬 Protocol Description
 
 The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provides:
 
--   **Key Generation**: Each user generates a signing key pair (for authentication and integrity) — this is your
-    persistent identity and "account". Encryption key pairs, in contrast, are generated for every new connection or
-    reconnection to a peer, ensuring that end-to-end encryption keys are always fresh and never reused.
--   **Registration**: Users register their public signing key and (optionally) push subscription with the server. All
-    registration data is signed and time-sensitive.
--   **Connection Establishment**: Peer-to-peer connections are established using WebRTC, with signaling and
-    authentication handled via the server. All signaling messages are signed and time-sensitive.
--   **End-to-End Encryption**: Each session uses a unique, ephemeral encryption key derived via Diffie-Hellman, never
-    stored or transmitted.
--   **Message Exchange**: All messages are encrypted and signed. The server only relays encrypted payloads and never
-    stores or inspects message content.
--   **Push Notifications**: Optional push notifications are supported via VAPID and Web Push, with subscriptions stored
-    only if the user consents.
+-   **Key Generation**: Each user generates a signing key pair (for authentication and integrity) — this is your persistent identity and "account." Encryption key pairs, in contrast, are generated for every new connection or reconnection to a peer, ensuring that end-to-end encryption keys are always fresh and never reused.
+-   **Registration**: Users register their public signing key and (optionally) push subscription with the server. All registration data is signed and time-sensitive.
+-   **Connection Establishment**: Peer-to-peer connections are established using WebRTC, with signaling and authentication handled via the server. All signaling messages are also signed and time-sensitive.
+-   **End-to-End Encryption**: Each session uses a unique, ephemeral encryption key derived via Diffie-Hellman, never stored or transmitted.
+-   **Message Exchange**: All messages are encrypted and signed. The server only relays encrypted payloads and never has the ability to modify, or inspect this content.
+-   **Push Notifications**: Optional push notifications are supported via VAPID and Web Push, with subscriptions stored only if the user consents.
 
 ---
 
-## Getting Started & Usage Example
+## 🚀 Getting Started & Usage Example
 
 ### [Minimal Integration](docs/example.min.html)
 
@@ -239,6 +238,6 @@ whisper.get('<peer public key>').send('Hello, Whisper!');
 
 ---
 
-## Test Coverage & Source Code
+## 🧪 Test Coverage & Source Code
 
 -   [View coverage and source code online](https://whisper.vorobalek.dev/coverage)
