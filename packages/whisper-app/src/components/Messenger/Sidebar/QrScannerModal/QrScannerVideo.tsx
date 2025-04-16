@@ -21,7 +21,7 @@ const QrScannerVideo: React.FC<QrScannerVideoProps> = ({ paused, hidden, onPlay,
 
     return (
         <video
-            ref={ref}
+            ref={ref as React.RefObject<HTMLVideoElement>}
             muted
             autoPlay
             playsInline
