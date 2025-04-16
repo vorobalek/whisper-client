@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 
 export function usePermissionOverlay() {
     const [showPermissionOverlay, setShowPermissionOverlay] = useState<boolean>(false);
-    const resolveRef = useRef<() => void | undefined>(undefined);
+    const resolveRef = useRef<() => void>();
 
     const permissionOverlayOnClick = useCallback(() => {
         if (resolveRef.current) {
