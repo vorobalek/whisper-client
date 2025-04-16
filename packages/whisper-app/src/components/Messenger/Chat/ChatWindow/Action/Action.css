@@ -1,0 +1,8 @@
+.action {
+    max-width: 60%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    display: inline-block;
+    margin: 10px 0;
+}

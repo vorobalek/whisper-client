@@ -1,0 +1,126 @@
+:root {
+    --message-input-height: 0px;
+    --message-input-input-bg-color: #eaeaea;
+    --message-input-input-bg-color-disabled: #cccccc;
+    --message-input-input-text-color: #000000;
+    --message-input-button-bg-color-disabled: #a0a0a0;
+    --message-input-reply-to-you-text-color: #333;
+    --message-input-reply-to-peer-text-color: #333;
+    --message-input-reply-to-you-bg-color: #a4cde3;
+    --message-input-reply-to-peer-bg-color: #d1d1d1;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --message-input-input-bg-color: #242728;
+        --message-input-input-bg-color-disabled: #35393b;
+        --message-input-button-bg-color-disabled: #4e5457;
+        --message-input-input-text-color: #e8e6e3;
+        --message-input-reply-to-you-text-color: #c5c3c0;
+        --message-input-reply-to-peer-text-color: #c5c3c0;
+        --message-input-reply-to-you-bg-color: #1d475e;
+        --message-input-reply-to-peer-bg-color: #323638;
+    }
+}
+@media (max-width: 768px) {
+    :root {
+        --message-input-bg-color: #f5f5f5;
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --message-input-bg-color: #1e2021;
+        }
+    }
+}
+.message-input {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0 15px 20px;
+    align-items: stretch;
+    justify-content: center;
+    .typing-area {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            color: var(--message-input-input-text-color);
+            background-color: var(--message-input-input-bg-color);
+            margin-right: 10px;
+            outline: none;
+        }
+        input:disabled {
+            background-color: var(--message-input-input-bg-color-disabled);
+            cursor: not-allowed;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--button-text-color);
+            background-color: var(--button-primary-bg-color);
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: var(--message-input-button-bg-color-disabled);
+            cursor: not-allowed;
+        }
+        button:hover {
+            background-color: var(--button-primary-hover-bg-color);
+            font-size: 16px;
+        }
+        button,
+        button:hover {
+            border-radius: 20px !important;
+        }
+    }
+    .reply-to {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 10px;
+        align-items: center;
+        cursor: pointer;
+        .icon {
+            font-size: 18px;
+            padding: 5px;
+        }
+        .icon.reset {
+            margin-left: auto;
+        }
+        .you {
+            background-color: var(--message-input-reply-to-you-bg-color);
+            color: var(--message-input-reply-to-you-text-color);
+        }
+        .peer {
+            background-color: var(--message-input-reply-to-peer-bg-color);
+            color: var(--message-input-reply-to-peer-text-color);
+        }
+        .you,
+        .peer {
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+}
+@media (max-width: 768px) {
+    .message-input {
+        position: absolute;
+        bottom: 0;
+        padding: 20px;
+        width: 100%;
+        background-color: var(--message-input-bg-color);
+    }
+    @media (display-mode: standalone) {
+        .message-input {
+            padding: 10px 20px 30px 20px;
+            min-height: 90px;
+        }
+    }
+}

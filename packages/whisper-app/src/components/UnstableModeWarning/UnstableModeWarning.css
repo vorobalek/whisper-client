@@ -1,0 +1,33 @@
+:root {
+    --unstable-mode-warning-height: 0px;
+    --unstable-mode-bg-color: #ff0000;
+    --unstable-mode-text-color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --unstable-mode-bg-color: #cc0000;
+        --unstable-mode-text-color: #e8e6e3;
+    }
+}
+.unstable-mode-warning {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: var(--unstable-mode-bg-color);
+    color: var(--unstable-mode-text-color);
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+    z-index: 10001;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+@media (max-width: 768px) {
+    .unstable-mode-warning {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 10001;
+    }
+}

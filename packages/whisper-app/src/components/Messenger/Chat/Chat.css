@@ -1,0 +1,20 @@
+.chat {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--messenger-bg-color);
+    position: relative;
+    width: 60%;
+}
+@media (max-width: 768px) {
+    .chat {
+        position: absolute;
+        top: calc(var(--navbar-height) + var(--unstable-mode-warning-height));
+        left: 0;
+        width: 100%;
+        height: calc(100% - var(--navbar-height) - var(--unstable-mode-warning-height));
+        order: 1;
+    }
+    .chat.hidden {
+        display: none;
+    }
+}

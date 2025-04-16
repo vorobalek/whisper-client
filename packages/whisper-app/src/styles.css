@@ -1,0 +1,72 @@
+:root {
+    --button-bg-color: #6c757d;
+    --button-hover-bg-color: #5a6268;
+    --button-primary-bg-color: #0084ff;
+    --button-primary-hover-bg-color: #006bbd;
+    --background-color: #e8e8e8;
+    --button-text-color: #ffffff;
+    --text-color: #000000;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --button-bg-color: #585f63;
+        --button-hover-bg-color: #494f52;
+        --button-primary-bg-color: #006acc;
+        --button-primary-hover-bg-color: #005697;
+        --background-color: #25282a;
+        --button-text-color: #e8e6e3;
+        --text-color: #e8e6e3;
+    }
+}
+*,
+::before,
+::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#root,
+body,
+html {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#root,
+body,
+button,
+input,
+textarea {
+    font-family: 'JetBrains Mono', monospace;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variant-ligatures: normal;
+    background: var(--background-color);
+    color: var(--text-color);
+}
+input,
+textarea {
+    font-size: 16px !important;
+}
+button {
+    cursor: pointer;
+}
+a,
+a:visited,
+.link,
+.link:visited {
+    color: var(--button-primary-bg-color);
+    text-decoration: none;
+}
+
+a:hover,
+a:focus,
+a:active,
+.link:hover,
+.link:focus,
+.link:active {
+    color: var(--button-primary-hover-bg-color);
+    text-decoration: underline;
+}

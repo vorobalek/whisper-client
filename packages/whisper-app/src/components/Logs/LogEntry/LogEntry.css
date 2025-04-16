@@ -1,0 +1,34 @@
+:root {
+    --log-trace-text-color: #9e9e9e;
+    --log-debug-text-color: #2196f3;
+    --log-info-text-color: #4caf50;
+    --log-warn-text-color: #ffc107;
+    --log-error-text-color: #f44336;
+}
+
+.log-container {
+    pre {
+        padding: 10px;
+        word-break: break-word;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+    }
+    .time {
+        color: var(--log-overlay-text-color);
+    }
+    .trace {
+        color: var(--log-trace-text-color);
+    }
+    .debug {
+        color: var(--log-debug-text-color);
+    }
+    .info {
+        color: var(--log-info-text-color);
+    }
+    .warn {
+        color: var(--log-warn-text-color);
+    }
+    .error {
+        color: var(--log-error-text-color);
+    }
+}

@@ -1,0 +1,63 @@
+{
+    "name": "@whisper/frontend",
+    "version": "0.0.1-beta",
+    "description": "Whisper Messenger SDK – Beta 0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vorobalek/whisper-frontend.git"
+    },
+    "workspaces": [
+        "packages/*"
+    ],
+    "private": true,
+    "scripts": {
+        "prettify": "npx prettier . --write",
+        "start": "npm run generate-coverage && webpack serve --env environment=serve",
+        "build": "npm run prettify && npx webpack --env environment=local && npm run generate-coverage && npm run copy-coverage",
+        "publish": "npm run prettify && npx webpack --env environment=staging && npm run generate-coverage && npm run copy-coverage",
+        "analyze": "npx webpack --config webpack.analyze.config.js --env environment=local",
+        "generate-coverage": "cd packages/whisper-core && npm run test:coverage && cd ../..",
+        "clean-lcov-report": "rm -rf packages/whisper-core/coverage/lcov-report",
+        "copy-coverage": "npm run clean-lcov-report && mkdir -p dist/coverage && cp -r packages/whisper-core/coverage/. dist/coverage/"
+    },
+    "prettier": {
+        "printWidth": 120,
+        "tabWidth": 4,
+        "useTabs": false,
+        "semi": true,
+        "singleQuote": true,
+        "jsxSingleQuote": true,
+        "trailingComma": "all",
+        "arrowParens": "always",
+        "bracketSpacing": true,
+        "quoteProps": "consistent",
+        "proseWrap": "always",
+        "htmlWhitespaceSensitivity": "css",
+        "vueIndentScriptAndStyle": true,
+        "endOfLine": "lf",
+        "singleAttributePerLine": true,
+        "bracketSameLine": false,
+        "embeddedLanguageFormatting": "auto",
+        "insertPragma": false,
+        "requirePragma": false,
+        "plugins": [
+            "@trivago/prettier-plugin-sort-imports"
+        ]
+    },
+    "dependencies": {
+        "@whisper/core": "^0.0.1-beta"
+    },
+    "devDependencies": {
+        "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+        "css-minimizer-webpack-plugin": "^7.0.0",
+        "json-minimizer-webpack-plugin": "^5.0.1",
+        "mini-css-extract-plugin": "^2.9.2",
+        "prettier": "^3.3.3",
+        "terser-webpack-plugin": "^5.3.14",
+        "webpack": "^5.95.0",
+        "webpack-bundle-analyzer": "^4.10.2",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^5.1.0",
+        "webpack-stats-plugin": "^1.1.3"
+    }
+}

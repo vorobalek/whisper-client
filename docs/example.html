@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+    <head></head>
+    <body></body>
+    <script>
+        (function (w, h, s, p, r, m, i, n) {
+            if (w[p]) return;
+            m = 1 * new Date();
+            w[p] = {};
+            w[p].t = m;
+            r = h.getElementsByTagName(s)[0];
+            i = h.createElement(s);
+            i.async = true;
+            i.src = 'https://whisper.vorobalek.dev/core.min.js?_=' + m;
+            i.onload = function () {
+                n = Whisper.getPrototype(console);
+                n.initialize({
+                    onMayWorkUnstably: (reason) => {
+                        console.warn(reason);
+                    },
+                    onTrace: (...args) => {
+                        console.trace(...args);
+                    },
+                    onDebug: (...args) => {
+                        console.debug(...args);
+                    },
+                    onLog: (...args) => {
+                        console.log(...args);
+                    },
+                    onWarn: (...args) => {
+                        console.warn(...args);
+                    },
+                    onError: (...args) => {
+                        console.error(...args);
+                    },
+                    serverUrl: 'https://cluster.vorobalek.dev/whisper',
+                    version: `${m}`,
+                    onNewVersion: () => {
+                        console.warn('Update needed!');
+                    },
+                    vapidKey: 'BHAYDRAjMWXfg7dxFIOZYNLlxrVDohy_PbN7SXcrXapiZq0Jnt0VXsAx6ytkLArVVFDSfula4VRWm5HDvkVVRbA',
+                    onPermissionDefault: () => {
+                        console.warn('Permissions default!');
+                    },
+                    onPermissionGranted: () => {
+                        console.warn('Permissions granted!');
+                    },
+                    onPermissionDenied: () => {
+                        console.warn('Permissions denied!');
+                    },
+                    signingKeyPair: n.generateSigningKeyPair(),
+                    onIncomingConnection: (connection) => console.warn('Incoming connection', connection),
+                    iceServers: [
+                        {
+                            urls: 'stun:coturn.sfo3.do.vorobalek.dev:3478',
+                        },
+                        {
+                            urls: 'stun:coturn.ams3.do.vorobalek.dev:3478',
+                        },
+                        {
+                            urls: 'stun:coturn.fra1.do.vorobalek.dev:3478',
+                        },
+                        {
+                            urls: 'turn:coturn.sfo3.do.vorobalek.dev:3478',
+                            username: 'anonymous',
+                            credential: 'anonymous',
+                        },
+                        {
+                            urls: 'turn:coturn.ams3.do.vorobalek.dev:3478',
+                            username: 'anonymous',
+                            credential: 'anonymous',
+                        },
+                        {
+                            urls: 'turn:coturn.fra1.do.vorobalek.dev:3478',
+                            username: 'anonymous',
+                            credential: 'anonymous',
+                        },
+                    ],
+                    focusOnDial: (peerPublicKey) => {
+                        console.warn('Dial!', peerPublicKey);
+                        return Promise.resolve(true);
+                    },
+                    requestDial: (peerPublicKey) => {
+                        if (window.confirm(`Incoming connection request from ${peerPublicKey}.\nAccept?`)) {
+                            return Promise.resolve(true);
+                        }
+                        console.warn('Declined.', peerPublicKey);
+                        return Promise.resolve(false);
+                    },
+                }).then((x) => {
+                    w[p] = x;
+                });
+            };
+            r.parentNode.insertBefore(i, r);
+        })(window, document, 'script', 'whisper');
+    </script>
+</html>

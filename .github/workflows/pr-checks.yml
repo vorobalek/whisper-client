@@ -1,0 +1,46 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests and generate coverage
+        id: test_cov
+        run: |
+          set -o pipefail
+          npm run generate-coverage 2>&1 | tee test.log
+      - name: Check test result
+        id: check_test
+        run: |
+          if grep -q "FAIL" test.log; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          else
+            echo "failed=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Generate Markdown coverage summary
+        if: steps.check_test.outputs.failed == 'false'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          lcov-file: packages/whisper-core/coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+      - name: Comment test errors on PR
+        if: steps.check_test.outputs.failed == 'true'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: test.log
+          comment_tag: TEST_ERRORS 

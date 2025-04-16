@@ -1,0 +1,52 @@
+:root {
+    --log-overlay-text-color: #ffffff;
+    --log-overlay-bg-color: rgba(0, 0, 0, 0.7);
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --log-overlay-text-color: #e8e6e3;
+        --log-overlay-bg-color: rgba(0, 0, 0, 0.7);
+    }
+}
+.toggle-log-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    font-size: 10pt;
+    color: var(--button-bg-color);
+    cursor: pointer;
+}
+
+.toggle-log-btn:hover {
+    color: var(--button-hover-bg-color);
+}
+.log-wrapper {
+    position: absolute;
+    top: calc(var(--unstable-mode-warning-height) + var(--navbar-height));
+    left: 0;
+    background-color: var(--log-overlay-bg-color);
+    color: var(--log-overlay-text-color);
+    z-index: 1000;
+    display: flex;
+    height: calc(100% - var(--unstable-mode-warning-height) - var(--navbar-height));
+    width: 100vw;
+    .log-container {
+        overflow-y: auto;
+        height: calc(100% - 40px);
+        width: 100%;
+    }
+}
+@media (max-width: 768px) {
+    .toggle-log-btn {
+        bottom: calc(var(--message-input-height) + 10px);
+    }
+    .log-wrapper {
+        height: calc(100% - var(--unstable-mode-warning-height) - var(--navbar-height) - var(--message-input-height));
+    }
+    @media (display-mode: standalone) {
+        .toggle-log-btn {
+            bottom: max(calc(var(--message-input-height) + 10px), 20px);
+        }
+    }
+}

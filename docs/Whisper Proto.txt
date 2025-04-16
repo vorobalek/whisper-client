@@ -1,0 +1,529 @@
+title Whisper Proto
+
+materialdesignicons F0004 Alice
+image data:image/png;base64,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 Whisper
+materialdesignicons F048B STUN/TURN
+materialdesignicons F0004 Bob
+
+group Registration
+
+Alice->Alice:generate_signing_key_pair();
+activate Alice
+Alice<<--Alice:[\n  alice_public_signing_key,\n  alice_private_signing_key\n]
+deactivate Alice
+
+Alice->Alice:gather_webpush_subscription();
+activate Alice
+note left of Alice:alice_webpush_subscription = [\n  alice_webpush_subscription_endpoint,\n  alice_webpush_subscription_expiration,\n  [\n    alice_webpush_subscription_keys_p256dh,\n    alice_webpush_subscription_keys_auth\n  ]\n]
+Alice<<--Alice:alice_webpush_subscription
+deactivate Alice
+
+note left of Alice:alice_update_data = [\n  alice_public_signing_key,\n  alice_webpush_subscription\n]
+
+Alice->Alice:sign(\n  alice_update_data,\n  alice_private_signing_key\n);
+activate Alice
+Alice<<--Alice:alice_update_data_signature
+deactivate Alice
+
+Alice->>Whisper:call(\n  'update',\n  alice_update_data,\n  alice_update_data_signature\n);
+activate Whisper
+
+Whisper->Whisper:get_server_timestamp();
+activate Whisper
+Whisper<<--Whisper:server_timestamp
+deactivate Whisper
+
+Whisper->Whisper:validate_signature(\n  alice_update_data,\n  alice_update_data_signature,\n  alice_public_signing_key\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->Whisper:store(\n  alice_public_signing_key,\n  alice_webpush_subscription\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Alice<<--Whisper:server_timestamp
+deactivate Whisper
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_timestamp_delta = server_timestamp - alice_timestamp
+
+end
+
+group Connection
+
+group Connection :: Send Dial
+
+Alice->Alice:generate_encryption_key_pair();
+activate Alice
+Alice<<--Alice:[\n  alice_public_encryption_key,\n  alice_private_encryption_key\n]
+deactivate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+note left of Alice:alice_bob_public_signing_key = bob_public_signing_key
+
+note left of Alice:alice_dial_data = [\n  alice_public_signing_key,\n  alice_server_timestamp,\n  alice_bob_public_signing_key\n  alice_public_encryption_key\n]
+
+Alice->Alice:sign(\n  alice_dial_data,\n  alice_private_signing_key\n);
+activate Alice
+Alice<<--Alice:alice_dial_data_signature
+deactivate Alice
+
+Alice->>Whisper:call(\n  'dial',\n  alice_dial_data,\n  alice_dial_data_signature\n);
+activate Whisper
+
+Whisper->Whisper:get_server_timestamp();
+activate Whisper
+Whisper<<--Whisper:server_timestamp
+deactivate Whisper
+
+Whisper->Whisper:validate_timestamp(\n  alice_server_timestamp,\n  server_timestamp\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->Whisper:validate_signature(\n  alice_dial_data,\n  alice_dial_data_signature,\n  alice_public_signing_key\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->>Bob:call(\n  'dial'\n  alice_dial_data,\n  alice_dial_data_signature\n);
+activate Bob
+space
+note right of Bob:See 'Connection :: Receive Dial'.
+deactivate Bob
+
+Alice<<--Whisper:server_timestamp
+deactivate Whisper
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_timestamp_delta = server_timestamp - alice_timestamp
+
+end
+
+group Connection :: Receive Dial
+
+Alice<<-Whisper:call(\n  'dial'\n  bob_dial_data,\n  bob_dial_data_signature\n);
+activate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+Alice->Alice:validate_timestamp(\n  bob_server_timestamp,\n  alice_server_timestamp\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_public_signing_key(\n  bob_alice_public_signing_key,\n  alice_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_signature(\n  bob_dial_data,\n  bob_dial_data_signature,\n  bob_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:generate_encryption_key_pair();
+activate Alice
+Alice<<--Alice:[\n  alice_public_encryption_key,\n  alice_private_encryption_key\n]
+deactivate Alice
+
+Alice->Alice:generate_shared_encryption_key(\n  bob_public_encryption_key\n  alice_private_encryption_key,\n);
+activate Alice
+Alice<<--Alice:shared_encryption_key
+deactivate Alice
+
+Alice->STUN/TURN:gather_offer();
+activate STUN/TURN
+Alice<<--STUN/TURN:alice_offer
+deactivate STUN/TURN
+
+Alice->>Alice:gather_ice(\n  alice_offer\n);
+activate Alice
+space
+note right of Alice:See 'Connection :: Gather Ice'.
+deactivate Alice
+
+Alice->Alice:encrypt(\n  alice_offer,\n  shared_encryption_key\n);
+activate Alice
+Alice<<--Alice:alice_offer_encrypted
+deactivate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+note left of Alice:alice_bob_public_signing_key = bob_public_signing_key
+
+note left of Alice:alice_offer_data = [\n  alice_public_signing_key,\n  alice_server_timestamp,\n  alice_bob_public_signing_key\n  alice_public_encryption_key\n  alice_offer_encrypted\n]
+
+Alice->Alice:sign(\n  alice_offer_data,\n  alice_private_signing_key\n);
+activate Alice
+Alice<<--Alice:alice_offer_data_signature
+deactivate Alice
+
+Alice->>Whisper:call(\n  'offer',\n  alice_offer_data,\n  alice_offer_data_signature\n);
+activate Whisper
+
+Whisper->Whisper:get_server_timestamp();
+activate Whisper
+Whisper<<--Whisper:server_timestamp
+deactivate Whisper
+
+Whisper->Whisper:validate_timestamp(\n  alice_server_timestamp,\n  server_timestamp\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->Whisper:validate_signature(\n  alice_offer_data,\n  alice_offer_data_signature,\n  alice_public_signing_key\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->>Bob:call(\n  'offer',\n  alice_offer_data,\n  alice_offer_data_signature\n);
+activate Bob
+space
+note right of Bob:See 'Connection :: Receive Offer'.
+deactivate Bob
+
+Alice<<--Whisper:server_timestamp
+deactivate Whisper
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_timestamp_delta = server_timestamp - alice_timestamp
+
+deactivate Alice
+
+end
+
+group Connection :: Receive Offer
+
+Alice<<-Whisper:call(\n  'offer'\n  bob_offer_data,\n  bob_offer_data_signature\n);
+activate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+Alice->Alice:validate_timestamp(\n  bob_server_timestamp,\n  alice_server_timestamp\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_public_signing_key(\n  bob_alice_public_signing_key,\n  alice_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_signature(\n  bob_offer_data,\n  bob_offer_data_signature,\n  bob_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:generate_shared_encryption_key(\n  bob_public_encryption_key\n  alice_private_encryption_key,\n);
+activate Alice
+Alice<<--Alice:shared_encryption_key
+deactivate Alice
+
+Alice->Alice:decrypt(\n  bob_offer_encrypted\n  shared_encryption_key,\n);
+activate Alice
+Alice<<--Alice:bob_offer
+deactivate Alice
+
+Alice->STUN/TURN:gather_answer(\n  bob_offer\n);
+activate STUN/TURN
+Alice<<--STUN/TURN:alice_answer
+deactivate STUN/TURN
+
+Alice->>Alice:gather_ice(\n  alice_answer\n);
+activate Alice
+space
+note right of Alice:See 'Connection :: Gather Ice'.
+deactivate Alice
+
+Alice->Alice:encrypt(\n  alice_offer,\n  shared_encryption_key\n);
+activate Alice
+Alice<<--Alice:alice_answer_encrypted
+deactivate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+note left of Alice:alice_bob_public_signing_key = bob_public_signing_key
+
+note left of Alice:alice_answer_data = [\n  alice_public_signing_key,\n  alice_server_timestamp,\n  alice_bob_public_signing_key\n  alice_public_encryption_key\n  alice_answer_encrypted\n]
+
+Alice->Alice:sign(\n  alice_answer_data,\n  alice_private_signing_key\n);
+activate Alice
+Alice<<--Alice:alice_answer_data_signature
+deactivate Alice
+
+Alice->>Whisper:call(\n  'answer',\n  alice_answer_data,\n  alice_answer_data_signature\n);
+activate Whisper
+
+Whisper->Whisper:get_server_timestamp();
+activate Whisper
+Whisper<<--Whisper:server_timestamp
+deactivate Whisper
+
+Whisper->Whisper:validate_timestamp(\n  alice_server_timestamp,\n  server_timestamp\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->Whisper:validate_signature(\n  alice_answer_data,\n  alice_answer_data_signature,\n  alice_public_signing_key\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->>Bob:call(\n  'answer',\n  alice_answer_data,\n  alice_answer_data_signature\n);
+activate Bob
+space
+note right of Bob:See 'Connection :: Receive Answer'.
+deactivate Bob
+
+Alice<<--Whisper:server_timestamp
+deactivate Whisper
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_timestamp_delta = server_timestamp - alice_timestamp
+
+deactivate Alice
+
+end
+
+group Connection :: Receive Answer
+
+Alice<<-Whisper:call(\n  'answer'\n  bob_answer_data,\n  bob_answer_data_signature\n);
+activate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+Alice->Alice:validate_timestamp(\n  bob_server_timestamp,\n  alice_server_timestamp\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_public_signing_key(\n  bob_alice_public_signing_key,\n  alice_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_signature(\n  bob_answer_data,\n  bob_answer_data_signature,\n  bob_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:generate_shared_encryption_key(\n  bob_public_encryption_key\n  alice_private_encryption_key,\n);
+activate Alice
+Alice<<--Alice:shared_encryption_key
+deactivate Alice
+
+Alice->Alice:decrypt(\n  bob_answer_encrypted\n  shared_encryption_key,\n);
+activate Alice
+Alice<<--Alice:bob_answer
+deactivate Alice
+
+Alice->Alice:await_rtc_connected(\n  alice_offer\n  bob_answer,\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+note left of Alice:Connected. See 'Send Message'
+
+deactivate Alice
+
+end
+
+group Connection :: Gather Ice
+
+Alice->>Alice:gather_ice(\n  alice_answer\n);
+activate Alice
+space
+
+Alice->STUN/TURN:gather_ice();
+activate STUN/TURN
+Alice<<--STUN/TURN:alice_ice
+deactivate STUN/TURN
+
+Alice->Alice:encrypt(\n  alice_ice,\n  shared_encryption_key\n);
+activate Alice
+Alice<<--Alice:alice_ice_encrypted
+deactivate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+note left of Alice:alice_bob_public_signing_key = bob_public_signing_key
+
+note left of Alice:alice_ice_data = [\n  alice_public_signing_key,\n  alice_server_timestamp,\n  alice_bob_public_signing_key\n  alice_public_encryption_key\n  alice_ice_encrypted\n]
+
+Alice->Alice:sign(\n  alice_ice_data,\n  alice_private_signing_key\n);
+activate Alice
+Alice<<--Alice:alice_ice_data_signature
+deactivate Alice
+
+Alice->>Whisper:call(\n  'ice',\n  alice_ice_data,\n  alice_ice_data_signature\n);
+activate Whisper
+
+Whisper->Whisper:get_server_timestamp();
+activate Whisper
+Whisper<<--Whisper:server_timestamp
+deactivate Whisper
+
+Whisper->Whisper:validate_timestamp(\n  alice_server_timestamp,\n  server_timestamp\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->Whisper:validate_signature(\n  alice_ice_data,\n  alice_ice_data_signature,\n  alice_public_signing_key\n);
+activate Whisper
+Whisper<<--Whisper:ok
+deactivate Whisper
+
+Whisper->>Bob:call(\n  'ice',\n  alice_ice_data,\n  alice_ice_data_signature\n);
+activate Bob
+space
+note right of Bob:See 'Connection :: Receive Ice'.
+deactivate Bob
+
+Alice<<--Whisper:server_timestamp
+deactivate Whisper
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_timestamp_delta = server_timestamp - alice_timestamp
+
+deactivate Alice
+
+end
+
+group Connection :: Receive Ice
+
+Alice<<-Whisper:call(\n  'ice'\n  bob_ice_data,\n  bob_ice_data_signature\n);
+activate Alice
+
+Alice->Alice:get_alice_timestamp();
+activate Alice
+Alice<<--Alice:alice_timestamp
+deactivate Alice
+
+note left of Alice:alice_server_timestamp = alice_timestamp + alice_timestamp_delta
+
+Alice->Alice:validate_timestamp(\n  bob_server_timestamp,\n  alice_server_timestamp\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_public_signing_key(\n  bob_alice_public_signing_key,\n  alice_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:validate_signature(\n  bob_ice_data,\n  bob_ice_data_signature,\n  bob_public_signing_key\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+Alice->Alice:generate_shared_encryption_key(\n  bob_public_encryption_key\n  alice_private_encryption_key,\n);
+activate Alice
+Alice<<--Alice:shared_encryption_key
+deactivate Alice
+
+Alice->Alice:decrypt(\n  bob_ice_encrypted\n  shared_encryption_key,\n);
+activate Alice
+Alice<<--Alice:bob_ice
+deactivate Alice
+
+Alice->Alice:add_rtc_ice(\n  bob_ice,\n);
+activate Alice
+Alice<<--Alice:ok
+deactivate Alice
+
+space
+
+deactivate Alice
+
+end
+
+end
+
+group Send Message
+
+Alice->Alice:generate_shared_encryption_key(\n  bob_public_encryption_key\n  alice_private_encryption_key,\n);
+activate Alice
+Alice<<--Alice:shared_encryption_key
+deactivate Alice
+
+Alice->Alice:encrypt(\n  message\n  shared_encryption_key,\n);
+activate Alice
+Alice<<--Alice:message_encrypted
+deactivate Alice
+
+Alice->Bob:message_encrypted
+activate Bob
+
+Bob->Bob:generate_shared_encryption_key(\n  alice_public_encryption_key\n  bob_private_encryption_key,\n);
+activate Bob
+Bob<<--Bob:shared_encryption_key
+deactivate Bob
+
+Bob->Bob:decrypt(\n  message_encrypted\n  shared_encryption_key,\n);
+activate Bob
+Bob<<--Bob:message
+deactivate Bob
+
+note right of Bob:Done.
+deactivate Bob
+
+end

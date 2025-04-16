@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <meta
+            name="theme-color"
+            content="#0084ff"
+            media="(prefers-color-scheme: light)"
+        />
+        <meta
+            name="theme-color"
+            content="#006acc"
+            media="(prefers-color-scheme: dark)"
+        />
+        <title>Whisper Messenger</title>
+        <link
+            rel="preconnect"
+            href="https://fonts.googleapis.com"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="preconnect"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/assets/apple-touch-icon.png?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/assets/favicon-32x32.png?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/assets/favicon-16x16.png?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="manifest"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/manifest.light.json?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+            media="(prefers-color-scheme: light)"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            rel="manifest"
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/manifest.dark.json?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+            media="(prefers-color-scheme: dark)"
+        />
+        <!--suppress HtmlUnknownTarget -->
+        <link
+            href="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/app.min.css?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+            rel="stylesheet"
+        />
+        <link
+            rel="preload"
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+            />
+        </noscript>
+    </head>
+    <body>
+        <div id="root"></div>
+        <!--suppress HtmlUnknownTarget -->
+        <script
+            src="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/scripts/react.production.min.js"
+            defer
+        ></script>
+        <!--suppress HtmlUnknownTarget -->
+        <script
+            src="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/scripts/react-dom.production.min.js"
+            defer
+        ></script>
+        <!--suppress HtmlUnknownTarget -->
+        <script
+            src="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/core.min.js?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+            defer
+        ></script>
+        <!--suppress HtmlUnknownTarget -->
+        <script
+            src="<%= htmlWebpackPlugin.options.templateParameters.FRONTEND_URL %>/app.min.js?_=<%= htmlWebpackPlugin.options.templateParameters.BUILD_TIMESTAMP %>"
+            defer
+        ></script>
+    </body>
+</html>

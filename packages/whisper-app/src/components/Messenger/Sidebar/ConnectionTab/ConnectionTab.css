@@ -1,0 +1,70 @@
+:root {
+    --connection-tab-bg-color: #eaeaea;
+    --connection-tab-active-bg-color: #cfe9f1;
+    --connection-tab-unread-bg-color: #ff0000;
+    --connection-tab-unread-active-bg-color: #ff0000;
+    --connection-tab-unread-text-color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --connection-tab-bg-color: #242728;
+        --connection-tab-active-bg-color: #143944;
+        --connection-tab-unread-bg-color: #cc0000;
+        --connection-tab-unread-active-bg-color: #cc0000;
+        --connection-tab-unread-text-color: #e8e6e3;
+    }
+}
+.connection-tab {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+    .public-key {
+        background-color: var(--connection-tab-bg-color);
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        outline: none;
+        word-break: break-all;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        cursor: pointer;
+        align-self: center;
+    }
+    .icon.edit {
+        display: flex;
+        cursor: pointer;
+        padding: 0 5px 0 0;
+        margin-left: auto;
+        align-self: center;
+    }
+    .icon.delete {
+        display: flex;
+        cursor: pointer;
+        padding: 0 0 0 5px;
+        margin-right: auto;
+        align-self: center;
+    }
+    .unread-count {
+        position: absolute;
+        bottom: -0.25em;
+        right: 1.25em;
+        border-radius: 50%;
+        width: 1.5em;
+        height: 1.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        background-color: var(--connection-tab-unread-bg-color);
+        color: var(--connection-tab-unread-text-color);
+    }
+}
+.connection-tab.active {
+    .public-key {
+        background-color: var(--connection-tab-active-bg-color);
+    }
+}
