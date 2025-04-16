@@ -44,7 +44,7 @@ const QrScannerModal: React.FC<QrScannerModalProps> = ({ visible, onClose, onRes
 
     useEffect(() => {
         if (visible && !scriptLoaded) {
-            const url = `${process.env.FRONTEND_URL}/scripts/zxing.min.js`;
+            const url = `${process.env.FRONTEND_URL}/scripts/zxing.0.21.3.min.js`;
             loadScript(url, () => !!(window as any).ZXing)
                 .then(async () => {
                     setScriptLoaded(true);
