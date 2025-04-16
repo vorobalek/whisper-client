@@ -52,7 +52,7 @@
         "css-minimizer-webpack-plugin": "^7.0.0",
         "json-minimizer-webpack-plugin": "^5.0.1",
         "mini-css-extract-plugin": "^2.9.2",
-        "prettier": "^3.3.3",
+        "prettier": "^3.5.3",
         "terser-webpack-plugin": "^5.3.14",
         "webpack": "^5.95.0",
         "webpack-bundle-analyzer": "^4.10.2",
