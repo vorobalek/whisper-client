@@ -129,7 +129,7 @@ describe('ConnectionSaga', () => {
         expect(stateTransitions).toContain(ConnectionSagaState.AwaitingDial);
         expect(stateTransitions).toContain(ConnectionSagaState.DialAccepted);
         expect(stateTransitions).toContain(ConnectionSagaState.SendOffer);
-        expect(mockCallService.dial).toHaveBeenCalledTimes(0); // dial не вызывается напрямую в этом сценарии
+        expect(mockCallService.dial).toHaveBeenCalledTimes(0); // dial is not called directly in this scenario
         saga.abort();
     });
 
@@ -162,7 +162,7 @@ describe('ConnectionSaga', () => {
         expect(stateTransitions).toContain(ConnectionSagaState.AwaitingAnswer);
         expect(stateTransitions).toContain(ConnectionSagaState.AnswerReceived);
         expect(stateTransitions).toContain(ConnectionSagaState.AwaitConnection);
-        expect(mockCallService.answer).toHaveBeenCalledTimes(0); // answer не вызывается напрямую в этом сценарии
+        expect(mockCallService.answer).toHaveBeenCalledTimes(0); // answer is not called directly in this scenario
         saga.abort();
     });
 });

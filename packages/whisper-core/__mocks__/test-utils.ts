@@ -1,6 +1,31 @@
-// @ts-nocheck
 // Common mocks for whisper-core tests
 import type { WorkerService } from '../src/services/worker-service';
+
+// Minimal interfaces for strict typing of mocks
+interface MockRTCDataChannel {
+    id: string;
+    label: string;
+    readyState: string;
+    onopen: jest.Mock<any, any>;
+    onmessage: jest.Mock<any, any>;
+    close: jest.Mock<any, any>;
+    send: jest.Mock<any, any>;
+}
+
+interface MockRTCPeerConnection {
+    createDataChannel: jest.Mock<any, any>;
+    createOffer: jest.Mock<any, any>;
+    createAnswer: jest.Mock<any, any>;
+    setLocalDescription: jest.Mock<any, any>;
+    setRemoteDescription: jest.Mock<any, any>;
+    addIceCandidate: jest.Mock<any, any>;
+    onicecandidate: jest.Mock<any, any>;
+    ondatachannel: jest.Mock<any, any>;
+    onconnectionstatechange: jest.Mock<any, any>;
+    close: jest.Mock<any, any>;
+    getStats: jest.Mock<any, any>;
+    remoteDescription: any;
+}
 
 export function createMockLogger() {
     return {
@@ -437,7 +462,7 @@ export function createMockConnection(overrides: Partial<any> = {}) {
     };
 }
 
-export function createMockDataChannel(overrides: Partial<any> = {}) {
+export function createMockDataChannel(overrides: Partial<MockRTCDataChannel> = {}): MockRTCDataChannel {
     return {
         id: 'data-channel-id',
         label: 'mock-data-channel',
@@ -450,7 +475,7 @@ export function createMockDataChannel(overrides: Partial<any> = {}) {
     };
 }
 
-export function createMockPeerConnection(overrides: Partial<any> = {}, mockDataChannel?: any) {
+export function createMockPeerConnection(overrides: Partial<MockRTCPeerConnection> = {}, mockDataChannel?: MockRTCDataChannel): MockRTCPeerConnection {
     return {
         createDataChannel: jest.fn(() => mockDataChannel || createMockDataChannel()),
         createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
@@ -481,7 +506,7 @@ export function createMockPeerConnection(overrides: Partial<any> = {}, mockDataC
                 ],
             ]),
         ),
-        remoteDescription: null as RTCSessionDescription | null,
+        remoteDescription: null,
         ...overrides,
     };
 }

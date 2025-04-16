@@ -63,7 +63,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         });
     });
 
-    it('should ignore setDescription when remote description is already set', async () => {
+    it('should not call setRemoteDescription if remote description is already set', async () => {
         // Setup mocks using test-utils factories
         const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
         const mockPeerConnection = createMockPeerConnection(
@@ -128,7 +128,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         expect(mockPeerConnection.setRemoteDescription).not.toHaveBeenCalled();
     }, 10000);
 
-    it('should directly test handling of empty messages in the saga', () => {
+    it('should not send empty outgoing messages and log debug', () => {
         const mockDataChannel = { send: jest.fn() };
         const mockWebRTC = createMockWebRTC();
 
@@ -159,7 +159,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         expect(mockDataChannel.send).not.toHaveBeenCalled();
     });
 
-    it('should ignore incoming empty messages on established data channel', async () => {
+    it('should not call onMessage for empty incoming messages on open data channel', async () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
 
@@ -194,163 +194,54 @@ describe('ConnectionSaga (Edge Cases)', () => {
         saga.abort();
     });
 
-    it('should cover the relay server connection path', async () => {
-        // Mock dependencies with relay candidate type
-        const mockDataChannel = {
-            id: 'data-channel-id',
-            label: 'mock-data-channel',
-            readyState: 'open',
-            onopen: null,
-            onmessage: null,
-            close: jest.fn(),
-            send: jest.fn(),
-        };
-
-        const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: null,
-            ondatachannel: null,
-            close: jest.fn(),
-            // This is the key change - we're using a relay server instead of host
-            getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    [
-                        'candidate-pair-id',
-                        {
-                            type: 'candidate-pair',
-                            selected: true,
-                            localCandidateId: 'local-candidate-id',
-                        },
-                    ],
-                    [
-                        'local-candidate-id',
-                        {
-                            candidateType: 'relay',
-                            address: '203.0.113.1',
-                        },
-                    ],
-                ]),
-            ),
-        };
-
-        const mockWebRTC = createMockWebRTC();
-        // Override PeerConnection to use our mockPeerConnection
-        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
-
-        // Create the connection saga
-        const publicKey = 'mock-relay-public-key';
-        const connectionType = 'outgoing' as ConnectionSagaType;
-
-        const saga = getConnectionSaga(
-            publicKey,
-            connectionType,
-            mockLogger,
-            mockTimeService,
-            mockCallService,
-            mockSessionService,
-            mockBase64,
-            mockUtf8,
-            mockCryptography,
-            mockWebRTC as any,
-            [], // iceServers
-            1000, // Use shorter timeout
-        );
-
-        // Set encryption for the saga
+    it('should log relay server address when relay candidate is used', async () => {
+        const { saga, mockPeerConnection } = createTestSaga({
+            peerConnectionOverrides: {
+                getStats: jest.fn().mockResolvedValue(new Map([
+                    ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
+                    ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
+                ])),
+                readyState: 'connecting',
+            },
+        });
         saga.setEncryption('mock-encryption-public-key');
-
-        // Clear previous warn calls
         mockLogger.warn.mockClear();
-
-        // Initialize the saga directly in the Connected state
         await saga.open(ConnectionSagaState.Connected);
-
-        // Verify that the warning about relay server was logged
-        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server 203.0.113.1'));
-    }, 10000); // Increase test timeout
-
-    it('should close and recreate peer connection when receiving data channel after restart', async () => {
-        const publicKey = 'mock-remote-public-key';
-        const connectionType = 'incoming';
-        // Arrange: data channel and peer connection
-        const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
-        const mockPeerConnection = createMockPeerConnection(
-            { onicecandidate: undefined as any, ondatachannel: undefined as any, remoteDescription: null },
-            mockDataChannel,
+        expect(mockLogger.warn).toHaveBeenCalledWith(
+            expect.stringContaining('Using relay server 123.45.67.89'),
         );
-        const webRTC = createMockWebRTC();
-        webRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        saga.abort();
+    });
 
-        const saga: any = getConnectionSaga(
-            publicKey,
-            connectionType,
-            mockLogger,
-            mockTimeService,
-            mockCallService,
-            mockSessionService,
-            mockBase64,
-            mockUtf8,
-            mockCryptography,
-            webRTC,
-            [],
-            1000,
-        );
+    it('should close and recreate peer connection on data channel after restart', async () => {
+        const { saga, mockDataChannel, mockPeerConnection, mockWebRTC } = createTestSaga({
+            dataChannelOverrides: { readyState: 'connecting' },
+            peerConnectionOverrides: {
+                onicecandidate: undefined as any,
+                ondatachannel: undefined as any,
+                remoteDescription: null,
+            },
+            timeout: 1000,
+        });
         saga.setEncryption('mock-encryption-public-key');
-
-        // Act: initialize and start in AwaitOffer
         await saga.open(ConnectionSagaState.New);
         await saga.open(ConnectionSagaState.AwaitOffer);
-
-        // Simulate incoming data channel then open event
         mockPeerConnection.ondatachannel({ channel: mockDataChannel });
         mockDataChannel.onopen?.();
-
-        // Exchange description to set remote desc
         const offer = JSON.stringify({ type: 'offer', sdp: 'mock-sdp-offer' });
         const encrypted = mockBase64.encode(mockUtf8.decode(offer));
         await saga.setDescription(encrypted);
         expect(mockPeerConnection.setRemoteDescription).toHaveBeenCalled();
         mockPeerConnection.setRemoteDescription.mockClear();
-
-        // Simulate re-sending same desc (ignored)
         mockPeerConnection.remoteDescription = { type: 'offer', sdp: 'mock-sdp-offer' } as any;
         await saga.setDescription(encrypted);
         expect(mockPeerConnection.setRemoteDescription).not.toHaveBeenCalled();
-
-        // Restart and expect closure and recalc
         await saga.open(ConnectionSagaState.AwaitOffer);
         expect(mockPeerConnection.close).toHaveBeenCalled();
-        expect(webRTC.PeerConnection).toHaveBeenCalledTimes(3);
+        expect(mockWebRTC.PeerConnection).toHaveBeenCalledTimes(3);
     });
 
-    it('should log and ignore empty outgoing messages', () => {
-        const publicKey = 'mock-remote-public-key';
-        const connectionType = 'incoming';
-        const webRTC = createMockWebRTC();
-        const saga: any = getConnectionSaga(
-            publicKey,
-            connectionType,
-            mockLogger,
-            mockTimeService,
-            mockCallService,
-            mockSessionService,
-            mockBase64,
-            mockUtf8,
-            mockCryptography,
-            webRTC,
-            [],
-        );
-        mockLogger.debug.mockClear();
-        saga.send('   ');
-        expect(mockLogger.debug).toHaveBeenCalledWith(
-            expect.stringContaining(`Message is empty and won't be sent in ${connectionType} connection with ${publicKey}`),
-        );
-    });
-
-    it('should not change state on dataChannel open when already connected', async () => {
+    it('should not change state if dataChannel opens when already connected', async () => {
         const publicKey = 'mock-remote-public-key';
         const connectionType = 'incoming';
         const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
@@ -378,61 +269,86 @@ describe('ConnectionSaga (Edge Cases)', () => {
         saga.abort();
     });
 
-    it('should warn when connection uses relay server candidate', async () => {
-        // Mock WebRTC objects and their behavior
-        const publicKey = 'mock-remote-public-key';
-        const connectionType = 'incoming';
-        const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
-        const mockPeerConnection = createMockPeerConnection(
-            { getStats: jest.fn().mockResolvedValue(new Map([
-                ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
-                ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
-            ])) },
-            mockDataChannel,
-        );
-        const webRTC2 = createMockWebRTC();
-        webRTC2.PeerConnection = jest.fn(() => mockPeerConnection);
-
-        const saga2: any = getConnectionSaga(
-            publicKey,
-            connectionType,
-            mockLogger,
-            mockTimeService,
-            mockCallService,
-            mockSessionService,
-            mockBase64,
-            mockUtf8,
-            mockCryptography,
-            webRTC2,
-            [],
-        );
-        saga2.setEncryption('mock-encryption-public-key');
+    it('should log relay server address if relay candidate is used (alternative path)', async () => {
+        const { saga, mockPeerConnection } = createTestSaga({
+            peerConnectionOverrides: {
+                getStats: jest.fn().mockResolvedValue(new Map([
+                    ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
+                    ['local-candidate-id', { candidateType: 'relay', address: '123.45.67.89' }],
+                ])),
+                readyState: 'connecting',
+            },
+        });
+        saga.setEncryption('mock-encryption-public-key');
         mockLogger.warn.mockClear();
-        await saga2.open(ConnectionSagaState.Connected);
+        await saga.open(ConnectionSagaState.Connected);
         expect(mockLogger.warn).toHaveBeenCalledWith(
             expect.stringContaining('Using relay server 123.45.67.89'),
         );
-        saga2.abort();
+        saga.abort();
     });
 
-    it('should handle DataChannel events and edge cases', async () => {
-        const publicKey = 'mock-remote-public-key';
-        const connectionType = 'incoming';
-        // Arrange: data channel and peer connection
-        const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
-        const mockPeerConnection = createMockPeerConnection(
-            { getStats: jest.fn().mockResolvedValue(
-                new Map([
-                    ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
-                    ['local-candidate-id', { candidateType: 'relay', address: '192.168.1.1' }],
-                ])
-            ), remoteDescription: null },
-            mockDataChannel,
-        );
-        const mockWebRTC = createMockWebRTC();
-        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+    it('should handle all DataChannel edge cases and state transitions', async () => {
+        const { saga, mockDataChannel, mockPeerConnection } = createTestSaga({
+            dataChannelOverrides: { readyState: 'connecting' },
+            peerConnectionOverrides: {
+                getStats: jest.fn().mockResolvedValue(
+                    new Map([
+                        ['candidate-pair-id', { type: 'candidate-pair', selected: true, localCandidateId: 'local-candidate-id' }],
+                        ['local-candidate-id', { candidateType: 'relay', address: '192.168.1.1' }],
+                    ])
+                ),
+                remoteDescription: null,
+            },
+        });
+        saga.setEncryption('mock-encryption-public-key');
+        const stateTransitions: ConnectionSagaState[] = [];
+        saga.onStateChanged = (_from: ConnectionSagaState, to: ConnectionSagaState) => stateTransitions.push(to);
+        const openPromise = saga.open(ConnectionSagaState.AwaitOffer);
+        saga.continue();
+        const encryptedOffer = mockBase64.encode(mockUtf8.decode(JSON.stringify({ type: 'offer', sdp: 'mock-sdp-offer' })));
+        await saga.setDescription(encryptedOffer);
+        mockPeerConnection.onicecandidate({ candidate: { toJSON: () => ({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0, usernameFragment: 'u' }) } });
+        mockPeerConnection.onicecandidate({ candidate: null });
+        mockPeerConnection.ondatachannel({ channel: mockDataChannel });
+        const encryptedIce = mockBase64.encode(mockUtf8.decode(JSON.stringify({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0 })));
+        mockPeerConnection.remoteDescription = null;
+        await saga.addIceCandidate(encryptedIce);
+        mockPeerConnection.remoteDescription = { type: 'offer', sdp: 'mock-sdp', toJSON: () => ({ type: 'offer', sdp: 'mock-sdp' }) } as any;
+        await saga.addIceCandidate(encryptedIce);
+        stateTransitions.push(ConnectionSagaState.AwaitingConnection);
+        mockDataChannel.onopen();
+        mockDataChannel.onmessage({ data: 'not-an-array-buffer' });
+        let received: string | undefined;
+        saga.onMessage = (msg: string) => { received = msg; };
+        mockDataChannel.onmessage({ data: new ArrayBuffer(10) });
+        saga.send('  ');
+        saga.send('test message');
+        await openPromise;
+        expect(stateTransitions).toContain(ConnectionSagaState.Connected);
+        expect(saga.state).toBe(ConnectionSagaState.Connected);
+        expect(mockCallService.answer).toHaveBeenCalled();
+        expect(mockPeerConnection.createAnswer).toHaveBeenCalled();
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Wrong message type received'));
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server'));
+    });
 
-        const saga: any = getConnectionSaga(
+    // Helper function for creating saga and mocks
+    function createTestSaga({
+        publicKey = 'mock-remote-public-key',
+        connectionType = 'incoming',
+        dataChannelOverrides = {},
+        peerConnectionOverrides = {},
+        webRTCOverrides = {},
+        sagaOverrides = {},
+        iceServers = [],
+        timeout = undefined,
+    }: any = {}) {
+        const mockDataChannel = createMockDataChannel(dataChannelOverrides);
+        const mockPeerConnection = createMockPeerConnection(peerConnectionOverrides, mockDataChannel);
+        const mockWebRTC = { ...createMockWebRTC(), ...webRTCOverrides };
+        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        const saga = getConnectionSaga(
             publicKey,
             connectionType,
             mockLogger,
@@ -443,55 +359,44 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockUtf8,
             mockCryptography,
             mockWebRTC,
-            [],
+            iceServers,
+            timeout,
         );
+        Object.assign(saga, sagaOverrides);
+        return { saga, mockDataChannel, mockPeerConnection, mockWebRTC };
+    }
+
+    it('should cover the relay server connection path', async () => {
+        const { saga, mockPeerConnection } = createTestSaga({
+            publicKey: 'mock-relay-public-key',
+            connectionType: 'outgoing',
+            dataChannelOverrides: { readyState: 'open' },
+            peerConnectionOverrides: {
+                getStats: jest.fn().mockResolvedValue(
+                    new Map([
+                        [
+                            'candidate-pair-id',
+                            {
+                                type: 'candidate-pair',
+                                selected: true,
+                                localCandidateId: 'local-candidate-id',
+                            },
+                        ],
+                        [
+                            'local-candidate-id',
+                            {
+                                candidateType: 'relay',
+                                address: '203.0.113.1',
+                            },
+                        ],
+                    ]),
+                ),
+            },
+            timeout: 1000,
+        });
         saga.setEncryption('mock-encryption-public-key');
-
-        const stateTransitions: ConnectionSagaState[] = [];
-        saga.onStateChanged = (_from: ConnectionSagaState, to: ConnectionSagaState) => stateTransitions.push(to);
-
-        // Start and negotiate offer
-        const openPromise = saga.open(ConnectionSagaState.AwaitOffer);
-        saga.continue();
-        const encryptedOffer = mockBase64.encode(mockUtf8.decode(JSON.stringify({ type: 'offer', sdp: 'mock-sdp-offer' })));
-        await saga.setDescription(encryptedOffer);
-
-        // ICE candidate events
-        mockPeerConnection.onicecandidate({ candidate: { toJSON: () => ({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0, usernameFragment: 'u' }) } });
-        mockPeerConnection.onicecandidate({ candidate: null });
-
-        // DataChannel event
-        mockPeerConnection.ondatachannel({ channel: mockDataChannel });
-
-        // Test addIceCandidate paths
-        const encryptedIce = mockBase64.encode(mockUtf8.decode(JSON.stringify({ candidate: 'candidate:1 1 UDP ...', sdpMid: '0', sdpMLineIndex: 0 })));
-        mockPeerConnection.remoteDescription = null;
-        await saga.addIceCandidate(encryptedIce);
-        mockPeerConnection.remoteDescription = { type: 'offer', sdp: 'mock-sdp', toJSON: () => ({ type: 'offer', sdp: 'mock-sdp' }) } as any;
-        await saga.addIceCandidate(encryptedIce);
-
-        // onopen in AwaitingConnection
-        stateTransitions.push(ConnectionSagaState.AwaitingConnection);
-        mockDataChannel.onopen();
-
-        // Handle messages
-        mockDataChannel.onmessage({ data: 'not-an-array-buffer' });
-        let received: string | undefined;
-        saga.onMessage = (msg: string) => { received = msg; };
-        mockDataChannel.onmessage({ data: new ArrayBuffer(10) });
-
-        // Send messages
-        saga.send('  ');
-        saga.send('test message');
-
-        await openPromise;
-
-        // Assertions
-        expect(stateTransitions).toContain(ConnectionSagaState.Connected);
-        expect(saga.state).toBe(ConnectionSagaState.Connected);
-        expect(mockCallService.answer).toHaveBeenCalled();
-        expect(mockPeerConnection.createAnswer).toHaveBeenCalled();
-        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Wrong message type received'));
-        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server'));
-    });
+        mockLogger.warn.mockClear();
+        await saga.open(ConnectionSagaState.Connected);
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Using relay server 203.0.113.1'));
+    }, 10000);
 });
