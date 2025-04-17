@@ -1,9 +1,9 @@
 # Whisper Messenger
 
-![Statements](./packages/whisper-core/coverage/badge-statements.svg)
-![Lines](./packages/whisper-core/coverage/badge-lines.svg)
-![Functions](./packages/whisper-core/coverage/badge-functions.svg)
-![Branches](./packages/whisper-core/coverage/badge-branches.svg)
+![Statements](.github/badges/coverage/badge-statements.svg)
+![Lines](.github/badges/coverage/badge-lines.svg)
+![Functions](.github/badges/coverage/badge-functions.svg)
+![Branches](.github/badges/coverage/badge-branches.svg)
 
 [`whisper-app`](./packages/whisper-app/) is a demonstration of the Whisper protocol in action. Try it live:
 [https://whisper.vorobalek.dev](https://whisper.vorobalek.dev)

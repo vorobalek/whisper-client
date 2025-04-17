@@ -3,9 +3,12 @@ name: Deploy to S3
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   build-and-deploy:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,13 +59,20 @@ jobs:
           npm install --no-save jest-coverage-badges
           npm run test:badges
           cd ../..
+      - name: Copy coverage badges to .github/badges/coverage
+        run: |
+          mkdir -p .github/badges/coverage
+          cp packages/whisper-core/coverage/badge-statements.svg .github/badges/coverage/
+          cp packages/whisper-core/coverage/badge-lines.svg .github/badges/coverage/
+          cp packages/whisper-core/coverage/badge-functions.svg .github/badges/coverage/
+          cp packages/whisper-core/coverage/badge-branches.svg .github/badges/coverage/
       - name: Commit coverage badges
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add packages/whisper-core/coverage/badge-statements.svg
-          git add packages/whisper-core/coverage/badge-lines.svg
-          git add packages/whisper-core/coverage/badge-functions.svg
-          git add packages/whisper-core/coverage/badge-branches.svg
+          git add .github/badges/coverage/badge-statements.svg
+          git add .github/badges/coverage/badge-lines.svg
+          git add .github/badges/coverage/badge-functions.svg
+          git add .github/badges/coverage/badge-branches.svg
           git commit -m 'chore: update coverage badges [skip ci]' || echo "No changes to commit"
           git push 
