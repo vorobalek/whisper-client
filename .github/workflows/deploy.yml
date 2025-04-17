@@ -71,6 +71,6 @@ jobs:
         with:
           commit-message: "chore: [skip ci] update coverage badges"
           branch: badges/update-${{ github.run_id }}
-          title: "Update coverage badges"
+          title: "chore: [skip ci] update coverage badges"
           body: "Automatic update of coverage badges."
           base: main 
