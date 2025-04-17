@@ -11,4 +11,6 @@ yarn-error.log*
 .idea/*
 **/dist
 **/coverage
+!.github/badges/coverage
+!.github/badges/coverage/*
 **/node_modules
