@@ -3,8 +3,6 @@ name: Deploy to S3
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '.github/badges/coverage/**'
 
 jobs:
   build-and-deploy:
@@ -52,25 +50,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
-          SOURCE_DIR: dist
-      - name: Generate coverage badges
-        run: |
-          cd packages/whisper-core
-          npm install --no-save jest-coverage-badges
-          npm run test:badges
-          cd ../..
-      - name: Copy coverage badges to .github/badges/coverage
-        run: |
-          mkdir -p .github/badges/coverage
-          cp packages/whisper-core/coverage/badge-statements.svg .github/badges/coverage/
-          cp packages/whisper-core/coverage/badge-lines.svg .github/badges/coverage/
-          cp packages/whisper-core/coverage/badge-functions.svg .github/badges/coverage/
-          cp packages/whisper-core/coverage/badge-branches.svg .github/badges/coverage/
-      - name: Create Pull Request for badges
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: [skip ci] update coverage badges"
-          branch: badges/update-${{ github.run_id }}
-          title: "chore: [skip ci] update coverage badges"
-          body: "Automatic update of coverage badges."
-          base: main 
+          SOURCE_DIR: dist 
