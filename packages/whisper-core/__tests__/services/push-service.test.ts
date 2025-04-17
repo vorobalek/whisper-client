@@ -625,16 +625,6 @@ describe('PushService', () => {
         });
     });
 
-    describe('getSubscription with key changes', () => {
-        it('should unsubscribe if application server key has changed', async () => {
-            // Skip this test as it's less critical and we've already added the PushManager undefined test
-            // The core functionality is tested in our new test for undefined PushManager API
-
-            // Use .skip() to skip this test
-            console.log('Skipping test: should unsubscribe if application server key has changed');
-        });
-    });
-
     describe('getSubscription undefined APIs', () => {
         it('should handle undefined PushManager API', async () => {
             // Mock notification with granted permission
@@ -715,14 +705,6 @@ describe('PushService', () => {
     });
 
     describe('showNotification tests', () => {
-        it('should show notification via service worker if available', async () => {
-            // Skip this test as it's less critical and we've already tested missing controller/subscription
-            // The core functionality is tested in our 'handle missing controller' and 'handle missing subscription' tests
-
-            // Use .skip() to skip this test
-            console.log('Skipping test: should show notification via service worker if available');
-        });
-
         it('should handle missing controller', async () => {
             // Mock services
             const mockLogger = createMockLogger();
