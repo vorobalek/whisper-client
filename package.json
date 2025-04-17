@@ -44,6 +44,9 @@
             "@trivago/prettier-plugin-sort-imports"
         ]
     },
+    "lint-staged": {
+        "*": "npm run prettify"
+    },
     "dependencies": {
         "@whisper/core": "^0.0.1-beta"
     },
@@ -52,6 +55,7 @@
         "css-minimizer-webpack-plugin": "^7.0.0",
         "jest-coverage-badges": "^1.1.2",
         "json-minimizer-webpack-plugin": "^5.0.1",
+        "lint-staged": "^15.5.1",
         "mini-css-extract-plugin": "^2.9.2",
         "prettier": "^3.5.3",
         "terser-webpack-plugin": "^5.3.14",
