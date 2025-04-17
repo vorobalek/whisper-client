@@ -7,6 +7,7 @@
     "scripts": {
         "test": "jest",
         "test:coverage": "jest --coverage",
+        "test:badges": "jest --coverage && jest-coverage-badges",
         "build": "webpack --env environment=local",
         "publish": "webpack --env environment=staging"
     },
