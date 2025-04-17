@@ -3,13 +3,13 @@
 // This file contains tests for the outgoing connection saga logic in connection-saga.ts.
 // It specifically tests the state progression and behaviors for outgoing WebRTC connections.
 // The test is moved here as part of a refactor to logically group tests by connection direction and flow.
+import { createMockDataChannel } from '../../../__mocks__/test-utils';
 import {
     ConnectionSaga,
     ConnectionSagaState,
     ConnectionSagaType,
     getConnectionSaga,
 } from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
 
 describe('ConnectionSaga (outgoing)', () => {
     // Mock all the required dependencies
@@ -134,7 +134,7 @@ describe('ConnectionSaga (outgoing)', () => {
 
         const mockWebRTC = {
             PeerConnection: jest.fn(() => mockPeerConnection),
-            DataChannel: RTCDataChannel,
+            DataChannel: createMockDataChannel(),
         };
 
         // Create the connection saga for the test

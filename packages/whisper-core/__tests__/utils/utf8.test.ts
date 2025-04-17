@@ -56,6 +56,7 @@ describe('UTF8 utility', () => {
 
         it('should correctly encode and decode data', () => {
             // Given
+            const TextEncoder = require('util').TextEncoder;
             const testString = 'Hello, world!';
             const testData = new TextEncoder().encode(testString);
 
