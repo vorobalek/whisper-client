@@ -1,0 +1,21 @@
+{
+  "name": "Whisper Dev Container",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "frontend",
+  "workspaceFolder": "/workspaces/whisper-frontend",
+  "forwardPorts": [8080, 5027],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "remoteUser": "node",
+  "containerEnv": {
+    "DEV_CONTAINER_ENV": "devcontainer"
+  }
+} 

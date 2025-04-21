@@ -95,6 +95,17 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
 
 ## 🚀 Getting Started & Usage Example
 
+### Running Locally via Dev Container
+
+1. Open the project in a development container (see `.devcontainer/devcontainer.json`).
+2. In the container terminal, install dependencies and start the app:
+   ```bash
+   npm ci
+   npm run start
+   ```
+3. The app will be available at `http://localhost:8080`.
+4. Ensure that ports `8080` and `5027` are free on your host machine before starting.
+
 ### [Minimal Integration](docs/example.min.html)
 
 ```html

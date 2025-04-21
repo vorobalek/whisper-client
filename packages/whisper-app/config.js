@@ -2,14 +2,6 @@ function getTemplateParameters(environment) {
     let parameters = {};
     switch (environment) {
         case 'serve':
-            parameters = {
-                CONSOLE_LOG_LEVEL: 'trace',
-                DOCUMENT_LOG_LEVEL: 'info',
-                SERVER_URL: 'http://localhost:5027',
-                FRONTEND_URL: 'http://localhost:8080',
-                VAPID_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I',
-            };
-            break;
         case 'local':
             parameters = {
                 CONSOLE_LOG_LEVEL: 'trace',
