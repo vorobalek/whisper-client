@@ -13,7 +13,7 @@
     "scripts": {
         "prettify": "npx prettier . --write",
         "test": "cd packages/whisper-core && npm run test && cd ../..",
-        "start": "webpack serve --env environment=serve",
+        "start": "webpack serve --env environment=local",
         "build": "npm run prettify && npx webpack --env environment=local && npm run coverage:generate && npm run coverage:copy",
         "publish": "npm run prettify && npx webpack --env environment=staging && npm run coverage:generate && npm run coverage:copy",
         "analyze": "npx webpack --config webpack.analyze.config.js --env environment=local",

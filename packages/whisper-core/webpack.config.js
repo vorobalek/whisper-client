@@ -1,6 +1,10 @@
 const path = require('path');
 
-module.exports = (env) => {
+module.exports = (args) => {
+    env = {
+        ...args,
+        ...process.env
+    };
     const environment = env.environment || 'local';
     return {
         mode: environment === 'local' ? 'development' : 'production',

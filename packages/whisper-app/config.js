@@ -1,13 +1,18 @@
-function getTemplateParameters(environment) {
+function getTemplateParameters(env) {
     let parameters = {};
-    switch (environment) {
-        case 'serve':
+    switch (env.environment) {
         case 'local':
             parameters = {
                 CONSOLE_LOG_LEVEL: 'trace',
                 DOCUMENT_LOG_LEVEL: 'info',
-                SERVER_URL: 'http://localhost:5027',
-                FRONTEND_URL: 'http://localhost:8080',
+                SERVER_URL: (
+                    env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
+                    ? `https://${env.CODESPACE_NAME}-5027.app.github.dev`
+                    : 'http://localhost:5027'),
+                FRONTEND_URL: (
+                    env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
+                    ? `https://${env.CODESPACE_NAME}-8080.app.github.dev`
+                    : 'http://localhost:8080'),
                 VAPID_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I',
             };
             break;
