@@ -10,7 +10,7 @@
         "terminal.integrated.shell.linux": "/bin/bash"
       },
       "extensions": [
-        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode"
       ]
     }

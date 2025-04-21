@@ -15,7 +15,7 @@ services:
       - lan
 
   backend:
-    image: vorobalek/whisper:staging
+    image: vorobalek/whisper:latest
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: 'Development'
