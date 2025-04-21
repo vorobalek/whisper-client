@@ -5,14 +5,14 @@ function getTemplateParameters(env) {
             parameters = {
                 CONSOLE_LOG_LEVEL: 'trace',
                 DOCUMENT_LOG_LEVEL: 'info',
-                SERVER_URL: (
+                SERVER_URL:
                     env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
-                    ? `https://${env.CODESPACE_NAME}-5027.app.github.dev`
-                    : 'http://localhost:5027'),
-                FRONTEND_URL: (
+                        ? `https://${env.CODESPACE_NAME}-5027.app.github.dev`
+                        : 'http://localhost:5027',
+                FRONTEND_URL:
                     env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
-                    ? `https://${env.CODESPACE_NAME}-8080.app.github.dev`
-                    : 'http://localhost:8080'),
+                        ? `https://${env.CODESPACE_NAME}-8080.app.github.dev`
+                        : 'http://localhost:8080',
                 VAPID_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I',
             };
             break;

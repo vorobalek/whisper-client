@@ -11,7 +11,7 @@ const { getTemplateParameters, getParameterReplacer, getEnvironmentVariables } =
 module.exports = (args) => {
     env = {
         ...args,
-        ...process.env
+        ...process.env,
     };
     const isServe = env.WEBPACK_SERVE === true;
     const templateParameters = getTemplateParameters(env);

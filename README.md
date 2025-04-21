@@ -6,7 +6,6 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-frontend?quickstart=1)
 
-
 [`whisper-app`](./packages/whisper-app/) is a demonstration of the Whisper protocol in action. Try it live:
 [https://whisper.vorobalek.dev](https://whisper.vorobalek.dev)
 
@@ -103,16 +102,18 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
 
 [![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/vorobalek/whisper-frontend)
 
-> **Also available via GitHub Codespaces**: open this repository in a Codespace (click "Code" → "Open with Codespaces" on GitHub) to launch the development container.
+> **Also available via GitHub Codespaces**: open this repository in a Codespace (click "Code" → "Open with Codespaces"
+> on GitHub) to launch the development container.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-frontend?quickstart=1)
 
-1. Open the project in a development container (see [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)).
+1. Open the project in a development container (see
+   [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)).
 2. In the container terminal, install dependencies and start the app:
-   ```bash
-   npm ci
-   npm run start
-   ```
+    ```bash
+    npm ci
+    npm run start
+    ```
 3. The app will be available at `http://localhost:8080`.
 4. Ensure that ports `8080` and `5027` are free on your host machine before starting.
 

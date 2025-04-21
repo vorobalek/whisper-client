@@ -8,7 +8,7 @@ const { getTemplateParameters, getParameterReplacer, getEnvironmentVariables } =
 module.exports = (args) => {
     env = {
         ...args,
-        ...process.env
+        ...process.env,
     };
     const environment = env.environment || 'local';
     const templateParameters = getTemplateParameters(env);

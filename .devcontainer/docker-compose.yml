@@ -1,59 +1,59 @@
 name: whisper-devcontainer
 
 services:
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    networks:
-      - lan
+    redis:
+        image: redis:latest
+        restart: unless-stopped
+        networks:
+            - lan
 
-  mongo:
-    image: mongo:latest
-    restart: unless-stopped
-    networks:
-      - lan
+    mongo:
+        image: mongo:latest
+        restart: unless-stopped
+        networks:
+            - lan
 
-  backend:
-    image: vorobalek/whisper:latest
-    restart: unless-stopped
-    environment:
-      ASPNETCORE_ENVIRONMENT: 'Development'
-      PORT: '80'
-      CORS: ''
-      PATH_BASE: ''
-      REDIS_CONNECTION_STRING: 'redis:6379'
-      MONGO_CONNECTION_STRING: 'mongodb://mongo:27017'
-      NOTIFICATION_SUBJECT: 'mailto:whisper-local@example.com'
-      NOTIFICATION_PUBLIC_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I'
-      NOTIFICATION_PRIVATE_KEY: 'ueOU3tiNi2CaW3CHmG538gp2nqE-h7Rfm9BhJ7W7PUQ'
-    depends_on:
-      - redis
-      - mongo
-    ports:
-      - '5027:80'
-    networks:
-      - lan
+    backend:
+        image: vorobalek/whisper:latest
+        restart: unless-stopped
+        environment:
+            ASPNETCORE_ENVIRONMENT: 'Development'
+            PORT: '80'
+            CORS: ''
+            PATH_BASE: ''
+            REDIS_CONNECTION_STRING: 'redis:6379'
+            MONGO_CONNECTION_STRING: 'mongodb://mongo:27017'
+            NOTIFICATION_SUBJECT: 'mailto:whisper-local@example.com'
+            NOTIFICATION_PUBLIC_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I'
+            NOTIFICATION_PRIVATE_KEY: 'ueOU3tiNi2CaW3CHmG538gp2nqE-h7Rfm9BhJ7W7PUQ'
+        depends_on:
+            - redis
+            - mongo
+        ports:
+            - '5027:80'
+        networks:
+            - lan
 
-  frontend:
-    build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
-    image: whisper-frontend-dev
-    command: sleep infinity
-    working_dir: /workspaces/whisper-frontend
-    volumes:
-      - ..:/workspaces/whisper-frontend:cached
-    ports:
-      - '8080:8080'
-    environment:
-      DEV_ENV: devcontainer
-    depends_on:
-      - backend
-      - redis
-      - mongo
-    networks:
-      - lan
+    frontend:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+        image: whisper-frontend-dev
+        command: sleep infinity
+        working_dir: /workspaces/whisper-frontend
+        volumes:
+            - ..:/workspaces/whisper-frontend:cached
+        ports:
+            - '8080:8080'
+        environment:
+            DEV_ENV: devcontainer
+        depends_on:
+            - backend
+            - redis
+            - mongo
+        networks:
+            - lan
 
 networks:
-  lan:
-    driver: bridge 
+    lan:
+        driver: bridge
