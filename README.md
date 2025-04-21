@@ -95,9 +95,11 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
 
 ## 🚀 Getting Started & Usage Example
 
-### Running Locally via Dev Container
+### Running via Dev Container
 
-1. Open the project in a development container (see `.devcontainer/devcontainer.json`).
+> **Also available via GitHub Codespaces**: open this repository in a Codespace (click "Code" → "Open with Codespaces" on GitHub) to launch the development container.
+
+1. Open the project in a development container (see [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)).
 2. In the container terminal, install dependencies and start the app:
    ```bash
    npm ci
