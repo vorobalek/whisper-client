@@ -5,9 +5,13 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { getTemplateParameters, getParameterReplacer, getEnvironmentVariables } = require('./config');
 
-module.exports = (env) => {
+module.exports = (args) => {
+    env = {
+        ...args,
+        ...process.env
+    };
     const environment = env.environment || 'local';
-    const templateParameters = getTemplateParameters(environment);
+    const templateParameters = getTemplateParameters(env);
     const environmentVariables = getEnvironmentVariables(templateParameters);
 
     // noinspection WebpackConfigHighlighting

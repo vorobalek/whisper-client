@@ -8,10 +8,13 @@ const TerserPlugin = require('terser-webpack-plugin');
 const JsonMinimizerPlugin = require('json-minimizer-webpack-plugin');
 const { getTemplateParameters, getParameterReplacer, getEnvironmentVariables } = require('@whisper/app/config');
 
-module.exports = (env) => {
-    const environment = env.environment || 'serve';
-    const isServe = environment === 'serve';
-    const templateParameters = getTemplateParameters(environment);
+module.exports = (args) => {
+    env = {
+        ...args,
+        ...process.env
+    };
+    const isServe = env.WEBPACK_SERVE === true;
+    const templateParameters = getTemplateParameters(env);
 
     return {
         mode: isServe ? 'development' : 'production',
