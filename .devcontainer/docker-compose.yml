@@ -6,13 +6,13 @@ services:
     image: redis:latest
     restart: unless-stopped
     networks:
-      - dev
+      - lan
 
   mongo:
     image: mongo:latest
     restart: unless-stopped
     networks:
-      - dev
+      - lan
 
   backend:
     image: vorobalek/whisper:staging
@@ -33,7 +33,7 @@ services:
     ports:
       - '5027:80'
     networks:
-      - dev
+      - lan
 
   frontend:
     build:
@@ -53,8 +53,8 @@ services:
       - redis
       - mongo
     networks:
-      - dev
+      - lan
 
 networks:
-  dev:
+  lan:
     driver: bridge 

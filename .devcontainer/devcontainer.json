@@ -18,6 +18,5 @@
   "remoteUser": "node",
   "containerEnv": {
     "DEV_CONTAINER_ENV": "devcontainer"
-  },
-  "initializeCommand": "npm ci"
+  }
 } 
