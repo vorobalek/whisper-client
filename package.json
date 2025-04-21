@@ -1,7 +1,7 @@
 {
     "name": "@whisper/frontend",
     "version": "0.0.1-beta",
-    "description": "Whisper Messenger SDK – Beta 0.0.1",
+    "description": "Whisper Messenger SDK -- Beta 0.0.1",
     "repository": {
         "type": "git",
         "url": "https://github.com/vorobalek/whisper-frontend.git"
@@ -12,13 +12,12 @@
     "private": true,
     "scripts": {
         "prettify": "npx prettier . --write",
-        "start": "npm run generate-coverage && webpack serve --env environment=serve",
-        "build": "npm run prettify && npx webpack --env environment=local && npm run generate-coverage && npm run copy-coverage",
-        "publish": "npm run prettify && npx webpack --env environment=staging && npm run generate-coverage && npm run copy-coverage",
+        "start": "npm run coverage:generate && webpack serve --env environment=serve",
+        "build": "npm run prettify && npx webpack --env environment=local && npm run coverage:generate && npm run coverage:copy",
+        "publish": "npm run prettify && npx webpack --env environment=staging && npm run coverage:generate && npm run coverage:copy",
         "analyze": "npx webpack --config webpack.analyze.config.js --env environment=local",
-        "generate-coverage": "cd packages/whisper-core && npm run test:coverage && cd ../..",
-        "clean-lcov-report": "rm -rf packages/whisper-core/coverage/lcov-report",
-        "copy-coverage": "npm run clean-lcov-report && mkdir -p dist/coverage && cp -r packages/whisper-core/coverage/. dist/coverage/"
+        "coverage:generate": "cd packages/whisper-core && npm run test:coverage && cd ../..",
+        "coverage:copy": "rm -rf packages/whisper-core/coverage/lcov-report && mkdir -p dist/coverage && cp -r packages/whisper-core/coverage/. dist/coverage/"
     },
     "prettier": {
         "printWidth": 120,
