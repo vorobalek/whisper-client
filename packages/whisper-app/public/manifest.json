@@ -1,9 +1,8 @@
 {
     "name": "Whisper Messenger App",
     "short_name": "Whisper",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#006acc",
-    "theme_color": "#006acc",
     "icons": [
         {
             "src": "__FRONTEND_URL__/assets/android-chrome-192x192.png",

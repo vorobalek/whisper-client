@@ -106,15 +106,8 @@ module.exports = (args) => {
                         },
                     },
                     {
-                        from: path.resolve(__dirname, './packages/whisper-app/public/manifest.light.json'),
-                        to: path.resolve(__dirname, './dist/manifest.light.json'),
-                        transform: {
-                            transformer: getParameterReplacer(templateParameters),
-                        },
-                    },
-                    {
-                        from: path.resolve(__dirname, './packages/whisper-app/public/manifest.dark.json'),
-                        to: path.resolve(__dirname, './dist/manifest.dark.json'),
+                        from: path.resolve(__dirname, './packages/whisper-app/public/manifest.json'),
+                        to: path.resolve(__dirname, './dist/manifest.json'),
                         transform: {
                             transformer: getParameterReplacer(templateParameters),
                         },

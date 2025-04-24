@@ -63,8 +63,6 @@
             display: flex;
             justify-content: end;
             align-items: center;
-            .sign {
-            }
             .info {
                 padding: 5px;
             }
