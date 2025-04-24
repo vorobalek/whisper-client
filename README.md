@@ -14,6 +14,26 @@
 
 ---
 
+## 🔗 PWA Support
+
+The live demo site ([https://whisper.vorobalek.dev](https://whisper.vorobalek.dev)) is a fully featured Progressive Web
+App (PWA). You can install it on Android and iOS devices for an app-like experience:
+
+### Android
+
+1. Open the demo site in Chrome (or another supported browser) on your Android device.
+2. Tap the “Install” icon in the address bar or open the menu and select “Add to Home screen.”
+3. Confirm to install the app.
+
+### iOS
+
+1. Open the demo site in Safari on your iOS device.
+2. Tap the “Share” button at the bottom of the screen.
+3. Scroll down and select “Add to Home Screen.”
+4. Tap “Add” to confirm and launch the app from your home screen.
+
+---
+
 ## ✨ Features
 
 - **_Multiple dialogs_** (multi-peer support)

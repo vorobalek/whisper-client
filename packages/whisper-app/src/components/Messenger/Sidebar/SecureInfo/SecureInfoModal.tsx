@@ -9,18 +9,6 @@ interface SecureInfoModalProps {
 const SecureInfoModal: React.FC<SecureInfoModalProps> = ({ visible, onClose }) => {
     if (!visible) return null;
 
-    const openDocs = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        e.preventDefault();
-        const url = `${process.env.FRONTEND_URL}/docs/protocol.svg?_=${process.env.BUILD_TIMESTAMP}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
-    const openCoverage = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        e.preventDefault();
-        const url = `${process.env.FRONTEND_URL}/coverage/index.html`;
-        window.open(url, '_blank', 'noopener,noreferrer');
-    };
-
     return (
         <div className='privacy-info-modal-overlay'>
             <div className='privacy-info-modal-content'>
@@ -52,21 +40,29 @@ const SecureInfoModal: React.FC<SecureInfoModalProps> = ({ visible, onClose }) =
                                 href={`${process.env.FRONTEND_URL}/docs/protocol.svg?_=${process.env.BUILD_TIMESTAMP}`}
                                 target='_blank'
                                 rel='external noopener noreferrer'
-                                onClick={openDocs}
                             >
                                 See full protocol schema for details.
                             </a>
                         </p>
 
                         <p>
+                            See&nbsp;
+                            <a
+                                href={'https://github.com/vorobalek/whisper-frontend'}
+                                target='_blank'
+                                rel='external noopener noreferrer'
+                            >
+                                source code
+                            </a>
+                            &nbsp;and&nbsp;
                             <a
                                 href={`${process.env.FRONTEND_URL}/coverage/index.html`}
                                 target='_blank'
                                 rel='external noopener noreferrer'
-                                onClick={openCoverage}
                             >
-                                See source code and coverage.
+                                coverage
                             </a>
+                            .
                         </p>
                     </div>
                 </div>
