@@ -187,7 +187,7 @@ function getIndexedDbDatabase(logger: Logger, cryptography: Cryptography): Datab
                             const data = (await cryptography.decryptData(
                                 key,
                                 Uint8Array.from(iv),
-                                Uint8Array.from(encryptedData),
+                                Uint8Array.from(encryptedData).buffer,
                             )) as { id: string; value: TypeData };
                             results.push(data);
                         }
