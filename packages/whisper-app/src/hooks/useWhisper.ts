@@ -11,15 +11,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import LogLevel = App.LogLevel;
 
-declare global {
-    // noinspection JSUnusedGlobalSymbols
-    interface Window {
-        whisper: Whisper & {
-            [key: string]: any;
-        };
-    }
-}
-
 type WhisperHookMetadataPasswordState = undefined | 'none' | 'valid' | 'invalid';
 
 type WhisperHookMetadata = {
@@ -29,7 +20,7 @@ type WhisperHookMetadata = {
     password: WhisperHookMetadataPasswordState;
 };
 
-export type WhisperHookConnectionCallbacks = {
+type WhisperHookConnectionCallbacks = {
     lifecycle: {
         open: (id: number) => Promise<void>;
         delete: (id: number) => Promise<void>;
@@ -63,7 +54,12 @@ type WhisperHookConnections = {
     callbacks: WhisperHookConnectionCallbacks;
 };
 
-type WhisperHook = [string | undefined, WhisperHookMetadata, WhisperHookConnections];
+type WhisperHookDebugFunctions = {
+    getEncryptedDatabaseBlob: () => Promise<Blob>;
+    setEncryptedDatabaseContent: (content: string) => Promise<void>;
+};
+
+type WhisperHook = [string | undefined, WhisperHookMetadata, WhisperHookConnections, WhisperHookDebugFunctions];
 
 export function useWhisper(
     password: string | undefined,
@@ -106,7 +102,7 @@ export function useWhisper(
             });
         }
 
-        return {
+        const logger = {
             trace(...args: any[]) {
                 switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
                     case 'trace':
@@ -188,6 +184,12 @@ export function useWhisper(
                 }
             },
         };
+        console.log = logger.log;
+        console.error = logger.error;
+        console.warn = logger.warn;
+        console.debug = logger.debug;
+        console.trace = logger.trace;
+        return logger;
     }, []);
     const cryptography = useMemo(() => getCryptography(), []);
     const whisperPrototype = useMemo<WhisperPrototype>(() => getPrototype(logger), [logger]);
@@ -533,46 +535,9 @@ export function useWhisper(
                     },
                 })
                 .then(async (_whisper) => {
-                    function downloadData(name: string, data: any, space?: string | number) {
-                        const tmpA = document.createElement('a');
-                        tmpA.href = window.URL.createObjectURL(
-                            new Blob([JSON.stringify(data, null, space)], { type: 'application/json' }),
-                        );
-                        tmpA.download = `${name}.json`;
-                        tmpA.click();
-                        tmpA.remove();
-                    }
-
-                    function uploadEncryptedDatabase(dbName: string, force: boolean = false) {
-                        const tmpInput = document.createElement('input');
-                        tmpInput.type = 'file';
-                        tmpInput.onchange = (e) => {
-                            const file = (e.target! as HTMLInputElement)!.files![0];
-                            const reader = new FileReader();
-                            reader.readAsText(file, 'UTF-8');
-                            reader.onload = async (readerEvent) => {
-                                const content = readerEvent.target!.result as string;
-                                await database.createDatabaseFromDump(dbName, JSON.parse(content), force);
-                            };
-                        };
-                        tmpInput.click();
-                        tmpInput.remove();
-                    }
-
-                    async function downloadEncryptedDatabase() {
-                        const data = await database.getRawDump();
-                        downloadData(`${serverTime()}-whisper-encrypted`, data);
-                    }
-
                     window.whisper = _whisper;
-                    // noinspection JSUnusedGlobalSymbols
-                    window.whisper['__debug'] = {
-                        downloadEncryptedDatabase,
-                        uploadEncryptedDatabase,
-                    };
                     const storedConnections = await getStoredConnections();
                     _initConnections(storedConnections);
-
                     setPublicKey(_whisper.publicKey);
                 })
                 .catch(logger.error);
@@ -788,6 +753,18 @@ export function useWhisper(
         [assertConnectionInitialized],
     );
 
+    const getEncryptedDatabaseBlob = useCallback(async () => {
+        const data = await database.getRawDump();
+        return new Blob([JSON.stringify(data)], { type: 'application/json' });
+    }, [database]);
+
+    const setEncryptedDatabaseContent = useCallback(
+        async (content: string) => {
+            await database.createDatabaseFromDump('whisper', JSON.parse(content), true);
+        },
+        [database],
+    );
+
     return [
         publicKey,
         {
@@ -826,6 +803,10 @@ export function useWhisper(
                     setOnMessage,
                 },
             },
+        },
+        {
+            getEncryptedDatabaseBlob,
+            setEncryptedDatabaseContent,
         },
     ];
 }

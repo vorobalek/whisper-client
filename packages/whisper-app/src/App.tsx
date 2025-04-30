@@ -1,3 +1,4 @@
+import DebugOverlay from './components/DebugOverlay';
 import LoadingOverlay from './components/LoadingOverlay';
 import Logs from './components/Logs';
 import Messenger from './components/Messenger';
@@ -64,7 +65,7 @@ const App: React.FC = () => {
     }, [debugPassword]);
     const [password, setPassword] = useState(debugPassword || undefined);
 
-    const [publicKey, metadata, connections] = useWhisper(
+    const [publicKey, metadata, connections, debugFunctions] = useWhisper(
         password,
         onPermissionDefault,
         onPermissionGranted,
@@ -116,7 +117,26 @@ const App: React.FC = () => {
         }
     }, [publicKey, createConnection, openConnection, debugSelfConnectValue]);
 
-    return (
+    const { getEncryptedDatabaseBlob, setEncryptedDatabaseContent } = debugFunctions;
+    const [showDebugOverlay, setShowDebugOverlay] = useState<boolean>(false);
+    useEffect(() => {
+        if (publicKey) {
+            window.whisper.__debug = () => {
+                setShowDebugOverlay(true);
+            };
+        }
+        return () => {
+            delete window.whisper.__debug;
+        };
+    }, [publicKey]);
+
+    return showDebugOverlay ? (
+        <DebugOverlay
+            getEncryptedDatabaseBlob={getEncryptedDatabaseBlob}
+            setEncryptedDatabaseContent={setEncryptedDatabaseContent}
+            onClose={() => setShowDebugOverlay(false)}
+        />
+    ) : (
         <>
             <Logs
                 visible={logsVisible}

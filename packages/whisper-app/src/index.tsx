@@ -1,6 +1,16 @@
 import App from './App';
+import { Whisper } from '@whisper/core';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
+declare global {
+    // noinspection JSUnusedGlobalSymbols
+    interface Window {
+        whisper: Whisper & {
+            __debug?: () => void;
+        };
+    }
+}
 
 const rootElement = document.getElementById('root');
 

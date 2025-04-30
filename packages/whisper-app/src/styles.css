@@ -18,6 +18,9 @@
         --text-color: #e8e6e3;
     }
 }
+* {
+    font-family: 'JetBrains Mono' !important;
+}
 *,
 ::before,
 ::after {
@@ -39,7 +42,6 @@ body,
 button,
 input,
 textarea {
-    font-family: 'JetBrains Mono', monospace;
     font-optical-sizing: auto;
     font-style: normal;
     font-variant-ligatures: normal;
