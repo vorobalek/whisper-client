@@ -529,7 +529,7 @@ export function useChat({
                     await openConnection();
                 } else {
                     await new Promise<void>((resolve) => {
-                        console.warn(`Reconnecting after 5 seconds.`);
+                        console.warn(`Reconnecting in 5 seconds...`);
                         timeout = setTimeout(async () => {
                             await job(retryCount)();
                             resolve();

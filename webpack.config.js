@@ -165,6 +165,9 @@ module.exports = (args) => {
             ],
             port: 8080,
             historyApiFallback: true,
+            client: {
+                overlay: false,
+            },
         },
     };
 };
