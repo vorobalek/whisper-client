@@ -77,7 +77,26 @@ export function useWhisper(
     const [logs, setLogs] = useState<Array<LogEntryProps>>([]);
 
     const logger = useMemo<Logger>(() => {
-        const originalConsole = { ...console };
+        enum LogLevelEnum {
+            Trace = 'trace',
+            Debug = 'debug',
+            Info = 'info',
+            Warn = 'warn',
+            Error = 'error',
+        }
+
+        const LOG_LEVELS: LogLevelEnum[] = [
+            LogLevelEnum.Trace,
+            LogLevelEnum.Debug,
+            LogLevelEnum.Info,
+            LogLevelEnum.Warn,
+            LogLevelEnum.Error,
+        ];
+
+        function shouldLog(current: LogLevelEnum, target: LogLevelEnum) {
+            return LOG_LEVELS.indexOf(current) <= LOG_LEVELS.indexOf(target);
+        }
+
         function getLine(...args: any[]) {
             return args
                 .map((arg) => {
@@ -93,97 +112,38 @@ export function useWhisper(
         }
 
         const MAX_LOG_LENGTH = 500;
-        function documentLog(level: LogLevel, ...args: any[]) {
+        const originalConsole = { ...console };
+
+        function documentLog(level: LogLevelEnum, ...args: any[]) {
             const timestamp = now();
             const content = getLine(...args);
             setLogs((prevLogs) => {
-                if (prevLogs.length > MAX_LOG_LENGTH) prevLogs.shift();
-                return [...prevLogs, { timestamp, level, content }];
+                const logs = prevLogs.length >= MAX_LOG_LENGTH ? prevLogs.slice(1) : prevLogs;
+                return [...logs, { timestamp, level, content }];
             });
         }
 
-        const logger = {
-            trace(...args: any[]) {
-                switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                        originalConsole.trace(...args);
-                        break;
+        function makeLogger(consoleLevel: LogLevelEnum, documentLevel: LogLevelEnum) {
+            function log(level: LogLevelEnum, ...args: any[]) {
+                if (shouldLog(consoleLevel, level)) {
+                    (originalConsole as any)[level](...args);
                 }
-                switch (process.env.DOCUMENT_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                        documentLog('trace', ...args);
-                        break;
+                if (shouldLog(documentLevel, level)) {
+                    documentLog(level, ...args);
                 }
-            },
-            debug(...args: any[]) {
-                switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                        originalConsole.debug(...args);
-                        break;
-                }
-                switch (process.env.DOCUMENT_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                        documentLog('debug', ...args);
-                        break;
-                }
-            },
-            log(...args: any[]) {
-                switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                        originalConsole.log(...args);
-                        break;
-                }
-                switch (process.env.DOCUMENT_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                        documentLog('info', ...args);
-                        break;
-                }
-            },
-            warn(...args: any[]) {
-                switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                    case 'warn':
-                        originalConsole.warn(...args);
-                        break;
-                }
-                switch (process.env.DOCUMENT_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                    case 'warn':
-                        documentLog('warn', ...args);
-                        break;
-                }
-            },
-            error(...args: any[]) {
-                switch (process.env.CONSOLE_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                    case 'warn':
-                    case 'error':
-                        originalConsole.error(...args);
-                        break;
-                }
-                switch (process.env.DOCUMENT_LOG_LEVEL as App.LogLevel) {
-                    case 'trace':
-                    case 'debug':
-                    case 'info':
-                    case 'warn':
-                    case 'error':
-                        documentLog('error', ...args);
-                        break;
-                }
-            },
-        };
+            }
+            return {
+                trace: (...args: any[]) => log(LogLevelEnum.Trace, ...args),
+                debug: (...args: any[]) => log(LogLevelEnum.Debug, ...args),
+                log: (...args: any[]) => log(LogLevelEnum.Info, ...args),
+                warn: (...args: any[]) => log(LogLevelEnum.Warn, ...args),
+                error: (...args: any[]) => log(LogLevelEnum.Error, ...args),
+            };
+        }
+
+        const consoleLevel = (process.env.CONSOLE_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
+        const documentLevel = (process.env.DOCUMENT_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
+        const logger = makeLogger(consoleLevel, documentLevel);
         console.log = logger.log;
         console.error = logger.error;
         console.warn = logger.warn;
@@ -191,6 +151,7 @@ export function useWhisper(
         console.trace = logger.trace;
         return logger;
     }, []);
+
     const cryptography = useMemo(() => getCryptography(), []);
     const whisperPrototype = useMemo<WhisperPrototype>(() => getPrototype(logger), [logger]);
 
@@ -760,7 +721,7 @@ export function useWhisper(
 
     const setEncryptedDatabaseContent = useCallback(
         async (content: string) => {
-            await database.createDatabaseFromDump('whisper', JSON.parse(content), true);
+            await database.createDatabaseFromDump(DB_SLUG, JSON.parse(content), true);
         },
         [database],
     );
