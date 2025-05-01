@@ -19,7 +19,7 @@
     }
 }
 * {
-    font-family: 'JetBrains Mono' !important;
+    font-family: 'JetBrains Mono', monospace !important;
 }
 *,
 ::before,
