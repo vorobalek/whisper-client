@@ -3,13 +3,11 @@ import { ChatWindowMessageType } from '../components/Messenger/Chat/ChatWindow';
 import { UpdateType } from '../types/updateType';
 import { getCryptography } from '../utils/cryptography';
 import getDatabase from '../utils/database';
-import { now, serverTime } from '../utils/functions';
+import { now } from '../utils/functions';
 import { Logger } from '../utils/logger';
 import { useSearchParams } from './useSearchParams';
-import { getPrototype, Connection, ConnectionState, Whisper, WhisperPrototype } from '@whisper/core';
+import { getPrototype, Connection, ConnectionState, WhisperPrototype } from '@whisper/core';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import LogLevel = App.LogLevel;
 
 type WhisperHookMetadataPasswordState = undefined | 'none' | 'valid' | 'invalid';
 
