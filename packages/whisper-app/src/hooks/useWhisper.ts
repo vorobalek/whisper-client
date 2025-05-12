@@ -139,8 +139,8 @@ export function useWhisper(
             };
         }
 
-        const consoleLevel = (process.env.CONSOLE_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
-        const documentLevel = (process.env.DOCUMENT_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
+        const consoleLevel = (process.env.WHISPER_CONSOLE_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
+        const documentLevel = (process.env.WHISPER_DOCUMENT_LOG_LEVEL as LogLevelEnum) || LogLevelEnum.Info;
         const logger = makeLogger(consoleLevel, documentLevel);
         console.log = logger.log;
         console.error = logger.error;
@@ -433,17 +433,17 @@ export function useWhisper(
                     },
 
                     // SignalRServiceConfig && CallServiceConfig
-                    serverUrl: process.env.SERVER_URL,
+                    serverUrl: process.env.WHISPER_SERVER_URL,
 
                     // WorkerServiceConfig
-                    version: process.env.BUILD_TIMESTAMP,
+                    version: process.env.WHISPER_BUILD_TIMESTAMP,
                     onNewVersion: () => {
                         setNeedUpdate(true);
                     },
 
                     // PushServiceConfig
                     disablePushService: disablePushServiceValue === 'true' ? true : undefined,
-                    vapidKey: process.env.VAPID_KEY,
+                    vapidKey: process.env.WHISPER_VAPID_KEY,
                     onPermissionDefault: onPermissionDefault,
                     onPermissionGranted: onPermissionGranted,
                     onPermissionDenied: onPermissionDenied,

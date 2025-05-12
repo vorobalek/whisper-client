@@ -4,11 +4,11 @@ declare namespace App {
 
 declare namespace NodeJS {
     interface ProcessEnv {
-        CONSOLE_LOG_LEVEL: App.LogLevel;
-        DOCUMENT_LOG_LEVEL: App.LogLevel;
-        BUILD_TIMESTAMP: string;
-        SERVER_URL: string;
-        FRONTEND_URL: string;
-        VAPID_KEY: string;
+        WHISPER_CONSOLE_LOG_LEVEL: App.LogLevel;
+        WHISPER_DOCUMENT_LOG_LEVEL: App.LogLevel;
+        WHISPER_BUILD_TIMESTAMP: string;
+        WHISPER_SERVER_URL: string;
+        WHISPER_FRONTEND_URL: string;
+        WHISPER_VAPID_KEY: string;
     }
 }

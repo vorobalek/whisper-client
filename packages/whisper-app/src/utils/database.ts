@@ -45,7 +45,7 @@ function getIndexedDbDatabase(logger: Logger, cryptography: Cryptography): Datab
             for (const table of tables) {
                 tableHashes.push(await cryptography.getHashString(table));
             }
-            const request: IDBOpenDBRequest = indexedDB.open(name, +process.env.BUILD_TIMESTAMP);
+            const request: IDBOpenDBRequest = indexedDB.open(name, +process.env.WHISPER_BUILD_TIMESTAMP);
 
             request.onerror = (event: Event) => {
                 const target = event.target as IDBOpenDBRequest;
@@ -325,7 +325,7 @@ function getIndexedDbDatabase(logger: Logger, cryptography: Cryptography): Datab
             }
 
             const tableNames = Object.keys(dump);
-            const request = indexedDB.open(dbName, +process.env.BUILD_TIMESTAMP);
+            const request = indexedDB.open(dbName, +process.env.WHISPER_BUILD_TIMESTAMP);
             let newDb: IDBDatabase;
             await new Promise<void>((resolve, reject) => {
                 request.onerror = (event: Event) => {

@@ -134,7 +134,8 @@ export function createMockCallService() {
 
 // Factory for creating mockConfig for push-service
 export function createMockPushConfig(overrides = {}) {
-    const TEST_VAPID_KEY = 'BDuixZ_tK0mDQPXYYuT1zWcql3BKy_y_dJmUVd9M5hTpCkE-BCvqeXGKyKqX2YRxLQIw1x_SZTHxY7MNwUx4hI0';
+    const TEST_WHISPER_VAPID_KEY =
+        'BDuixZ_tK0mDQPXYYuT1zWcql3BKy_y_dJmUVd9M5hTpCkE-BCvqeXGKyKqX2YRxLQIw1x_SZTHxY7MNwUx4hI0';
     const notificationMock = jest.fn() as unknown as typeof Notification;
     (notificationMock as any).permission = 'granted';
     notificationMock.requestPermission = jest.fn().mockResolvedValue('granted');
@@ -143,7 +144,7 @@ export function createMockPushConfig(overrides = {}) {
         subscribe: jest.fn().mockResolvedValue(undefined),
     } as unknown as typeof PushManager;
     return {
-        vapidKey: TEST_VAPID_KEY,
+        vapidKey: TEST_WHISPER_VAPID_KEY,
         onCall: jest.fn().mockResolvedValue(undefined),
         onPermissionDefault: jest.fn().mockResolvedValue(undefined),
         onPermissionGranted: jest.fn().mockResolvedValue(undefined),

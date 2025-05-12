@@ -8,5 +8,5 @@ if [ "${CODESPACES:-}" = "true" ] && command -v gh >/dev/null 2>&1; then
       || echo "Failed to set port $port"
   done
 else
-  echo "Not in Codespaces or gh CLI unavailable – skipping port visibility"
+  echo "Not in Codespaces or gh CLI unavailable, skipping port visibility."
 fi
