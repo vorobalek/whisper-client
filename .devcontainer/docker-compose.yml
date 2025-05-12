@@ -16,6 +16,8 @@ services:
     backend:
         image: vorobalek/whisper:latest
         restart: unless-stopped
+        env_file:
+            - ./tmp/.env
         environment:
             ASPNETCORE_ENVIRONMENT: 'Development'
             PORT: '80'
@@ -24,8 +26,6 @@ services:
             REDIS_CONNECTION_STRING: 'redis:6379'
             MONGO_CONNECTION_STRING: 'mongodb://mongo:27017'
             NOTIFICATION_SUBJECT: 'mailto:whisper-local@example.com'
-            NOTIFICATION_PUBLIC_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I'
-            NOTIFICATION_PRIVATE_KEY: 'ueOU3tiNi2CaW3CHmG538gp2nqE-h7Rfm9BhJ7W7PUQ'
         depends_on:
             - redis
             - mongo
@@ -43,14 +43,14 @@ services:
         working_dir: /workspaces/whisper-frontend
         volumes:
             - ..:/workspaces/whisper-frontend:cached
-        ports:
-            - '8080:8080'
-        environment:
-            DEV_ENV: devcontainer
+        env_file:
+            - ./tmp/.env
         depends_on:
             - backend
             - redis
             - mongo
+        ports:
+            - '8080:8080'
         networks:
             - lan
 

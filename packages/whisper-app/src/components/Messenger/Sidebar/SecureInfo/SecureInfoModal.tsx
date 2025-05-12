@@ -37,7 +37,7 @@ const SecureInfoModal: React.FC<SecureInfoModalProps> = ({ visible, onClose }) =
 
                         <p>
                             <a
-                                href={`${process.env.FRONTEND_URL}/docs/protocol.svg?_=${process.env.BUILD_TIMESTAMP}`}
+                                href={`${process.env.WHISPER_FRONTEND_URL}/docs/protocol.svg?_=${process.env.WHISPER_BUILD_TIMESTAMP}`}
                                 target='_blank'
                                 rel='external noopener noreferrer'
                             >
@@ -56,7 +56,7 @@ const SecureInfoModal: React.FC<SecureInfoModalProps> = ({ visible, onClose }) =
                             </a>
                             &nbsp;and&nbsp;
                             <a
-                                href={`${process.env.FRONTEND_URL}/coverage/index.html`}
+                                href={`${process.env.WHISPER_FRONTEND_URL}/coverage/index.html`}
                                 target='_blank'
                                 rel='external noopener noreferrer'
                             >

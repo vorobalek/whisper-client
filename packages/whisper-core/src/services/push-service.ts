@@ -215,9 +215,7 @@ export function getPushService(logger: Logger, workerService: WorkerService, bas
             async function getPushSubscription(
                 urlBase64ToUint8Array: (base64String: string) => Uint8Array,
             ): Promise<PushSubscription | undefined> {
-                const PushManager = pushManager;
-
-                if (!PushManager) {
+                if (!pushManager) {
                     logger.warn('[push-service] PushManager is not available.');
                     return undefined;
                 }

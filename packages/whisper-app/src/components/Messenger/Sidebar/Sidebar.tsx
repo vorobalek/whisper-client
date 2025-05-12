@@ -120,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <span className='info'>Read how Whisper protects your privacy</span>
                 </div>
             </span>
-            <span className='build-timestamp'>Build #{process.env.BUILD_TIMESTAMP}</span>
+            <span className='build-timestamp'>Build #{process.env.WHISPER_BUILD_TIMESTAMP}</span>
             <QrCodeModal
                 visible={showQrCodeModal}
                 onClose={() => setShowQrCodeModal(false)}

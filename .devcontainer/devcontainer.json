@@ -11,7 +11,8 @@
     "features": {
         "ghcr.io/devcontainers/features/github-cli:1": {}
     },
-    "postStartCommand": "bash .devcontainer/codespace/set-ports-visibility.sh",
+    "initializeCommand": "bash .devcontainer/scripts/generate-vapid.sh",
+    "postStartCommand": "bash .devcontainer/scripts/codespace/set-ports-visibility.sh",
     "customizations": {
         "vscode": {
             "settings": {

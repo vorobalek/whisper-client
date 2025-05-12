@@ -51,7 +51,8 @@ describe('PushService', () => {
     let mockPushSubscription: any;
     let mockContainer: any;
 
-    const TEST_VAPID_KEY = 'BDuixZ_tK0mDQPXYYuT1zWcql3BKy_y_dJmUVd9M5hTpCkE-BCvqeXGKyKqX2YRxLQIw1x_SZTHxY7MNwUx4hI0';
+    const TEST_WHISPER_VAPID_KEY =
+        'BDuixZ_tK0mDQPXYYuT1zWcql3BKy_y_dJmUVd9M5hTpCkE-BCvqeXGKyKqX2YRxLQIw1x_SZTHxY7MNwUx4hI0';
 
     beforeEach(() => {
         // Mock worker controller
@@ -379,7 +380,7 @@ describe('PushService', () => {
             };
 
             // Make sure mockConfig has the necessary vapidKey
-            mockConfig.vapidKey = TEST_VAPID_KEY;
+            mockConfig.vapidKey = TEST_WHISPER_VAPID_KEY;
 
             // Mock push subscription retrieval
             mockPushManager.getSubscription.mockResolvedValue(mockPushSubscription);

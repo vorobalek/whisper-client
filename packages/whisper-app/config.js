@@ -3,31 +3,34 @@ function getTemplateParameters(env) {
     switch (env.environment) {
         case 'local':
             parameters = {
-                CONSOLE_LOG_LEVEL: 'trace',
-                DOCUMENT_LOG_LEVEL: 'info',
-                SERVER_URL:
-                    env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
+                WHISPER_CONSOLE_LOG_LEVEL: 'trace',
+                WHISPER_DOCUMENT_LOG_LEVEL: 'info',
+                WHISPER_SERVER_URL:
+                    env.CODESPACES === 'true' && env.CODESPACE_NAME !== undefined
                         ? `https://${env.CODESPACE_NAME}-5027.app.github.dev`
                         : 'http://localhost:5027',
-                FRONTEND_URL:
-                    env.CODESPACES == 'true' && env.CODESPACE_NAME !== undefined
+                WHISPER_FRONTEND_URL:
+                    env.CODESPACES === 'true' && env.CODESPACE_NAME !== undefined
                         ? `https://${env.CODESPACE_NAME}-8080.app.github.dev`
                         : 'http://localhost:8080',
-                VAPID_KEY: 'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I',
+                WHISPER_VAPID_KEY:
+                    env.WHISPER_VAPID_KEY ||
+                    'BDJvWjwP8E1UQpbH1GecXj29D0toqjTIRE4jGfeChwBPX86oHP_9PNcyUoxM-Uo41v_oOJtGB559oQVhEmpsv-I',
             };
             break;
         case 'staging':
             parameters = {
-                CONSOLE_LOG_LEVEL: 'trace',
-                DOCUMENT_LOG_LEVEL: 'info',
-                SERVER_URL: 'https://cluster.vorobalek.dev/whisper',
-                FRONTEND_URL: 'https://whisper.vorobalek.dev',
-                VAPID_KEY: 'BHAYDRAjMWXfg7dxFIOZYNLlxrVDohy_PbN7SXcrXapiZq0Jnt0VXsAx6ytkLArVVFDSfula4VRWm5HDvkVVRbA',
+                WHISPER_CONSOLE_LOG_LEVEL: 'trace',
+                WHISPER_DOCUMENT_LOG_LEVEL: 'info',
+                WHISPER_SERVER_URL: 'https://cluster.vorobalek.dev/whisper',
+                WHISPER_FRONTEND_URL: 'https://whisper.vorobalek.dev',
+                WHISPER_VAPID_KEY:
+                    'BHAYDRAjMWXfg7dxFIOZYNLlxrVDohy_PbN7SXcrXapiZq0Jnt0VXsAx6ytkLArVVFDSfula4VRWm5HDvkVVRbA',
             };
             break;
     }
     parameters = {
-        BUILD_TIMESTAMP: Date.now(),
+        WHISPER_BUILD_TIMESTAMP: Date.now(),
         ...parameters,
     };
     console.log(JSON.stringify(parameters, null, 2));

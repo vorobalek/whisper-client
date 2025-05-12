@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { getTemplateParameters, getParameterReplacer, getEnvironmentVariables } = require('./config');
 
 module.exports = (args) => {
-    env = {
+    const env = {
         ...args,
         ...process.env,
     };
