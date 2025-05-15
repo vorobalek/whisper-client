@@ -1,4 +1,4 @@
-import { encodeBase64, decodeBase64 } from './nacl-util-wrapper';
+import { decodeBase64, encodeBase64 } from './nacl-util-wrapper';
 
 /**
  * Interface for Base64 encoding and decoding operations.

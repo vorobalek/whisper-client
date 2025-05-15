@@ -2,12 +2,14 @@
     --progress-bg-color: #bfbfbf;
     --progress-text-color: #000;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --progress-bg-color: #3c4144;
         --progress-text-color: #e8e6e3;
     }
 }
+
 .progress {
     max-width: 60%;
     word-break: break-word;

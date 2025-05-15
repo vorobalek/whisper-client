@@ -1,11 +1,13 @@
 :root {
     --messenger-bg-color: #ffffff;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --messenger-bg-color: #181a1b;
     }
 }
+
 .messenger {
     display: flex;
     height: 100vh;
@@ -14,18 +16,21 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     border-radius: 20px;
 }
+
 @media (min-width: 1112px) {
     .messenger {
         width: 1112px;
         padding: 20px;
     }
 }
+
 @media (min-width: 769px) {
     .messenger {
         max-width: 90%;
         max-height: 90%;
         padding: 20px;
     }
+
     @media (display-mode: standalone) {
         .messenger {
             max-width: 100vw;
@@ -37,6 +42,7 @@
         }
     }
 }
+
 @media (max-width: 768px) {
     .messenger {
         border-radius: 0;

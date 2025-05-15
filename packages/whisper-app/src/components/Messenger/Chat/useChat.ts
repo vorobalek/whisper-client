@@ -68,6 +68,7 @@ export function useChat({
                 });
             }
         }
+
         let newValues: Array<ChatWindowMessageType> = [];
         let lastDate: number | undefined = undefined;
         const delta = now() - serverTime();
@@ -139,6 +140,7 @@ export function useChat({
                                 return message.timestamp * 10 + 2;
                         }
                     }
+
                     const keyA = getKey(a);
                     const keyB = getKey(b);
                     return keyA == keyB ? 0 : keyA < keyB ? -1 : 1;

@@ -8,7 +8,7 @@ import { Utf8 } from '../../utils/utf8';
 import { ConnectionService } from '../connection-service';
 import { SessionService } from '../session-service';
 import { TimeService } from '../time-service';
-import { getCallHandler, CallHandler } from './call-handler';
+import { CallHandler, getCallHandler } from './call-handler';
 
 /**
  * Interface for handling 'ice' call requests in the WebRTC signaling process.

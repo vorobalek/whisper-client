@@ -1,4 +1,4 @@
-import { getPrototype, Whisper, WhisperPrototype, Connection, ConnectionState } from '../src/index';
+import { Connection, ConnectionState, getPrototype, Whisper, WhisperPrototype } from '../src/index';
 import * as whisperModule from '../src/whisper';
 
 // Mock the connection module (where ConnectionState is actually defined)

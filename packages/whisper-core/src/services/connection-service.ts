@@ -4,8 +4,8 @@ import { Logger } from '../utils/logger';
 import { Utf8 } from '../utils/utf8';
 import { CallService } from './call-service';
 import {
-    ConnectionInternal,
     Connection,
+    ConnectionInternal,
     ConnectionState,
     getConnection,
     translateConnection,
@@ -126,6 +126,7 @@ export function getConnectionService(
     let connections: {
         [publicKey: string]: ConnectionInternal;
     } = {};
+
     function createConnection(publicKey: string): ConnectionInternal {
         const connection = getConnection(
             publicKey,
@@ -142,6 +143,7 @@ export function getConnectionService(
         connections[publicKey] = connection;
         return connection;
     }
+
     return {
         initialize(config: ConnectionServiceEffectiveConfig): void {
             onIncomingConnection = config.onIncomingConnection;

@@ -1,7 +1,7 @@
 import { createMockLogger } from '../../__mocks__/test-utils';
 import { getCryptography } from '../../src/utils/cryptography';
 import { Logger } from '../../src/utils/logger';
-import { sign, box, secretbox } from '../../src/utils/nacl-wrapper';
+import { secretbox, sign } from '../../src/utils/nacl-wrapper';
 
 describe('Cryptography utility', () => {
     let cryptography: ReturnType<typeof getCryptography>;

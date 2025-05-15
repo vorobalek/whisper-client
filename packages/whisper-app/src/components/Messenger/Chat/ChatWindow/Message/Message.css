@@ -38,19 +38,23 @@
     margin: 10px 0;
     touch-action: pan-y;
     min-width: 100px;
+
     .message-status {
         display: flex;
         justify-content: end;
         align-items: center;
+
         .message-time {
             font-size: 10px;
             padding: 2px;
             align-self: center;
         }
+
         .message-check {
             display: flex;
             align-items: center;
         }
+
         .message-reaction-button {
             cursor: pointer;
             margin-left: 4px;
@@ -62,12 +66,14 @@
             justify-content: center;
             transition: all 0.2s;
         }
+
         .message-reaction-button:hover {
             background-color: rgba(255, 255, 255, 0.2);
             opacity: 1;
             transform: scale(1.1);
         }
     }
+
     .message-reaction {
         position: absolute;
         bottom: -0.5em;
@@ -82,9 +88,11 @@
         cursor: pointer;
         transition: transform 0.2s;
     }
+
     .message-reaction:hover {
         transform: scale(1.1);
     }
+
     .message-reaction-placeholder {
         position: absolute;
         bottom: -0.5em;
@@ -102,27 +110,33 @@
             opacity 0.3s,
             transform 0.2s;
     }
+
     .message-reaction-placeholder:hover {
         transform: scale(1.1);
     }
+
     .reply-to {
         display: flex;
         flex-direction: row;
         align-items: center;
         padding: 5px;
         cursor: pointer;
+
         .icon {
             font-size: 18px;
             padding: 5px;
         }
+
         .you {
             background-color: var(--message-reply-to-you-bg-color);
             color: var(--message-reply-to-you-text-color);
         }
+
         .peer {
             background-color: var(--message-reply-to-peer-bg-color);
             color: var(--message-reply-to-peer-text-color);
         }
+
         .you,
         .peer {
             padding: 5px;
@@ -133,6 +147,7 @@
             text-overflow: ellipsis;
         }
     }
+
     .message-marker-top,
     .message-marker-bottom {
         width: 100%;
@@ -142,31 +157,37 @@
         visibility: hidden;
     }
 }
+
 .message.you {
     align-self: flex-end;
     background-color: var(--message-you-bg-color);
     color: var(--message-you-text-color);
     padding: 5px 5px 0 5px;
     border-radius: 10px 0 10px 10px;
+
     .message-reaction {
         background-color: var(--message-reply-to-peer-bg-color);
         color: var(--message-reply-to-peer-text-color);
     }
 }
+
 .message.peer {
     align-self: flex-start;
     background-color: var(--message-peer-bg-color);
     color: var(--message-peer-text-color);
     padding: 5px 5px 0 5px;
     border-radius: 0 10px 10px 10px;
+
     .message-reaction {
         background-color: var(--message-reply-to-you-bg-color);
         color: var(--message-reply-to-you-text-color);
     }
+
     &:hover .message-reaction-placeholder {
         opacity: 1;
     }
 }
+
 .message.system,
 .message.date {
     align-self: center;
@@ -176,12 +197,14 @@
     border-radius: 20px;
     font-size: 12px;
 }
+
 .message.you,
 .message.peer {
     .message-text {
         padding: 5px;
     }
 }
+
 .message.blur {
     filter: blur(5px);
 }

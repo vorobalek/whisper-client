@@ -1,11 +1,13 @@
 :root {
     --overlay-bg-color: rgba(0, 0, 0, 0.8);
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --overlay-bg-color: rgba(0, 0, 0, 0.8);
     }
 }
+
 .permission-overlay {
     position: fixed;
     top: 0;
@@ -17,6 +19,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     button {
         border: none;
         border-radius: 5px;
@@ -25,10 +28,12 @@
         background-color: var(--button-bg-color);
         padding: 15px 30px;
     }
+
     button:hover {
         background-color: var(--button-hover-bg-color);
         font-size: 16px;
     }
+
     pre {
         padding: 20px;
         color: var(--button-text-color);

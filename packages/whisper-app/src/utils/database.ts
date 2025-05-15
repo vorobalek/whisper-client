@@ -8,14 +8,21 @@ export type DatabaseConfig = {
 
 interface Database {
     initialize(config: DatabaseConfig): void;
+
     set<TypeData>(table: string, id: string, value: TypeData, password: string): Promise<void>;
+
     get<TypeData>(table: string, id: string, password: string): Promise<TypeData | null>;
+
     getAll<TypeData>(table: string, password: string): Promise<{ id: string; value: TypeData }[] | null>;
+
     delete(table: string, id: string): Promise<void>;
+
     clear(table: string): Promise<void>;
+
     getRawDump(): Promise<{
         [table: string]: Array<{ id: string; iv: number[]; salt: number[]; encryptedData: number[] }>;
     }>;
+
     createDatabaseFromDump(
         dbName: string,
         dump: {

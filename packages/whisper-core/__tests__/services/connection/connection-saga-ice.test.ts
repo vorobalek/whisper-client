@@ -4,12 +4,10 @@
 // It specifically tests the addIceCandidate and related flows for WebRTC connections.
 // The test is moved here as part of a refactor to logically group tests by connection feature.
 import {
-    ConnectionSaga,
     ConnectionSagaState,
     ConnectionSagaType,
     getConnectionSaga,
 } from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
 
 describe('ConnectionSaga (ICE handling)', () => {
     // Mock all the required dependencies

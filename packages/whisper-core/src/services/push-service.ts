@@ -219,6 +219,7 @@ export function getPushService(logger: Logger, workerService: WorkerService, bas
                     logger.warn('[push-service] PushManager is not available.');
                     return undefined;
                 }
+
                 async function unsubscribePushSubscription(subscription: PushSubscription): Promise<void> {
                     try {
                         await subscription.unsubscribe();
@@ -227,6 +228,7 @@ export function getPushService(logger: Logger, workerService: WorkerService, bas
                         logger.error('[push-service] An error occurred while cancelling the subscription.', err);
                     }
                 }
+
                 const registration = workerService.registration;
                 if (!registration) {
                     logger.warn('[push-service] Service Worker registration is not available.');
@@ -317,6 +319,7 @@ export function getPushService(logger: Logger, workerService: WorkerService, bas
                 workerService.controller.postMessage({ type: 'SHOW_NOTIFICATION', title: title, options: options });
                 return true;
             }
+
             const shown = showInternal();
             if (!shown) {
                 const Notification = notification;

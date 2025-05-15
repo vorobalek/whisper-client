@@ -113,6 +113,19 @@ export interface Connection {
  */
 export interface ConnectionInternal {
     /**
+     * Callback for connection progress updates.
+     */
+    onProgress?: (progress: number) => void;
+    /**
+     * Callback for connection state changes.
+     */
+    onStateChanged?: (from: ConnectionState, to: ConnectionState) => void;
+    /**
+     * Callback for received messages.
+     */
+    onMessage?: (message: string) => void;
+
+    /**
      * Gets the timestamp when the connection was opened.
      *
      * @returns The timestamp in milliseconds or undefined if not yet opened
@@ -146,21 +159,6 @@ export interface ConnectionInternal {
      * @returns The state of the outgoing connection process
      */
     get outgoingState(): ConnectionSagaState;
-
-    /**
-     * Callback for connection progress updates.
-     */
-    onProgress?: (progress: number) => void;
-
-    /**
-     * Callback for connection state changes.
-     */
-    onStateChanged?: (from: ConnectionState, to: ConnectionState) => void;
-
-    /**
-     * Callback for received messages.
-     */
-    onMessage?: (message: string) => void;
 
     /**
      * Sends a text message to the peer over the established connection.
@@ -322,6 +320,7 @@ export function getConnection(
     let state: ConnectionState = ConnectionState.New;
     let incomingSaga = createConnectionSaga('incoming');
     let outgoingSaga = createConnectionSaga('outgoing');
+
     function createConnectionSaga(type: ConnectionSagaType) {
         return getConnectionSaga(
             publicKey,
@@ -337,6 +336,7 @@ export function getConnection(
             iceServers,
         );
     }
+
     function connectionOnProgress(progress: number): void {
         new Promise<void>((resolve) => {
             if (connection.onProgress !== undefined && connection.onProgress !== null) {
@@ -347,6 +347,7 @@ export function getConnection(
             logger.error(`[connection] Progress callback error in connection with ${connection.publicKey}.`, err);
         });
     }
+
     function connectionOnStateChange(from: ConnectionState, to: ConnectionState): void {
         new Promise<void>((resolve) => {
             if (connection.onStateChanged !== undefined && connection.onStateChanged !== null) {
@@ -357,6 +358,7 @@ export function getConnection(
             logger.error(`[connection] State change callback error in connection with ${connection.publicKey}.`, err);
         });
     }
+
     function connectionOnMessage(message: string) {
         new Promise<void>((resolve) => {
             if (connection.onMessage !== undefined && connection.onMessage !== null) {
@@ -367,6 +369,7 @@ export function getConnection(
             logger.error(`[connection] Message callback error in connection with ${connection.publicKey}.`, err);
         });
     }
+
     function getConnectionSagaOnStateChanged(type: ConnectionSagaType) {
         return (from: ConnectionSagaState, to: ConnectionSagaState) => {
             const old = state;
@@ -392,6 +395,7 @@ export function getConnection(
             connectionOnProgress(progress);
         };
     }
+
     function getSaga(): ConnectionSaga | undefined {
         if (incomingSaga.state === ConnectionSagaState.Connected) {
             return incomingSaga;

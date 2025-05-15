@@ -55,6 +55,20 @@ export type ConnectionSagaType = 'incoming' | 'outgoing';
  */
 export interface ConnectionSaga {
     /**
+     * Optional callback triggered when the saga state changes.
+     *
+     * @param from - Previous state
+     * @param to - New state
+     */
+    onStateChanged?: (from: ConnectionSagaState, to: ConnectionSagaState) => void;
+    /**
+     * Optional callback triggered when a message is received from the peer.
+     *
+     * @param message - The received message
+     */
+    onMessage?: (message: string) => void;
+
+    /**
      * The public key of the remote peer in this connection.
      */
     get publicKey(): string;
@@ -78,21 +92,6 @@ export interface ConnectionSaga {
      * Function to abort the saga and terminate the connection attempt.
      */
     get abort(): () => void;
-
-    /**
-     * Optional callback triggered when the saga state changes.
-     *
-     * @param from - Previous state
-     * @param to - New state
-     */
-    onStateChanged?: (from: ConnectionSagaState, to: ConnectionSagaState) => void;
-
-    /**
-     * Optional callback triggered when a message is received from the peer.
-     *
-     * @param message - The received message
-     */
-    onMessage?: (message: string) => void;
 
     /**
      * Initializes and starts the connection saga with the specified initial state.
@@ -213,6 +212,7 @@ export function getConnectionSaga(
     const stateAwaiterGteMap: {
         [state: number]: (() => void)[];
     } = {};
+
     function setState(value: ConnectionSagaState) {
         const current = state;
         state = value;
@@ -233,9 +233,11 @@ export function getConnectionSaga(
             }
         }
     }
+
     let _continueCallback: (() => void) | undefined;
     let iceCandidates: WebRtcIceCandidate[] = [];
     let _rtcPeerConnection: RTCPeerConnection | undefined;
+
     function getRtcPeerConnection(): RTCPeerConnection {
         if (!_rtcPeerConnection) {
             throw newError(
@@ -245,8 +247,10 @@ export function getConnectionSaga(
         }
         return _rtcPeerConnection;
     }
+
     let _rtcSendDataChannel: RTCDataChannel | undefined;
     let rtcReceiveDataChannel: RTCDataChannel | undefined;
+
     function getRtcSendDataChannel(): RTCDataChannel {
         if (!_rtcSendDataChannel) {
             throw newError(
@@ -256,7 +260,9 @@ export function getConnectionSaga(
         }
         return _rtcSendDataChannel;
     }
+
     let _sharedSymmetricKey: Uint8Array | undefined;
+
     function getSharedSymmetricKey(): Uint8Array {
         if (!_sharedSymmetricKey) {
             throw newError(
@@ -266,9 +272,11 @@ export function getConnectionSaga(
         }
         return _sharedSymmetricKey;
     }
+
     function setSharedSymmetricKey(value: Uint8Array) {
         _sharedSymmetricKey = value;
     }
+
     async function awaitStateGte(value: ConnectionSagaState): Promise<void> {
         if (state >= value) {
             return;
@@ -286,17 +294,21 @@ export function getConnectionSaga(
             `[connection-saga] Got saga state = ${ConnectionSagaState[state]} in ${type} connection with ${publicKey}.`,
         );
     }
+
     function setContinueCallback(value: () => void, reason?: string): void {
         _continueCallback = value;
         logger.debug(`[connection-saga] Continue callback set.`, reason);
     }
+
     function removeContinueCallback(reason?: string): void {
         _continueCallback = undefined;
         logger.debug(`[connection-saga] Continue callback removed.`, reason);
     }
+
     let rtcSendDataChannelSafeKiller: (() => void) | undefined;
     let rtcReceiveDataChannelSafeKiller: (() => void) | undefined;
     let stepTimeout: NodeJS.Timeout | undefined;
+
     async function awaitDial(): Promise<boolean> {
         logger.debug(`[connection-saga] Awaiting for Dial in ${type} connection with ${publicKey}`);
         return await new Promise<void>(async (resolve, reject) => {
@@ -319,6 +331,7 @@ export function getConnectionSaga(
             },
         );
     }
+
     async function sendDial(): Promise<void> {
         logger.debug(`[connection-saga] Sending Dial in ${type} connection with ${publicKey}`);
         setState(ConnectionSagaState.SendingDial);
@@ -330,6 +343,7 @@ export function getConnectionSaga(
         setState(ConnectionSagaState.DialSent);
         logger.debug(`[connection-saga] Dial sent in ${type} connection with ${publicKey}`);
     }
+
     async function awaitOffer(): Promise<boolean> {
         logger.debug(`[connection-saga] Awaiting for Offer in ${type} connection with ${publicKey}`);
         return await new Promise<void>(async (resolve, reject) => {
@@ -352,12 +366,14 @@ export function getConnectionSaga(
             },
         );
     }
+
     async function gatherWebRtcOffer(): Promise<WebRtcDescription> {
         logger.debug(`[connection-saga] Gathering WebRTC offer data in ${type} connection with ${publicKey}`);
         const offer = await getRtcPeerConnection().createOffer();
         await getRtcPeerConnection().setLocalDescription(offer);
         return offer;
     }
+
     async function sendOffer(): Promise<void> {
         logger.debug(`[connection-saga] Sending Offer in ${type} connection with ${publicKey}`);
         setState(ConnectionSagaState.SendingOffer);
@@ -374,6 +390,7 @@ export function getConnectionSaga(
         setState(ConnectionSagaState.OfferSent);
         logger.debug(`[connection-saga] Offer sent in ${type} connection with ${publicKey}`);
     }
+
     async function awaitAnswer(): Promise<boolean> {
         logger.debug(`[connection-saga] Awaiting for Answer in ${type} connection with ${publicKey}`);
         return await new Promise<void>(async (resolve, reject) => {
@@ -396,12 +413,14 @@ export function getConnectionSaga(
             },
         );
     }
+
     async function gatherWebRtcAnswer(): Promise<WebRtcDescription> {
         logger.debug(`[connection-saga] Gathering WebRTC answer data in ${type} connection with ${publicKey}`);
         const answer = await getRtcPeerConnection().createAnswer();
         await getRtcPeerConnection().setLocalDescription(answer);
         return answer;
     }
+
     async function sendAnswer(): Promise<void> {
         logger.debug(`[connection-saga] Sending Answer step in ${type} connection with ${publicKey}`);
         setState(ConnectionSagaState.SendingAnswer);
@@ -418,6 +437,7 @@ export function getConnectionSaga(
         setState(ConnectionSagaState.AnswerSent);
         logger.debug(`[connection-saga] Answer sent in ${type} connection with ${publicKey}`);
     }
+
     async function awaitConnection(): Promise<boolean> {
         logger.debug(`[connection-saga] Awaiting for Connection in ${type} connection with ${publicKey}`);
         return await new Promise<void>(async (resolve, reject) => {
@@ -439,6 +459,7 @@ export function getConnectionSaga(
             },
         );
     }
+
     async function sendIce(candidate: WebRtcIceCandidate): Promise<void> {
         const source = {
             incoming: IceSource.Incoming,
@@ -455,6 +476,7 @@ export function getConnectionSaga(
             source,
         );
     }
+
     function initializePeerConnection(): void {
         getRtcPeerConnection().onicecandidate = async (event) => {
             if (event.candidate) {
@@ -478,6 +500,7 @@ export function getConnectionSaga(
             rtcReceiveDataChannel = dataChannel;
         };
     }
+
     function initializeDataChanel(dataChannel: RTCDataChannel, suffix: string): () => void {
         logger.debug(`[connection-saga] [${dataChannel.id}] DataChannel-${suffix}(${dataChannel.label}) created`);
         dataChannel.onopen = async () => {
@@ -528,6 +551,7 @@ export function getConnectionSaga(
             );
         };
     }
+
     function initializeRtc(dataChannelName: string): void {
         if (rtcSendDataChannelSafeKiller !== undefined && rtcSendDataChannelSafeKiller !== null) {
             rtcSendDataChannelSafeKiller();
@@ -548,6 +572,7 @@ export function getConnectionSaga(
         _rtcSendDataChannel = dataChannel;
         iceCandidates = [];
     }
+
     async function open(initialState: ConnectionSagaState): Promise<void> {
         clearTimeout(stepTimeout);
         setState(initialState);

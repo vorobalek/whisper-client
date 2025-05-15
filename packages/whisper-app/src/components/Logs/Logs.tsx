@@ -35,6 +35,11 @@ const Logs: React.FC<LogsProps> = ({ visible, setVisible, entries }) => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInput(e.target.value);
+        // Auto-resize textarea on user input
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -66,6 +71,10 @@ const Logs: React.FC<LogsProps> = ({ visible, setVisible, entries }) => {
         setHistory((prev) => [...prev, code]);
         setHistoryIndex(null);
         setInput('');
+        // Reset textarea height after execution
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+        }
         try {
             // eslint-disable-next-line no-eval
             const result = eval(code);
@@ -74,14 +83,6 @@ const Logs: React.FC<LogsProps> = ({ visible, setVisible, entries }) => {
             setLocalEntries((prev) => [...prev, { timestamp: now(), level: 'error', content: String(err) }]);
         }
     };
-
-    // Auto-resize textarea
-    React.useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.style.height = 'auto';
-            inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
-        }
-    }, [input]);
 
     return (
         <>

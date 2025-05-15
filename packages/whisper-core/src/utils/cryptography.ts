@@ -1,5 +1,5 @@
 import { Logger } from './logger';
-import { secretbox, secretbox_open, sign as naclSign, box, box_open, randomBytes } from './nacl-wrapper';
+import { box, randomBytes, secretbox, secretbox_open, sign as naclSign } from './nacl-wrapper';
 import { newError } from './new-error';
 
 /**

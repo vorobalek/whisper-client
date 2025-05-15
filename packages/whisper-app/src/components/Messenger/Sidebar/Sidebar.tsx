@@ -5,7 +5,7 @@ import SecureInfoModal from './SecureInfo';
 import './Sidebar.css';
 import { mdiShieldLockOutline } from '@mdi/js';
 import Icon from '@mdi/react';
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 
 type SidebarProps = {
     publicKey: string | undefined;
@@ -32,20 +32,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     connectionChooseOnClick,
     connectionDeleteOnClick,
 }) => {
-    const getActiveConnectionPublicKey = useCallback(() => {
-        if (activeConnectionId !== undefined && activeConnectionId !== null) {
-            const candidateConnection = connections.find((e) => e.id === activeConnectionId);
-            if (candidateConnection !== undefined && candidateConnection !== null) {
-                return candidateConnection.publicKey;
-            }
+    // Compute the active connection's public key directly
+    const activeConnectionPublicKey = useMemo(() => {
+        if (activeConnectionId != null) {
+            return connections.find((e) => e.id === activeConnectionId)?.publicKey;
         }
+        return undefined;
     }, [activeConnectionId, connections]);
-
-    const [activeConnectionPublicKey, setActiveConnectionPublicKey] = useState<string | undefined>();
-
-    useLayoutEffect(() => {
-        setActiveConnectionPublicKey(getActiveConnectionPublicKey());
-    }, [getActiveConnectionPublicKey]);
 
     const [peerPublicKey, setPeerPublicKey] = useState<string>('');
 

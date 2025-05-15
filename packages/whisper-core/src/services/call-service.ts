@@ -161,6 +161,7 @@ export function getCallService(
 ): CallService {
     let serverUrl: string | undefined;
     let navigator: Navigator;
+
     function getBase64Signature(data: any): string {
         const dataString = JSON.stringify(data);
         const dataBytes = utf8.decode(dataString);
@@ -168,6 +169,7 @@ export function getCallService(
         const dataSignature = cryptography.sign(dataBytes, signatureSecretKey);
         return base64.encode(dataSignature);
     }
+
     async function signAndSend<TypeData extends CallData>(
         method: CallMethodName,
         data: TypeData,
@@ -178,6 +180,7 @@ export function getCallService(
             }
             return await apiClient.call(serverUrl, request);
         }
+
         const request = {
             a: method,
             b: data,
@@ -196,6 +199,7 @@ export function getCallService(
         timeService.serverTime = response.timestamp;
         return response;
     }
+
     return {
         initialize(config: CallServiceEffectiveConfig): void {
             serverUrl = config.serverUrl;

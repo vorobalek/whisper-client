@@ -5,7 +5,6 @@
 // The test is moved here as part of a refactor to logically group tests by connection direction and flow.
 import { createMockDataChannel } from '../../../__mocks__/test-utils';
 import {
-    ConnectionSaga,
     ConnectionSagaState,
     ConnectionSagaType,
     getConnectionSaga,

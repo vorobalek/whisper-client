@@ -6,7 +6,7 @@ import getDatabase from '../utils/database';
 import { now } from '../utils/functions';
 import { Logger } from '../utils/logger';
 import { useSearchParams } from './useSearchParams';
-import { getPrototype, Connection, ConnectionState, WhisperPrototype } from '@whisper/core';
+import { Connection, ConnectionState, getPrototype, WhisperPrototype } from '@whisper/core';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type WhisperHookMetadataPasswordState = undefined | 'none' | 'valid' | 'invalid';
@@ -130,6 +130,7 @@ export function useWhisper(
                     documentLog(level, ...args);
                 }
             }
+
             return {
                 trace: (...args: any[]) => log(LogLevelEnum.Trace, ...args),
                 debug: (...args: any[]) => log(LogLevelEnum.Debug, ...args),
@@ -188,6 +189,7 @@ export function useWhisper(
     useEffect(() => {
         if (database) {
             setPasswordState(undefined);
+
             async function check() {
                 try {
                     const check = await database.get<DB_CHECK_TYPE>(DB_SLUG_TABLE_CHECK, 'check', password || '');
@@ -212,6 +214,7 @@ export function useWhisper(
                     }
                 }
             }
+
             check().then();
         }
     }, [password, database]);

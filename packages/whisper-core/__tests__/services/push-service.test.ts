@@ -1,16 +1,16 @@
 import {
-    createMockLogger,
     createMockBase64,
-    createMockPushConfig,
-    createMockWorkerService,
+    createMockLogger,
     createMockNotification,
-    createMockPushSubscription,
+    createMockPushConfig,
     createMockPushManager,
+    createMockPushSubscription,
     createMockServiceWorkerContainer,
+    createMockWorkerService,
 } from '../../__mocks__/test-utils';
 import { CallMethodName } from '../../src/models/infrasctructure/call-method-name';
 import { CallPayload } from '../../src/models/infrasctructure/call-payload';
-import { getPushService, PushServiceConfig, Subscription } from '../../src/services/push-service';
+import { getPushService, PushServiceConfig } from '../../src/services/push-service';
 import { WorkerService } from '../../src/services/worker-service';
 import { Base64 } from '../../src/utils/base64';
 import { Logger } from '../../src/utils/logger';

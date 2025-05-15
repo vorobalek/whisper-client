@@ -3,12 +3,14 @@
     --unstable-mode-bg-color: #ff0000;
     --unstable-mode-text-color: #ffffff;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --unstable-mode-bg-color: #cc0000;
         --unstable-mode-text-color: #e8e6e3;
     }
 }
+
 .unstable-mode-warning {
     position: fixed;
     top: 0;
@@ -23,6 +25,7 @@
     white-space: pre-wrap;
     overflow-wrap: break-word;
 }
+
 @media (max-width: 768px) {
     .unstable-mode-warning {
         position: fixed;
