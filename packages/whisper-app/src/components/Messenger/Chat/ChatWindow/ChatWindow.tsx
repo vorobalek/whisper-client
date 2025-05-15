@@ -6,7 +6,7 @@ import Typing from './Action/Typing';
 import './ChatWindow.css';
 import Message from './Message';
 import Progress from './Progress/Progress';
-import { useSpring, animated } from '@react-spring/web';
+import { animated, useSpring } from '@react-spring/web';
 import { useScroll } from '@use-gesture/react';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 

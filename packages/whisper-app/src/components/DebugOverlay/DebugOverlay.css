@@ -1,11 +1,13 @@
 :root {
     --debug-overlay-bg-color: rgba(0, 0, 0, 0.8);
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --debug-overlay-bg-color: rgba(0, 0, 0, 0.8);
     }
 }
+
 .debug-overlay {
     position: fixed;
     top: 0;
@@ -17,12 +19,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     .button-group {
         display: flex;
         flex-direction: column;
         gap: 16px;
         align-items: center;
     }
+
     .file-upload-label,
     button.action {
         width: 220px;
@@ -41,10 +45,12 @@
         font-size: 16px;
         transition: background 0.2s;
     }
+
     .file-upload-label:hover,
     button.action:hover {
         background-color: var(--button-hover-bg-color);
     }
+
     .close-btn {
         cursor: pointer;
         position: absolute;
@@ -59,9 +65,11 @@
         padding: 0;
         line-height: 1;
     }
+
     input[type='file'] {
         display: none;
     }
+
     .file-upload-label {
         border: none;
         border-radius: 5px;
@@ -73,6 +81,7 @@
         text-align: center;
         font: inherit;
     }
+
     .file-upload-label:hover {
         background-color: var(--button-hover-bg-color);
         font-size: 16px;

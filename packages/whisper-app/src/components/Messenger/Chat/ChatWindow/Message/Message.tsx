@@ -5,9 +5,9 @@ import { SeenType } from '../../../../../types/seenType';
 import { formatTimestampLong, formatTimestampShort, now, serverTime } from '../../../../../utils/functions';
 import './Message.css';
 import ReactionMenu from './ReactionMenu';
-import { mdiLoading, mdiCheck, mdiCheckAll, mdiEmoticonOutline } from '@mdi/js';
+import { mdiCheck, mdiCheckAll, mdiEmoticonOutline, mdiLoading } from '@mdi/js';
 import Icon from '@mdi/react';
-import { useSpring, animated } from '@react-spring/web';
+import { animated, useSpring } from '@react-spring/web';
 import { useDrag, useWheel } from '@use-gesture/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 

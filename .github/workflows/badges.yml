@@ -2,7 +2,7 @@ name: Coverage Badges
 
 on:
   workflow_run:
-    workflows: ["Deploy to S3"]
+    workflows: [ "Deploy to S3" ]
     types:
       - completed
 

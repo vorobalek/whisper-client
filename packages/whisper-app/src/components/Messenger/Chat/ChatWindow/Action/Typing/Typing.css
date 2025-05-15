@@ -2,12 +2,14 @@
     --action-typying-bg-color: #eaeaea;
     --action-typying-text-color: #000;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --action-typying-bg-color: #242728;
         --action-typying-text-color: #e8e6e3;
     }
 }
+
 .action.typing {
     align-self: flex-start;
     background-color: var(--action-typying-bg-color);

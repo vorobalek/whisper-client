@@ -3,13 +3,7 @@
 // This file contains tests for timeout handling logic in connection-saga.ts.
 // It specifically tests the awaitDial timeout and related flows for WebRTC connections.
 // The test is moved here as part of a refactor to logically group tests by connection feature.
-import {
-    ConnectionSaga,
-    ConnectionSagaState,
-    ConnectionSagaType,
-    getConnectionSaga,
-} from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
+import { ConnectionSagaState, getConnectionSaga } from '../../../src/services/connection/connection-saga';
 
 describe('ConnectionSaga (Timeout handling)', () => {
     // Mock all the required dependencies

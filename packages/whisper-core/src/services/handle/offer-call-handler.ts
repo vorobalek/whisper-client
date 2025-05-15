@@ -8,7 +8,7 @@ import { ConnectionService } from '../connection-service';
 import { ConnectionSagaState } from '../connection/connection-saga';
 import { SessionService } from '../session-service';
 import { TimeService } from '../time-service';
-import { getCallHandler, CallHandler } from './call-handler';
+import { CallHandler, getCallHandler } from './call-handler';
 
 /**
  * Interface for handling 'offer' call requests in the WebRTC signaling process.

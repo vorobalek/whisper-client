@@ -1,19 +1,18 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockSessionService,
     createMockBase64,
-    createMockUtf8,
-    createMockCryptography,
     createMockCallService,
-    createMockWebRTC,
     createMockConnection,
+    createMockCryptography,
+    createMockLogger,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
+    createMockWebRTC,
 } from '../../__mocks__/test-utils';
 import { CallService } from '../../src/services/call-service';
 import { getConnectionService } from '../../src/services/connection-service';
 // Import ConnectionState after mocking
 import { ConnectionState } from '../../src/services/connection/connection';
-import { WebRTC } from '../../src/services/connection/web-rtc';
 import { SessionService } from '../../src/services/session-service';
 import { TimeService } from '../../src/services/time-service';
 import { Base64 } from '../../src/utils/base64';

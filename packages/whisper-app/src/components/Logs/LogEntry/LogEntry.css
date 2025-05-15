@@ -13,21 +13,27 @@
         white-space: pre-wrap;
         overflow-wrap: break-word;
     }
+
     .time {
         color: var(--log-overlay-text-color);
     }
+
     .trace {
         color: var(--log-trace-text-color);
     }
+
     .debug {
         color: var(--log-debug-text-color);
     }
+
     .info {
         color: var(--log-info-text-color);
     }
+
     .warn {
         color: var(--log-warn-text-color);
     }
+
     .error {
         color: var(--log-error-text-color);
     }

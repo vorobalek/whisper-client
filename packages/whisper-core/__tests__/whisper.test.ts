@@ -1,14 +1,12 @@
 import {
+    createMockKeyPair,
     createMockLogger,
+    createMockWhisperConfig,
     mockWhisperCoreServices,
     setupWhisperBrowserMocks,
     teardownWhisperBrowserMocks,
-    createMockKeyPair,
-    createMockWhisperConfig,
 } from '../__mocks__/test-utils';
-import { ConnectionState } from '../src';
-import { Whisper, WhisperPrototype } from '../src';
-import { CryptoKeyPair } from '../src/utils/cryptography';
+import { ConnectionState, Whisper, WhisperPrototype } from '../src';
 import { Logger } from '../src/utils/logger';
 
 const mockNavigator = { serviceWorker: {} };

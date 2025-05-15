@@ -78,6 +78,7 @@ export function getHandleService(
         logger.debug(`[handle-service] Successfully processed call '${payload.a}'`, payload);
         return true;
     }
+
     async function processCall(payload: CallPayload, validate: boolean = true): Promise<boolean> {
         switch (payload.a) {
             case 'dial':
@@ -93,7 +94,9 @@ export function getHandleService(
         }
         return true;
     }
+
     let queue: Array<CallPayload> = [];
+
     async function processCallQueue() {
         while (queue.length > 0) {
             const payload = queue.shift();
@@ -105,6 +108,7 @@ export function getHandleService(
         }
         setTimeout(processCallQueue, 500);
     }
+
     processCallQueue().then().catch(logger.error);
     return {
         initialize(config: HandleServiceConfig): void {

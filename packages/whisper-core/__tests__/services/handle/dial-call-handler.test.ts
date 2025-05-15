@@ -1,20 +1,19 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockSessionService,
     createMockBase64,
-    createMockUtf8,
     createMockCryptography,
+    createMockLogger,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
 } from '../../../__mocks__/test-utils';
 import { DialCallData } from '../../../src/models/dial-call-data';
 import { CallRequest } from '../../../src/models/infrasctructure/call-request';
 import { ConnectionService } from '../../../src/services/connection-service';
-import { ConnectionInternal, ConnectionState } from '../../../src/services/connection/connection';
 import { ConnectionSagaState } from '../../../src/services/connection/connection-saga';
 import {
-    getDialCallHandler,
     DialCallHandler,
     DialCallHandlerConfig,
+    getDialCallHandler,
 } from '../../../src/services/handle/dial-call-handler';
 import { SessionService } from '../../../src/services/session-service';
 import { TimeService } from '../../../src/services/time-service';

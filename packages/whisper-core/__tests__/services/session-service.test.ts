@@ -1,4 +1,4 @@
-import { createMockLogger, createMockBase64, createMockKeyPair } from '../../__mocks__/test-utils';
+import { createMockBase64, createMockKeyPair, createMockLogger } from '../../__mocks__/test-utils';
 import { getSessionService, SessionServiceConfig } from '../../src/services/session-service';
 import { Base64 } from '../../src/utils/base64';
 import { CryptoKeyPair } from '../../src/utils/cryptography';

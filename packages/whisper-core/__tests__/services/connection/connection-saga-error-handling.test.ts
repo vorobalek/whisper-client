@@ -3,7 +3,7 @@
 // This file contains tests for error handling and cleanup logic in connection-saga.ts.
 // It specifically tests error handling when closing the peer connection during abort and related flows.
 // The test is moved here as part of a refactor to logically group tests by error and cleanup behavior.
-import { createMockPeerConnection, createMockDataChannel } from '../../../__mocks__/test-utils';
+import { createMockDataChannel, createMockPeerConnection } from '../../../__mocks__/test-utils';
 import {
     ConnectionSaga,
     ConnectionSagaState,

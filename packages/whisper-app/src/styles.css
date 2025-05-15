@@ -7,6 +7,7 @@
     --button-text-color: #ffffff;
     --text-color: #000000;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --button-bg-color: #585f63;
@@ -18,9 +19,11 @@
         --text-color: #e8e6e3;
     }
 }
+
 * {
     font-family: 'JetBrains Mono', monospace !important;
 }
+
 *,
 ::before,
 ::after {
@@ -28,6 +31,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 #root,
 body,
 html {
@@ -37,6 +41,7 @@ html {
     align-items: center;
     justify-content: center;
 }
+
 #root,
 body,
 button,
@@ -48,13 +53,16 @@ textarea {
     background: var(--background-color);
     color: var(--text-color);
 }
+
 input,
 textarea {
     font-size: 16px !important;
 }
+
 button {
     cursor: pointer;
 }
+
 a,
 a:visited,
 .link,

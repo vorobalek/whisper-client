@@ -3,9 +3,11 @@ export function showNotification(title: string, options?: NotificationOptions) {
         window.whisper.showNotification(title, options);
     }
 }
+
 export function now() {
     return Date.now();
 }
+
 export function serverTime() {
     if (window.whisper !== undefined && window.whisper !== null) {
         return window.whisper.serverTime;

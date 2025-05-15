@@ -5,6 +5,7 @@
     --unread-bg-color: #ff0000;
     --unread-text-color: #ffffff;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --navbar-bg-color: #006acc;
@@ -13,8 +14,10 @@
         --unread-text-color: #e8e6e3;
     }
 }
+
 .navbar {
     display: none;
+
     .unread-count {
         border-radius: 50%;
         width: 1.5em;
@@ -28,10 +31,12 @@
         color: var(--unread-text-color);
     }
 }
+
 @media (max-width: 768px) {
     :root {
         --navbar-height: 75px;
     }
+
     .navbar {
         display: flex;
         width: 100%;
@@ -45,6 +50,7 @@
         left: 0;
         justify-content: space-between;
         cursor: pointer;
+
         h2 {
             font-size: 18px;
         }

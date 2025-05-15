@@ -1,22 +1,16 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockCallService,
-    createMockSessionService,
-    createMockDataChannel,
-    createMockPeerConnection,
-    createMockWebRTC,
     createMockBase64,
-    createMockUtf8,
+    createMockCallService,
     createMockCryptography,
+    createMockDataChannel,
+    createMockLogger,
+    createMockPeerConnection,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
+    createMockWebRTC,
 } from '../../../__mocks__/test-utils';
-import {
-    ConnectionSaga,
-    ConnectionSagaState,
-    ConnectionSagaType,
-    getConnectionSaga,
-} from '../../../src/services/connection/connection-saga';
-import { newError } from '../../../src/utils/new-error';
+import { ConnectionSagaState, getConnectionSaga } from '../../../src/services/connection/connection-saga';
 
 describe('ConnectionSaga (Edge Cases)', () => {
     let mockLogger: any;

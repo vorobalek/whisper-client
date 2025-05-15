@@ -1,14 +1,14 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockSessionService,
     createMockBase64,
-    createMockUtf8,
     createMockCryptography,
+    createMockLogger,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
 } from '../../__mocks__/test-utils';
 import { IceSource } from '../../src/models/ice-source';
 import { CallResponse } from '../../src/models/infrasctructure/call-response';
-import { getCallService, CallServiceConfig } from '../../src/services/call-service';
+import { getCallService } from '../../src/services/call-service';
 import { SessionService } from '../../src/services/session-service';
 import { SignalRService } from '../../src/services/signalr-service';
 import { TimeService } from '../../src/services/time-service';

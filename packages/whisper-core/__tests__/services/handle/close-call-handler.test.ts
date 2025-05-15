@@ -1,17 +1,17 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockSessionService,
     createMockBase64,
-    createMockUtf8,
     createMockCryptography,
+    createMockLogger,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
 } from '../../../__mocks__/test-utils';
 import { CloseCallData } from '../../../src/models/close-call-data';
 import { CallRequest } from '../../../src/models/infrasctructure/call-request';
 import { ConnectionService } from '../../../src/services/connection-service';
 import { ConnectionInternal, ConnectionState } from '../../../src/services/connection/connection';
 import { ConnectionSagaState } from '../../../src/services/connection/connection-saga';
-import { getCloseCallHandler, CloseCallHandler } from '../../../src/services/handle/close-call-handler';
+import { CloseCallHandler, getCloseCallHandler } from '../../../src/services/handle/close-call-handler';
 import { SessionService } from '../../../src/services/session-service';
 import { TimeService } from '../../../src/services/time-service';
 import { Base64 } from '../../../src/utils/base64';

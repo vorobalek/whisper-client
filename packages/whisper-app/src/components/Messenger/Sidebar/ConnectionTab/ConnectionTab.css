@@ -5,6 +5,7 @@
     --connection-tab-unread-active-bg-color: #ff0000;
     --connection-tab-unread-text-color: #ffffff;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --connection-tab-bg-color: #242728;
@@ -14,12 +15,14 @@
         --connection-tab-unread-text-color: #e8e6e3;
     }
 }
+
 .connection-tab {
     position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-bottom: 10px;
+
     .public-key {
         background-color: var(--connection-tab-bg-color);
         padding: 10px;
@@ -33,6 +36,7 @@
         cursor: pointer;
         align-self: center;
     }
+
     .icon.edit {
         display: flex;
         cursor: pointer;
@@ -40,6 +44,7 @@
         margin-left: auto;
         align-self: center;
     }
+
     .icon.delete {
         display: flex;
         cursor: pointer;
@@ -47,6 +52,7 @@
         margin-right: auto;
         align-self: center;
     }
+
     .unread-count {
         position: absolute;
         bottom: -0.25em;
@@ -63,6 +69,7 @@
         color: var(--connection-tab-unread-text-color);
     }
 }
+
 .connection-tab.active {
     .public-key {
         background-color: var(--connection-tab-active-bg-color);

@@ -159,8 +159,10 @@ export function createMockPushConfig(overrides = {}) {
 export function createMockWebRTC(): any {
     class MockPeerConnection {
         static generateCertificate = jest.fn().mockResolvedValue({});
+
         constructor(_config?: any) {}
     }
+
     return {
         PeerConnection: MockPeerConnection as any,
         DataChannel: jest.fn() as any,
@@ -212,7 +214,11 @@ export function createMockWorkerService({
     registration,
     container,
     controller,
-}: { registration?: any; container?: any; controller?: any } = {}): WorkerService {
+}: {
+    registration?: any;
+    container?: any;
+    controller?: any;
+} = {}): WorkerService {
     return {
         async initialize(_config: any) {
             return;
@@ -253,6 +259,7 @@ export function createMockNotification({
         function MockNotification(this: any, ...args: any[]) {
             MockNotification.calls.push(args);
         }
+
         MockNotification.calls = [] as any[];
         (MockNotification as any).permission = permission;
         (MockNotification as any).requestPermission = jest.fn().mockResolvedValue(requestPermissionResult);

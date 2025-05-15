@@ -1,5 +1,5 @@
-import { createMockLogger, createMockServiceWorker, createMockNavigator } from '../../__mocks__/test-utils';
-import { getWorkerService, WorkerServiceConfig } from '../../src/services/worker-service';
+import { createMockLogger, createMockNavigator, createMockServiceWorker } from '../../__mocks__/test-utils';
+import { getWorkerService } from '../../src/services/worker-service';
 import { Logger } from '../../src/utils/logger';
 
 // Define locally for test type safety

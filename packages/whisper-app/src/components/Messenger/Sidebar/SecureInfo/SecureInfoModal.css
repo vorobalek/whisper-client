@@ -12,6 +12,7 @@
     align-items: center;
     z-index: 1001;
 }
+
 .privacy-info-modal-content {
     position: relative;
     width: 70%;
@@ -27,6 +28,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transform: translateY(0);
 }
+
 .privacy-info-modal-body {
     flex: 1 1 auto;
     overflow-y: auto;
@@ -34,19 +36,24 @@
     line-height: 1.6;
     margin-bottom: 20px;
 }
+
 .privacy-info-modal-body p {
     margin-bottom: 1em;
 }
+
 .privacy-info-modal-body p:last-child {
     margin-bottom: 0;
 }
+
 .privacy-info-modal-body ul {
     margin-bottom: 1em;
     padding-left: 20px;
 }
+
 .privacy-info-modal-body li {
     margin-bottom: 0.5em;
 }
+
 .privacy-info-modal-close-btn {
     align-self: center;
     margin-top: 20px;
@@ -58,9 +65,11 @@
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
 }
+
 .privacy-info-modal-close-btn:hover {
     background-color: var(--button-hover-bg-color);
 }
+
 @media (max-width: 768px) {
     .privacy-info-modal-content {
         width: 90%;

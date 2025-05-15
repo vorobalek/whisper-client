@@ -1,11 +1,11 @@
 import {
-    createMockLogger,
-    createMockTimeService,
-    createMockSessionService,
     createMockBase64,
-    createMockUtf8,
-    createMockCryptography,
     createMockCallService,
+    createMockCryptography,
+    createMockLogger,
+    createMockSessionService,
+    createMockTimeService,
+    createMockUtf8,
 } from '../../../__mocks__/test-utils';
 import { CallService } from '../../../src/services/call-service';
 import { ConnectionState, getConnection, translateConnection } from '../../../src/services/connection/connection';

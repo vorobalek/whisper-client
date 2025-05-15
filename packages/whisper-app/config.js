@@ -43,6 +43,7 @@ function getEnvironmentVariables(templateParameters) {
         return acc;
     }, {});
 }
+
 function getParameterReplacer(templateParameters) {
     return (content, file) => {
         return content.toString().replaceAll(/(__([A-Z_]*)__)/g, (match, p1, p2) => {
@@ -52,6 +53,7 @@ function getParameterReplacer(templateParameters) {
         });
     };
 }
+
 module.exports = {
     getTemplateParameters,
     getEnvironmentVariables,

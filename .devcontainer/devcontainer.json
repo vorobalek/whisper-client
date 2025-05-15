@@ -5,8 +5,12 @@
     "workspaceFolder": "/workspaces/whisper-frontend",
     "forwardPorts": [8080, 5027],
     "portsAttributes": {
-        "8080": { "label": "frontend" },
-        "5027": { "label": "backend" }
+        "8080": {
+            "label": "frontend"
+        },
+        "5027": {
+            "label": "backend"
+        }
     },
     "features": {
         "ghcr.io/devcontainers/features/github-cli:1": {}

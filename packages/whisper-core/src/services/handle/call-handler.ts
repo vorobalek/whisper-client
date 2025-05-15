@@ -74,6 +74,7 @@ export function getCallHandler<TypeData extends CloseCallData>(
         logger.debug(`[${request.a}-call-handler] Request timestamp is valid (delta ${delta}ms).`);
         return true;
     }
+
     function validatePublicKey(request: CallRequest<TypeData>): boolean {
         const isIntendedForMe = sessionService.signingPublicKeyBase64 === request.b.c;
         if (!isIntendedForMe) {
@@ -83,6 +84,7 @@ export function getCallHandler<TypeData extends CloseCallData>(
         logger.debug(`[${request.a}-call-handler] Message is intended for this user.`);
         return true;
     }
+
     function validateSignature(request: CallRequest<TypeData>): boolean {
         const message = JSON.stringify(request.b);
         const messageBytes = utf8.decode(message);
@@ -97,6 +99,7 @@ export function getCallHandler<TypeData extends CloseCallData>(
         logger.debug(`[${request.a}-call-handler] Signature is valid.`);
         return true;
     }
+
     return {
         parse(payloadData: CallPayload): CallRequest<TypeData> {
             const data = JSON.parse(payloadData.b) as TypeData;

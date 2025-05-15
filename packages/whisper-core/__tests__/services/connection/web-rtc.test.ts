@@ -1,5 +1,3 @@
-import { getDefaultWebRTC } from '../../../src/services/connection/web-rtc';
-
 describe('WebRTC', () => {
     const MockRTCPeerConnection = function () {};
     const MockRTCDataChannel = function () {};

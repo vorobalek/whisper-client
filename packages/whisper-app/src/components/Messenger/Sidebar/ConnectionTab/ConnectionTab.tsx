@@ -1,5 +1,5 @@
 import './ConnectionTab.css';
-import { mdiPencil, mdiDeleteOutline } from '@mdi/js';
+import { mdiDeleteOutline, mdiPencil } from '@mdi/js';
 import Icon from '@mdi/react';
 import React from 'react';
 

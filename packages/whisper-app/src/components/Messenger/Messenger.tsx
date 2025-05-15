@@ -6,7 +6,7 @@ import './Messenger.css';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { ConnectionState } from '@whisper/core';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 type MessengerProps = {
     publicKey?: string;
@@ -103,11 +103,11 @@ const Messenger: React.FC<MessengerProps> = ({
         });
     }, [connections]);
 
-    const [unread, _setUnread] = useState<number>(0);
-
-    useEffect(() => {
-        _setUnread(connectionsOverride.reduce((acc, curr) => acc + curr.unread, 0));
-    }, [connectionsOverride, activeConnectionId]);
+    // Calculate total unread count from connectionsOverride without additional state
+    const unread = useMemo(
+        () => connectionsOverride.reduce((acc, curr) => acc + curr.unread, 0),
+        [connectionsOverride],
+    );
 
     const setUnreadOverride = useCallback((id: number, value: number) => {
         setConnectionsOverride((prevConnections) =>
