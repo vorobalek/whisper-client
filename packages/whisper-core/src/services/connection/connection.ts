@@ -350,9 +350,7 @@ export function getConnection(
 
     function connectionOnStateChange(from: ConnectionState, to: ConnectionState): void {
         new Promise<void>((resolve) => {
-            if (connection.onStateChanged !== undefined && connection.onStateChanged !== null) {
-                connection.onStateChanged(from, to);
-            }
+            connection.onStateChanged?.call(connection, from, to);
             resolve();
         }).catch((err) => {
             logger.error(`[connection] State change callback error in connection with ${connection.publicKey}.`, err);
@@ -361,9 +359,7 @@ export function getConnection(
 
     function connectionOnMessage(message: string) {
         new Promise<void>((resolve) => {
-            if (connection.onMessage !== undefined && connection.onMessage !== null) {
-                connection.onMessage(message);
-            }
+            connection.onMessage?.call(connection, message);
             resolve();
         }).catch((err) => {
             logger.error(`[connection] Message callback error in connection with ${connection.publicKey}.`, err);

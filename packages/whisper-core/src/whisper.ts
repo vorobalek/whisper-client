@@ -291,9 +291,7 @@ export function getPrototype(logger: Logger): WhisperPrototype {
             }
 
             logger.log('[whisper] Initialized.');
-            if (initializationResolver) {
-                initializationResolver(whisper);
-            }
+            initializationResolver?.call(this, whisper);
             busy = false;
             return whisper;
         },

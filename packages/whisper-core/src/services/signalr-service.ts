@@ -105,9 +105,7 @@ export function getSignalRService(logger: Logger): SignalRService {
             });
             connection.onreconnected(async () => {
                 ready = true;
-                if (readyPromiseResolve) {
-                    readyPromiseResolve();
-                }
+                readyPromiseResolve?.call(this);
                 logger.warn('[signalr-service] Reconnected.');
                 await config.onReady();
             });

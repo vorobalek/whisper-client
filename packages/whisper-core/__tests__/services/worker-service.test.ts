@@ -121,6 +121,49 @@ describe('WorkerService', () => {
             expect(mockLogger.debug).toHaveBeenCalledWith('[worker-service] New version is available.');
             expect(mockCallback).toHaveBeenCalled();
         });
+
+        it('should not call onNewVersion callback when receiving message with different type', async () => {
+            // Given
+            const mockCallback = jest.fn();
+            const config: WorkerServiceEffectiveConfig = {
+                version: '1.0.0',
+                navigator: mockNavigator,
+                onNewVersion: mockCallback,
+            };
+
+            // When
+            await workerService.initialize(config);
+
+            // Then verify that event listener was added
+            expect(mockAddEventListener).toHaveBeenCalledWith('message', expect.any(Function));
+
+            // Simulate message event with different type
+            const handler = mockAddEventListener.mock.calls[0][1];
+            handler({ data: { type: 'SOME_OTHER_TYPE' } });
+
+            // Verify callback was not called
+            expect(mockLogger.debug).not.toHaveBeenCalledWith('[worker-service] New version is available.');
+            expect(mockCallback).not.toHaveBeenCalled();
+        });
+
+        it('should not throw if onNewVersion is not provided and NEW_VERSION_AVAILABLE message is received', async () => {
+            // Given
+            const config: WorkerServiceEffectiveConfig = {
+                version: '1.0.0',
+                navigator: mockNavigator,
+            };
+
+            // When
+            await workerService.initialize(config);
+
+            // Then verify that event listener was added
+            expect(mockAddEventListener).toHaveBeenCalledWith('message', expect.any(Function));
+
+            // Simulate message event with NEW_VERSION_AVAILABLE, but no onNewVersion
+            const handler = mockAddEventListener.mock.calls[0][1];
+            expect(() => handler({ data: { type: 'NEW_VERSION_AVAILABLE' } })).not.toThrow();
+            expect(mockLogger.debug).toHaveBeenCalledWith('[worker-service] New version is available.');
+        });
     });
 
     describe('getters', () => {

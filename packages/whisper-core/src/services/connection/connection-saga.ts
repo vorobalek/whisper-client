@@ -285,9 +285,7 @@ export function getConnectionSaga(
             logger.debug(
                 `[connection-saga] Awaiting for saga state = ${ConnectionSagaState[value]} in ${type} connection with ${publicKey}. Current state = ${ConnectionSagaState[state]}`,
             );
-            if (!stateAwaiterGteMap[value]) {
-                stateAwaiterGteMap[value] = [];
-            }
+            stateAwaiterGteMap[value] = stateAwaiterGteMap[value] || [];
             stateAwaiterGteMap[value].push(resolve);
         });
         logger.debug(
@@ -534,9 +532,7 @@ export function getConnectionSaga(
             const messageBytes = cryptography.decrypt(dataBytes, getSharedSymmetricKey());
             const message = utf8.encode(messageBytes);
             new Promise<void>((resolve) => {
-                if (saga.onMessage) {
-                    saga.onMessage(message);
-                }
+                saga.onMessage?.call(saga, message);
                 resolve();
             }).catch((err) => {
                 logger.error(`[connection-saga] Message callback error in ${type} connection with ${publicKey}.`, err);

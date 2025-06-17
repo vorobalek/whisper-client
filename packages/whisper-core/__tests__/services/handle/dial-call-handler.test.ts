@@ -197,5 +197,38 @@ describe('DialCallHandler', () => {
                 `[dial-call-handler] Incoming call 'dial' from peerPublicKey declined.`,
             );
         });
+
+        it('should skip reconnect logic when incomingState is AwaitingAnswer', async () => {
+            const connectionMock = {
+                setIncomingEncryption: jest.fn(),
+                openIncoming: jest.fn().mockResolvedValue(undefined),
+                continueIncoming: jest.fn(),
+                get incomingState() {
+                    return ConnectionSagaState.AwaitingAnswer;
+                },
+            };
+            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock as any);
+            const result = await dialCallHandler.handle(request);
+            expect(result).toBe(true);
+            expect(connectionMock.setIncomingEncryption).toHaveBeenCalledWith('encryptionKey');
+            expect(connectionMock.continueIncoming).not.toHaveBeenCalled();
+            expect(connectionMock.openIncoming).not.toHaveBeenCalled();
+            expect(mockLogger.debug).not.toHaveBeenCalledWith(expect.stringContaining('triggered connection re-open'));
+        });
+
+        it('should reconnect without focusOnDial configured', async () => {
+            // reinitialize handler without focusOnDial
+            dialCallHandler.initialize({ requestDial: mockRequestDial });
+            const connectionMock = {
+                setIncomingEncryption: jest.fn(),
+                openIncoming: jest.fn().mockResolvedValue(undefined),
+                continueIncoming: jest.fn(),
+            };
+            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock as any);
+            const result = await dialCallHandler.handle(request);
+            expect(result).toBe(true);
+            expect(connectionMock.openIncoming).toHaveBeenCalled();
+            expect(mockFocusOnDial).not.toHaveBeenCalled();
+        });
     });
 });

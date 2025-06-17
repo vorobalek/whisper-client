@@ -257,14 +257,49 @@ describe('HandleService', () => {
             expect(mockDialHandler.validate).toHaveBeenCalledWith(mockRequest);
             expect(mockDialHandler.handle).toHaveBeenCalledWith(mockRequest);
             expect(mockLogger.debug).toHaveBeenCalledWith(`[handle-service] Postpone processing call 'dial'.`, payload);
+        });
 
-            // Fast-forward time to trigger queue processing
+        it('should process queued calls', async () => {
+            const payload1: CallPayload = { a: 'dial', b: '{}', c: 'signature1' };
+            const payload2: CallPayload = { a: 'dial', b: '{}', c: 'signature2' };
+            const mockRequest: CallRequest<DialCallData> = {
+                a: 'dial',
+                b: {
+                    a: 'publicKey',
+                    b: 12345,
+                    c: 'targetKey',
+                    d: 'encryptionKey',
+                },
+                c: 'signature',
+            };
+
+            // First call fails and gets queued
+            mockDialHandler.parse.mockReturnValue(mockRequest);
+            mockDialHandler.validate.mockReturnValue(true);
+            mockDialHandler.handle.mockResolvedValueOnce(false);
+
+            await handleService.call(payload1);
+
+            // Second call also fails and gets queued
+            mockDialHandler.handle.mockResolvedValueOnce(false);
+            await handleService.call(payload2);
+
+            // Now make the handler succeed
+            mockDialHandler.handle.mockResolvedValue(true);
+
+            // Fast-forward timers to process the queue
             jest.advanceTimersByTime(500);
 
-            // Second attempt should not validate again
-            mockDialHandler.handle.mockResolvedValue(true);
-            expect(mockDialHandler.validate).toHaveBeenCalledTimes(1);
-            expect(mockDialHandler.handle).toHaveBeenCalledTimes(2);
+            // Verify that both queued calls were processed
+            expect(mockDialHandler.handle).toHaveBeenCalledTimes(3); // Initial + 2 queued calls
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[handle-service] Postpone processing call 'dial'.`,
+                payload1,
+            );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[handle-service] Postpone processing call 'dial'.`,
+                payload2,
+            );
         });
 
         it('should handle unknown call type', async () => {
@@ -275,10 +310,15 @@ describe('HandleService', () => {
 
             // None of the handlers should be called
             expect(mockDialHandler.parse).not.toHaveBeenCalled();
+            expect(mockDialHandler.handle).not.toHaveBeenCalled();
             expect(mockOfferHandler.parse).not.toHaveBeenCalled();
+            expect(mockOfferHandler.handle).not.toHaveBeenCalled();
             expect(mockAnswerHandler.parse).not.toHaveBeenCalled();
+            expect(mockAnswerHandler.handle).not.toHaveBeenCalled();
             expect(mockIceHandler.parse).not.toHaveBeenCalled();
+            expect(mockIceHandler.handle).not.toHaveBeenCalled();
             expect(mockCloseHandler.parse).not.toHaveBeenCalled();
+            expect(mockCloseHandler.handle).not.toHaveBeenCalled();
         });
     });
 });
