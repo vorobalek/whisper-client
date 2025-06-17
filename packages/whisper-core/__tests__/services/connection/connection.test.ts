@@ -245,6 +245,53 @@ describe('Connection Tests', () => {
 
             expect(connection.onMessage).toBe(onMessageMock);
         });
+
+        it('should debug log saga state changes when from !== to', () => {
+            const connection = getConnection(
+                mockPublicKey,
+                mockLogger,
+                mockTimeService,
+                mockCallService,
+                mockSessionService,
+                mockBase64,
+                mockUtf8,
+                mockCryptography,
+                mockWebRTC,
+                mockIceServers,
+            );
+            const sagaResults = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+                .results;
+            const mockSaga = sagaResults[sagaResults.length - 1].value;
+            // simulate saga state change event
+            mockSaga.onStateChanged(ConnectionSagaState.New, ConnectionSagaState.AwaitOffer);
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[connection-saga] State changed in ${mockSaga.type} connection saga with ${mockPublicKey} from ${ConnectionSagaState[ConnectionSagaState.New]} to ${ConnectionSagaState[ConnectionSagaState.AwaitOffer]}.`,
+            );
+        });
+
+        it('should not debug log saga state changes when from === to', () => {
+            const connection = getConnection(
+                mockPublicKey,
+                mockLogger,
+                mockTimeService,
+                mockCallService,
+                mockSessionService,
+                mockBase64,
+                mockUtf8,
+                mockCryptography,
+                mockWebRTC,
+                mockIceServers,
+            );
+            const sagaResults = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+                .results;
+            const mockSaga = sagaResults[sagaResults.length - 1].value;
+            // simulate saga state change event with same state
+            mockSaga.onStateChanged(ConnectionSagaState.New, ConnectionSagaState.New);
+            // No debug for saga state change should be logged
+            expect(mockLogger.debug).not.toHaveBeenCalledWith(
+                expect.stringContaining('[connection-saga] State changed'),
+            );
+        });
     });
 
     describe('Connection Operations', () => {

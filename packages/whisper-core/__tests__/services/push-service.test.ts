@@ -1021,6 +1021,57 @@ describe('PushService', () => {
             expect(mockLogger.error).toHaveBeenCalledWith('[push-service] Invalid payload data.');
         });
     });
+
+    // Branch coverage tests moved from separate file
+    it('should handle invalid payload with no required property and log error', async () => {
+        await pushService.initialize(mockConfig);
+        const container = mockWorkerService.container!;
+        const handler = (container.addEventListener as jest.Mock).mock.calls.find(
+            ([event]) => event === 'message',
+        )?.[1];
+        expect(handler).toBeDefined();
+        await (handler as Function)({
+            data: {
+                type: 'PUSH_NOTIFICATION',
+                payload: { data: {} }, // missing 'a'
+            },
+        });
+        expect(mockLogger.error).toHaveBeenCalledWith('[push-service] Invalid payload data.');
+    });
+
+    it('should fall back to Notification constructor when showInternal fails and Notification is defined', async () => {
+        const MockNotification = createMockNotification({ asConstructor: true });
+        mockConfig.notification = MockNotification;
+        pushService = getPushService(mockLogger, mockWorkerService, mockBase64);
+        await pushService.initialize(mockConfig);
+        const result = pushService.showNotification('Test title', { body: 'Test body' });
+        expect(MockNotification.calls).toEqual([['Test title', { body: 'Test body' }]]);
+        expect(result).toBe(true);
+    });
+
+    it('should ignore non-push message events', async () => {
+        await pushService.initialize(mockConfig);
+        const container = mockWorkerService.container!;
+        const handler = (container.addEventListener as jest.Mock).mock.calls.find(
+            ([event]: [any]) => event === 'message',
+        )?.[1];
+        expect(handler).toBeDefined();
+        await (handler as Function)({}); // no data
+        await (handler as Function)({ data: { type: 'OTHER', payload: { data: { a: 'update', b: '', c: '' } } } });
+        expect(mockConfig.onCall).not.toHaveBeenCalled();
+    });
+
+    it('should skip onPermissionDefault when not provided and permission remains default', async () => {
+        const defaultNotification = createMockNotification({
+            permission: 'default',
+            requestPermissionResult: 'default',
+        });
+        mockConfig.notification = defaultNotification;
+        delete mockConfig.onPermissionDefault;
+        await pushService.initialize(mockConfig);
+        expect(defaultNotification.requestPermission).toHaveBeenCalled();
+        expect(mockLogger.error).toHaveBeenCalledWith('[push-service] Notification permission is still default.');
+    });
 });
 
 describe('urlBase64ToUint8Array', () => {

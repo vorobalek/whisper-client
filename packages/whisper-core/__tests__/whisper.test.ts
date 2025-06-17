@@ -141,6 +141,7 @@ describe('Whisper', () => {
             const [whisper1, whisper2] = await Promise.all([promise1, promise2]);
             expect(whisper1).toBe(whisper2);
             expect(mockLogger.warn).toHaveBeenCalledWith('[whisper] Parallel initialization attempt.');
+            expect(mockLogger.log).toHaveBeenCalledWith('[whisper] Initialized.');
         });
 
         it('should set up a periodic update call', async () => {
@@ -175,6 +176,31 @@ describe('Whisper', () => {
             expect(mockOnMayWorkUnstably).toHaveBeenCalledWith(
                 'Due to notifications unavailable, Whisper Messenger may work unstably.',
             );
+        });
+
+        it('should not call onMayWorkUnstably when push subscription is available', async () => {
+            // Mock an available subscription
+            const { getPushService } = require('../src/services/push-service');
+            getPushService().getSubscription.mockResolvedValueOnce({ endpoint: 'test-endpoint' });
+
+            const mockOnMayWorkUnstably = jest.fn().mockResolvedValue(undefined);
+            const configWithCallback = {
+                ...mockConfig,
+                onMayWorkUnstably: mockOnMayWorkUnstably,
+            };
+
+            const whisper = await whisperPrototype.initialize(configWithCallback);
+
+            expect(mockOnMayWorkUnstably).not.toHaveBeenCalled();
+        });
+
+        it('should not throw if push subscription is not available and onMayWorkUnstably is not provided', async () => {
+            const { getPushService } = require('../src/services/push-service');
+            getPushService().getSubscription.mockResolvedValueOnce(undefined);
+
+            const whisper = await whisperPrototype.initialize(mockConfig);
+            expect(whisper).toBeDefined();
+            expect(mockLogger.log).toHaveBeenCalledWith('[whisper] Initialized.');
         });
     });
 

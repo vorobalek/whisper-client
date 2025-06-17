@@ -98,12 +98,9 @@ export function getHandleService(
     let queue: Array<CallPayload> = [];
 
     async function processCallQueue() {
-        while (queue.length > 0) {
-            const payload = queue.shift();
-            if (payload) {
-                if (!(await processCall(payload, false))) {
-                    break;
-                }
+        for (let payload = queue.shift(); payload !== undefined; payload = queue.shift()) {
+            if (!(await processCall(payload, false))) {
+                break;
             }
         }
         setTimeout(processCallQueue, 500);
