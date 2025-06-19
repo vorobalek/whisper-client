@@ -3,6 +3,7 @@
     "dockerComposeFile": ["docker-compose.yml"],
     "service": "frontend",
     "workspaceFolder": "/workspaces/whisper-frontend",
+    "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind,consistency=cached",
     "forwardPorts": [8080, 5027],
     "portsAttributes": {
         "8080": {
