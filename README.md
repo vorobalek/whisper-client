@@ -2,7 +2,6 @@
 
 ![Statements](.github/badges/coverage/badge-statements.svg) ![Lines](.github/badges/coverage/badge-lines.svg)
 ![Functions](.github/badges/coverage/badge-functions.svg) ![Branches](.github/badges/coverage/badge-branches.svg)
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/vorobalek/whisper-frontend)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-frontend?quickstart=1)
 

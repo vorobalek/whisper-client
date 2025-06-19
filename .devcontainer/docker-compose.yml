@@ -41,6 +41,8 @@ services:
         image: whisper-frontend-dev
         command: sleep infinity
         working_dir: /workspaces/whisper-frontend
+        volumes:
+            - ..:/workspaces/whisper-frontend:cached
         env_file:
             - ./tmp/.env
         depends_on:
@@ -55,3 +57,6 @@ services:
 networks:
     lan:
         driver: bridge
+
+volumes:
+    whisper-frontend-workspace:
