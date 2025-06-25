@@ -11,4 +11,5 @@ export interface UpdateType {
     delivered?: DeliveredType;
     seen?: SeenType;
     reaction?: ReactionType;
+    history?: UpdateType[];
 }

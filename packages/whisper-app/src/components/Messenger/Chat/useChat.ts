@@ -413,9 +413,10 @@ export function useChat({
 
     const resendCached = useCallback(async () => {
         const cache = await getCache();
-        for (const update of cache) {
-            await sendUpdate(update);
-        }
+        await sendUpdate({
+            id: serverTime(),
+            history: cache,
+        });
     }, [sendUpdate]);
 
     const setReplyTo = useCallback(
@@ -470,10 +471,8 @@ export function useChat({
         },
         [resendCached, hasBeenOpened, displayMessage, displayTyping, hasBeenClosed],
     );
-
-    const onMessage = useCallback(
-        (value: string) => {
-            const update: UpdateType = JSON.parse(value);
+    const onUpdate = useCallback(
+        (update: UpdateType) => {
             if (update.action !== undefined && update.action !== null) {
                 switch (update.action) {
                     case 'typing':
@@ -496,6 +495,11 @@ export function useChat({
             if (update.reaction !== undefined && update.reaction !== null) {
                 setMessageReaction(update.id, 'you', update.reaction);
             }
+            if (update.history !== undefined && update.history !== null) {
+                for (const historicalUpdate of update.history) {
+                    onUpdate(historicalUpdate);
+                }
+            }
         },
         [
             displayTyping,
@@ -506,6 +510,14 @@ export function useChat({
             setMessageSeen,
             setMessageReaction,
         ],
+    );
+
+    const onMessage = useCallback(
+        (value: string) => {
+            const update: UpdateType = JSON.parse(value);
+            onUpdate(update);
+        },
+        [onUpdate],
     );
 
     const [firstUndeliveredMessageTimestamp, setFirstUndeliveredMessageTimestamp] = useState<number | undefined>();

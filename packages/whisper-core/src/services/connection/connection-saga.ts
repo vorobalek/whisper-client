@@ -9,6 +9,7 @@ import { SessionService } from '../session-service';
 import { TimeService } from '../time-service';
 import { IceServer } from './ice-server';
 import { WebRTC } from './web-rtc';
+import { gzip, ungzip } from 'pako';
 
 /**
  * Enumeration of all possible states in a WebRTC connection establishment saga.
@@ -529,8 +530,15 @@ export function getConnectionSaga(
                 return;
             }
             const dataBytes = new Uint8Array(event.data);
-            const messageBytes = cryptography.decrypt(dataBytes, getSharedSymmetricKey());
-            const message = utf8.encode(messageBytes);
+            const decryptedBytes = cryptography.decrypt(dataBytes, getSharedSymmetricKey());
+            let inflatedBytes: Uint8Array;
+            try {
+                inflatedBytes = ungzip(decryptedBytes);
+            } catch (err) {
+                logger.warn(`[connection-saga] Gzip decompression failed, using raw decrypted data.`, err);
+                inflatedBytes = decryptedBytes;
+            }
+            const message = utf8.encode(inflatedBytes);
             new Promise<void>((resolve) => {
                 saga.onMessage?.call(saga, message);
                 resolve();
@@ -771,7 +779,8 @@ export function getConnectionSaga(
                     return;
                 }
                 const dataBytes = utf8.decode(data);
-                const dataEncrypted = cryptography.encrypt(dataBytes, getSharedSymmetricKey());
+                const compressedBytes = gzip(dataBytes);
+                const dataEncrypted = cryptography.encrypt(compressedBytes, getSharedSymmetricKey());
                 getRtcSendDataChannel().send(new Uint8Array(dataEncrypted.buffer));
             } catch (error) {
                 logger.error(`[connection-saga] Error sending data in ${type} connection with ${publicKey}.`);
