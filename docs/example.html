@@ -52,29 +52,13 @@
                     onIncomingConnection: (connection) => console.warn('Incoming connection', connection),
                     iceServers: [
                         {
-                            urls: 'stun:coturn.sfo3.do.vorobalek.dev:3478',
+                            urls: 'stun:***:3478',
                         },
                         {
-                            urls: 'stun:coturn.ams3.do.vorobalek.dev:3478',
-                        },
-                        {
-                            urls: 'stun:coturn.fra1.do.vorobalek.dev:3478',
-                        },
-                        {
-                            urls: 'turn:coturn.sfo3.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
-                        },
-                        {
-                            urls: 'turn:coturn.ams3.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
-                        },
-                        {
-                            urls: 'turn:coturn.fra1.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
-                        },
+                            urls: 'turn:***:3478',
+                            username: '***',
+                            credential: '***',
+                        }
                     ],
                     focusOnDial: (peerPublicKey) => {
                         console.warn('Dial!', peerPublicKey);
