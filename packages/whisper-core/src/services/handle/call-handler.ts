@@ -68,7 +68,9 @@ export function getCallHandler<TypeData extends CloseCallData>(
     function validateTimestamp(request: CallRequest<TypeData>): boolean {
         const delta = request.b.b - timeService.serverTime;
         if (Math.abs(delta) > 5 * 1000) {
-            logger.debug(`[${request.a}-call-handler] Request timestamp is more than 5 seconds stale (delta ${delta}).`);
+            logger.debug(
+                `[${request.a}-call-handler] Request timestamp is more than 5 seconds stale (delta ${delta}ms).`,
+            );
             return false;
         }
         logger.debug(`[${request.a}-call-handler] Request timestamp is valid (delta ${delta}ms).`);

@@ -192,13 +192,13 @@ describe('CallHandler', () => {
         });
 
         it('should fail validation if timestamp is stale', () => {
-            request.b.b = 100000; // More than 1 minute from server time
+            request.b.b = 100000; // More than 5 seconds from server time
 
             const result = callHandler.validate(request);
 
             expect(result).toBe(false);
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                '[close-call-handler] Request timestamp is more than 1 minute stale (delta 99000).',
+                '[close-call-handler] Request timestamp is more than 5 seconds stale (delta 99000ms).',
             );
         });
 
