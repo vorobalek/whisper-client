@@ -468,18 +468,18 @@ export function useWhisper(
                         },
                         {
                             urls: 'turn:coturn.sfo3.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
+                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
+                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
                         },
                         {
                             urls: 'turn:coturn.ams3.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
+                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
+                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
                         },
                         {
                             urls: 'turn:coturn.fra1.do.vorobalek.dev:3478',
-                            username: 'anonymous',
-                            credential: 'anonymous',
+                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
+                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
                         },
                     ],
 
