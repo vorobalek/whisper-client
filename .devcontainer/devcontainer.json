@@ -1,15 +1,15 @@
 {
     "name": "Whisper Dev Container",
     "dockerComposeFile": ["docker-compose.yml"],
-    "service": "frontend",
-    "workspaceFolder": "/workspaces/whisper-frontend",
+    "service": "client",
+    "workspaceFolder": "/workspaces/whisper-client",
     "forwardPorts": [8080, 5027],
     "portsAttributes": {
         "8080": {
-            "label": "frontend"
+            "label": "client"
         },
         "5027": {
-            "label": "backend"
+            "label": "server"
         }
     },
     "features": {

@@ -8,7 +8,7 @@ declare namespace NodeJS {
         WHISPER_DOCUMENT_LOG_LEVEL: App.LogLevel;
         WHISPER_BUILD_TIMESTAMP: string;
         WHISPER_SERVER_URL: string;
-        WHISPER_FRONTEND_URL: string;
+        WHISPER_CLIENT_URL: string;
         WHISPER_VAPID_KEY: string;
     }
 }

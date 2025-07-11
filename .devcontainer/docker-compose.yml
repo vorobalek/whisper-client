@@ -13,7 +13,7 @@ services:
         networks:
             - lan
 
-    backend:
+    server:
         image: vorobalek/whisper:latest
         restart: unless-stopped
         env_file:
@@ -34,19 +34,19 @@ services:
         networks:
             - lan
 
-    frontend:
+    client:
         build:
             context: ..
             dockerfile: .devcontainer/Dockerfile
-        image: whisper-frontend-dev
+        image: whisper-client-dev
         command: sleep infinity
-        working_dir: /workspaces/whisper-frontend
+        working_dir: /workspaces/whisper-client
         volumes:
-            - ..:/workspaces/whisper-frontend:cached
+            - ..:/workspaces/whisper-client:cached
         env_file:
             - ./tmp/.env
         depends_on:
-            - backend
+            - server
             - redis
             - mongo
         ports:
@@ -57,6 +57,3 @@ services:
 networks:
     lan:
         driver: bridge
-
-volumes:
-    whisper-frontend-workspace:
