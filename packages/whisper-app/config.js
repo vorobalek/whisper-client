@@ -9,7 +9,7 @@ function getTemplateParameters(env) {
                     env.CODESPACES === 'true' && env.CODESPACE_NAME !== undefined
                         ? `https://${env.CODESPACE_NAME}-5027.app.github.dev`
                         : 'http://localhost:5027',
-                WHISPER_FRONTEND_URL:
+                WHISPER_CLIENT_URL:
                     env.CODESPACES === 'true' && env.CODESPACE_NAME !== undefined
                         ? `https://${env.CODESPACE_NAME}-8080.app.github.dev`
                         : 'http://localhost:8080',
@@ -23,7 +23,7 @@ function getTemplateParameters(env) {
                 WHISPER_CONSOLE_LOG_LEVEL: 'trace',
                 WHISPER_DOCUMENT_LOG_LEVEL: 'info',
                 WHISPER_SERVER_URL: 'https://cluster.vorobalek.dev/whisper',
-                WHISPER_FRONTEND_URL: 'https://whisper.vorobalek.dev',
+                WHISPER_CLIENT_URL: 'https://whisper.vorobalek.dev',
                 WHISPER_VAPID_KEY:
                     'BHAYDRAjMWXfg7dxFIOZYNLlxrVDohy_PbN7SXcrXapiZq0Jnt0VXsAx6ytkLArVVFDSfula4VRWm5HDvkVVRbA',
             };

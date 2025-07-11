@@ -108,7 +108,7 @@ self.addEventListener('activate', () => {
 });
 
 self.addEventListener('notificationclick', function (event) {
-    let url = '__WHISPER_FRONTEND_URL__';
+    let url = '__WHISPER_CLIENT_URL__';
     event.notification.close();
     event.waitUntil(
         self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {

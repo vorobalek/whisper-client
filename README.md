@@ -3,7 +3,7 @@
 ![Statements](.github/badges/coverage/badge-statements.svg) ![Lines](.github/badges/coverage/badge-lines.svg)
 ![Functions](.github/badges/coverage/badge-functions.svg) ![Branches](.github/badges/coverage/badge-branches.svg)
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-frontend?quickstart=1)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-client?quickstart=1)
 
 [`whisper-app`](./packages/whisper-app/) is a demonstration of the Whisper protocol in action. Try it live:
 [https://whisper.vorobalek.dev](https://whisper.vorobalek.dev)
@@ -119,12 +119,7 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
 
 ### Running via Dev Container
 
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/vorobalek/whisper-frontend)
-
-> **Also available via GitHub Codespaces**: open this repository in a Codespace (click "Code" → "Open with Codespaces"
-> on GitHub) to launch the development container.
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-frontend?quickstart=1)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vorobalek/whisper-client?quickstart=1)
 
 1. Open the project in a development container (see
    [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)).
@@ -233,7 +228,7 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
                             urls: 'turn:***:3478',
                             username: '***',
                             credential: '***',
-                        }
+                        },
                     ],
                     focusOnDial: (peerPublicKey) => {
                         console.warn('Dial!', peerPublicKey);

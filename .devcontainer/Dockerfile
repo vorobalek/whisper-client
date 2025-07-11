@@ -5,7 +5,7 @@ FROM node:20
 RUN npm install -g npm@11.4.2
 
 # Set working directory to the mounted workspace
-WORKDIR /workspaces/whisper-frontend
+WORKDIR /workspaces/whisper-client
 
 # Switch to the non-root user
 USER node
