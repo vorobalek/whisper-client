@@ -8,6 +8,8 @@
 [`whisper-app`](./packages/whisper-app/) is a demonstration of the Whisper protocol in action. Try it live:
 [https://whisper.vorobalek.dev](https://whisper.vorobalek.dev)
 
+[`whisper-server`](https://github.com/vorobalek/whisper-server) is the server-side reference implementation of the Whisper protocol.
+
 > This app showcases the capabilities of the Whisper protocol. Below you'll find a detailed protocol description and
 > usage examples for integration into your own projects.
 
