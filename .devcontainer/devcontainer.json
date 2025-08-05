@@ -15,9 +15,7 @@
     "features": {
         "ghcr.io/devcontainers/features/github-cli:1": {}
     },
-    "mounts": [
-        "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"
-    ],
+    "mounts": ["source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached"],
     "initializeCommand": "bash .devcontainer/scripts/generate-vapid.sh",
     "postStartCommand": "bash .devcontainer/scripts/codespace/set-ports-visibility.sh",
     "customizations": {

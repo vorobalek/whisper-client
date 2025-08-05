@@ -13,13 +13,17 @@ export interface Cryptography {
 export function getCryptography(): Cryptography {
     async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
         const encoder = new TextEncoder();
-        const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), { name: 'PBKDF2' }, false, [
-            'deriveKey',
-        ]);
+        const keyMaterial = await crypto.subtle.importKey(
+            'raw',
+            encoder.encode(password).buffer as ArrayBuffer,
+            { name: 'PBKDF2' },
+            false,
+            ['deriveKey'],
+        );
         return await crypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
-                salt: salt,
+                salt: salt.buffer as ArrayBuffer,
                 iterations: 100000,
                 hash: 'SHA-256',
             },
@@ -34,12 +38,20 @@ export function getCryptography(): Cryptography {
         const encoder = new TextEncoder();
         const iv = crypto.getRandomValues(new Uint8Array(12));
         const encodedData = encoder.encode(JSON.stringify(data));
-        const encryptedData = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encodedData);
+        const encryptedData = await crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv: iv.buffer as ArrayBuffer },
+            key,
+            encodedData.buffer as ArrayBuffer,
+        );
         return { iv, encryptedData };
     }
 
     async function decryptData(key: CryptoKey, iv: Uint8Array, encryptedData: ArrayBuffer): Promise<any> {
-        const decryptedData = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encryptedData);
+        const decryptedData = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: iv.buffer as ArrayBuffer },
+            key,
+            encryptedData,
+        );
         const decoder = new TextDecoder();
         const decodedData = decoder.decode(decryptedData);
         return JSON.parse(decodedData);
@@ -51,7 +63,7 @@ export function getCryptography(): Cryptography {
 
     async function getHashString(data: string): Promise<string> {
         const dataBytes = new TextEncoder().encode(data);
-        const hashBytes = await crypto.subtle.digest('SHA-256', dataBytes);
+        const hashBytes = await crypto.subtle.digest('SHA-256', dataBytes.buffer as ArrayBuffer);
         return new TextDecoder().decode(hashBytes);
     }
 
