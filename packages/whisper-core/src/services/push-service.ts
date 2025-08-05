@@ -255,7 +255,7 @@ export function getPushService(logger: Logger, workerService: WorkerService, bas
                     }
                     return await registration.pushManager.subscribe({
                         userVisibleOnly: true,
-                        applicationServerKey: applicationServerKey,
+                        applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
                     });
                 } catch (err) {
                     logger.error('[push-service] An error occurred while obtaining the subscription.', err);

@@ -781,7 +781,7 @@ export function getConnectionSaga(
                 const dataBytes = utf8.decode(data);
                 const compressedBytes = gzip(dataBytes);
                 const dataEncrypted = cryptography.encrypt(compressedBytes, getSharedSymmetricKey());
-                getRtcSendDataChannel().send(new Uint8Array(dataEncrypted.buffer));
+                getRtcSendDataChannel().send(new Uint8Array(dataEncrypted.buffer as ArrayBuffer));
             } catch (error) {
                 logger.error(`[connection-saga] Error sending data in ${type} connection with ${publicKey}.`);
             }
