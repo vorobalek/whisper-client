@@ -63,10 +63,44 @@
 
         .scroll-progress {
             margin-left: auto;
-            background-image: linear-gradient(to right, #0084ff, #006acc);
+            background-image: linear-gradient(
+                to right,
+                var(--button-primary-bg-color),
+                var(--button-primary-hover-bg-color)
+            );
             height: 100%;
             border-radius: 10px;
         }
+    }
+
+    .scroll-to-bottom {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        outline: none;
+        background-image: linear-gradient(
+            to bottom right,
+            var(--button-primary-bg-color),
+            var(--button-primary-hover-bg-color)
+        );
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 150ms ease;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .scroll-to-bottom.visible {
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 
