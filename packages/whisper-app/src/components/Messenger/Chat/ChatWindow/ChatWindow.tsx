@@ -6,6 +6,8 @@ import Typing from './Action/Typing';
 import './ChatWindow.css';
 import Message from './Message';
 import Progress from './Progress/Progress';
+import { mdiArrowDown } from '@mdi/js';
+import Icon from '@mdi/react';
 import { animated, useSpring } from '@react-spring/web';
 import { useScroll } from '@use-gesture/react';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -39,7 +41,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     const wrapperRef = useRef<HTMLDivElement>(null);
     const windowRef = useRef<HTMLDivElement>(null);
     const [progress, setProgress] = useState<number | undefined>();
+    const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false);
     const messageDivRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+    const lastShowButtonRef = useRef<boolean>(false);
     useLayoutEffect(() => {
         const scrollToTop = () => {
             if (windowRef.current) {
@@ -88,8 +92,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                         height: width > 0 ? '15px' : '0px',
                         width: width + '%',
                     });
+                    const shouldShow = y < delta - 1;
+                    if (lastShowButtonRef.current !== shouldShow) {
+                        lastShowButtonRef.current = shouldShow;
+                        setShowScrollToBottom(shouldShow);
+                    }
                 } else {
                     api.start({ paddingTop: '0px', paddingBottom: '0px', height: '0', width: '0' });
+                    if (lastShowButtonRef.current) {
+                        lastShowButtonRef.current = false;
+                        setShowScrollToBottom(false);
+                    }
                 }
             }
         },
@@ -98,6 +111,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             eventOptions: { passive: true },
         },
     );
+
+    const scrollToBottom = () => {
+        if (windowRef.current) {
+            windowRef.current.scrollTo({ top: windowRef.current.scrollHeight, behavior: 'smooth' });
+        }
+    };
     return (
         <div
             ref={wrapperRef}
@@ -112,6 +131,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     style={{ width }}
                 />
             </animated.div>
+            <button
+                className={`scroll-to-bottom${showScrollToBottom ? ' visible' : ''}`}
+                onClick={scrollToBottom}
+                aria-label='Scroll to latest message'
+            >
+                <Icon
+                    path={mdiArrowDown}
+                    size={'24px'}
+                    color={'var(--button-text-color)'}
+                />
+            </button>
             <div
                 ref={windowRef}
                 className='chat-window'
