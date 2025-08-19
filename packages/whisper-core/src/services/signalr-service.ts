@@ -104,7 +104,7 @@ export function getSignalRService(logger: Logger): SignalRService {
                         return Math.max(1000 + 1000 * retryContext.previousRetryCount, 5000);
                     },
                 })
-                .configureLogging(LogLevel.Warning)
+                .configureLogging(LogLevel.None)
                 .build();
             connection.onreconnecting(() => {
                 resetReadyPromise();
@@ -127,19 +127,24 @@ export function getSignalRService(logger: Logger): SignalRService {
                 }
                 try {
                     await config.onCall(payload);
-                } catch (error) {
-                    logger.error(`[signalr-service] Error while processing signalR call.`, error);
+                } catch (error: any) {
+                    logger.error(`[signalr-service] Error while processing signalR call.`, error.message);
                 }
             });
-            try {
-                await connection.start();
-                readyResolver?.call(this);
-                logger.debug('[signalr-service] SignalR is ready.');
-                await config.onReady();
-            } catch (error) {
-                logger.error('[signalr-service] SignalR connection error.', error);
-                resetReadyPromise();
+            async function startConnection(connection: HubConnection, signalRService: SignalRService, retryCount: number): Promise<void> {
+                try {
+                    await connection.start();
+                    readyResolver?.call(signalRService);
+                    logger.debug('[signalr-service] SignalR is ready.');
+                    await config.onReady();
+                } catch (error: any) {
+                    logger.error('[signalr-service] SignalR connection error.', error.message);
+                    resetReadyPromise();
+                    const retryDelay = Math.min(1000 + 1000 * retryCount, 5000);
+                    setTimeout(() => startConnection(connection, signalRService, retryCount + 1), retryDelay);
+                }
             }
+            startConnection(connection, this, 0);
         },
         get ready(): boolean {
             return !readyPromise;

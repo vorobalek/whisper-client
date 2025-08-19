@@ -49,7 +49,7 @@ describe('SignalRService', () => {
             // Then
             expect(mockHubBuilder.withUrl).toHaveBeenCalledWith('https://test-server.com/signal/v1');
             expect(mockHubBuilder.withAutomaticReconnect).toHaveBeenCalled();
-            expect(mockHubBuilder.configureLogging).toHaveBeenCalledWith(LogLevel.Warning);
+            expect(mockHubBuilder.configureLogging).toHaveBeenCalledWith(LogLevel.None);
             expect(mockHubBuilder.build).toHaveBeenCalled();
 
             expect(mockHubConnection.start).toHaveBeenCalled();
@@ -85,8 +85,35 @@ describe('SignalRService', () => {
             await signalRService.initialize(mockConfig);
 
             // Then
-            expect(mockLogger.error).toHaveBeenCalledWith('[signalr-service] SignalR connection error.', error);
+            expect(mockLogger.error).toHaveBeenCalledWith('[signalr-service] SignalR connection error.', error.message);
             expect(signalRService.ready).toBe(false);
+        });
+
+        it('should retry connection via setTimeout and increment retryCount', async () => {
+            // Given: first start fails, subsequent starts succeed
+            jest.useFakeTimers();
+            const error = new Error('Connection error');
+            mockHubConnection.start.mockRejectedValueOnce(error);
+
+            // When: initialize triggers first start attempt
+            await signalRService.initialize(mockConfig);
+
+            // Allow the rejected promise to be handled and the retry timeout to be scheduled
+            await Promise.resolve();
+
+            // First attempt should have been made
+            expect(mockHubConnection.start).toHaveBeenCalledTimes(1);
+
+            // Advance timers to trigger the scheduled retry (initial retryDelay = 1000ms)
+            jest.advanceTimersByTime(1000);
+
+            // Allow any microtasks kicked off by the retry to run
+            await Promise.resolve();
+
+            // Then: second start attempt should have been made via the setTimeout callback
+            expect(mockHubConnection.start).toHaveBeenCalledTimes(2);
+
+            jest.useRealTimers();
         });
 
         it('should setup reconnect handlers correctly', async () => {
@@ -188,7 +215,7 @@ describe('SignalRService', () => {
             // Then
             expect(mockLogger.error).toHaveBeenCalledWith(
                 '[signalr-service] Error while processing signalR call.',
-                error,
+                error.message,
             );
         });
     });
