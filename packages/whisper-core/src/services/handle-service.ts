@@ -106,7 +106,7 @@ export function getHandleService(
         setTimeout(processCallQueue, 500);
     }
 
-    processCallQueue().then().catch(logger.error);
+    processCallQueue().catch(logger.error);
     return {
         initialize(config: HandleServiceConfig): void {
             dialCallHandler.initialize(config);
