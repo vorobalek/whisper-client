@@ -174,28 +174,50 @@ export function getCallService(
         method: CallMethodName,
         data: TypeData,
     ): Promise<CallResponse> {
-        async function sendViaApi<TypeData extends CallData>(request: CallRequest<TypeData>): Promise<CallResponse> {
-            if (!serverUrl) {
-                throw newError(logger, '[call-service] Server URL is missing.');
-            }
-            return await apiClient.call(serverUrl, request);
-        }
-
-        const request = {
+        const request: CallRequest<TypeData> = {
             a: method,
             b: data,
             c: getBase64Signature(data),
         };
-        let response: CallResponse;
-        try {
-            response = await signalRService.call(request);
-        } catch (error) {
+        let response: CallResponse | undefined;
+        let trySignalR = signalRService.ready;
+        let tryApi = false;
+
+        if (trySignalR) {
+            try {
+                response = await signalRService.call(request);
+            } catch (error) {
+                tryApi = true;
+                logger.warn(
+                    `[call-service] Error while sending call '${request.a}' via signalR. Trying to use http API.`,
+                    error,
+                );
+            }
+        } else {
+            tryApi = true;
             logger.warn(
-                `[call-service] Error while sending call '${request.a}' via signalR. Trying to use http API.`,
-                error,
+                `[call-service] SignalR is not ready. Trying to use http API.`,
             );
-            response = await sendViaApi<TypeData>(request);
         }
+
+        if (tryApi) {
+            if (!serverUrl) {
+                throw newError(logger, '[call-service] Server URL is missing.');
+            }
+            try {
+                response = await apiClient.call(serverUrl, request);
+            } catch (error) {
+                logger.error(
+                    `[call-service] Error while sending call '${request.a}' via http API.`,
+                    error,
+                );
+            }
+        }
+
+        if (!response) {
+            throw newError(logger, `[call-service] Failed to send call '${request.a}'.`);
+        }
+
         timeService.serverTime = response.timestamp;
         return response;
     }
