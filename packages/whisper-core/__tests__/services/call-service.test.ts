@@ -133,6 +133,82 @@ describe('CallService', () => {
             await expect(callService.update(publicKey)).rejects.toThrow('[call-service] Server URL is missing.');
             expect(mockLogger.error).toHaveBeenCalled();
         });
+
+        it('should warn and use API client when SignalR is not ready', async () => {
+            // Given: a SignalR service that is not ready
+            const notReadySignalRService: SignalRService = {
+                initialize: jest.fn().mockResolvedValue(undefined),
+                get ready() {
+                    return false;
+                },
+                call: jest.fn().mockResolvedValue(mockResponse),
+            };
+
+            const service = getCallService(
+                mockLogger,
+                mockTimeService,
+                mockSessionService,
+                mockApiClient,
+                notReadySignalRService,
+                mockBase64,
+                mockUtf8,
+                mockCryptography,
+            );
+            service.initialize({ serverUrl: 'https://test-server.com', navigator: mockNavigator });
+
+            // When
+            const response = await service.update(publicKey);
+
+            // Then
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                '[call-service] SignalR is not ready. Trying to use http API.',
+            );
+            expect(mockApiClient.call).toHaveBeenCalled();
+            expect((notReadySignalRService as any).call).not.toHaveBeenCalled();
+            expect(response).toBe(mockResponse);
+            expect(mockTimeService.serverTime).toBe(mockResponse.timestamp);
+        });
+
+        it('should log error for API failure and then throw when no response is received', async () => {
+            // Given: SignalR not ready and API call fails
+            const notReadySignalRService: SignalRService = {
+                initialize: jest.fn().mockResolvedValue(undefined),
+                get ready() {
+                    return false;
+                },
+                call: jest.fn(),
+            };
+
+            const failingApiClient: ApiClient = {
+                call: jest.fn().mockRejectedValue(new Error('API error')),
+            };
+
+            const service = getCallService(
+                mockLogger,
+                mockTimeService,
+                mockSessionService,
+                failingApiClient,
+                notReadySignalRService,
+                mockBase64,
+                mockUtf8,
+                mockCryptography,
+            );
+            service.initialize({ serverUrl: 'https://test-server.com', navigator: mockNavigator });
+
+            // When & Then
+            await expect(service.update(publicKey)).rejects.toThrow(
+                "[call-service] Failed to send call 'update'.",
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                '[call-service] SignalR is not ready. Trying to use http API.',
+            );
+            expect((failingApiClient.call as jest.Mock)).toHaveBeenCalled();
+            // Ensure the API error was logged from the catch block (string + error)
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                expect.stringContaining("[call-service] Error while sending call 'update' via http API."),
+                expect.any(Error),
+            );
+        });
     });
 
     describe('update', () => {

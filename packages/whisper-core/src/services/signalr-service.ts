@@ -80,12 +80,22 @@ export interface SignalRService {
  */
 export function getSignalRService(logger: Logger): SignalRService {
     let connection: HubConnection | undefined;
-    let ready: boolean = false;
+    let readyResolver: (() => void) | undefined;
     let readyPromise: Promise<void> | undefined;
-    let readyPromiseResolve: (() => void) | undefined;
+    function resetReadyPromise(): void {
+        if (!readyPromise) {
+            readyPromise = new Promise<void>((resolve) => {
+                readyResolver = () => {
+                    resolve();
+                    readyPromise = undefined;
+                };
+            });
+        }
+    }
     let serverUrl: string | undefined;
     return {
         async initialize(config: SignalRServiceEffectiveConfig): Promise<void> {
+            resetReadyPromise();
             serverUrl = config.serverUrl;
             connection = new HubConnectionBuilder()
                 .withUrl(`${config.serverUrl}/signal/v1`)
@@ -94,18 +104,14 @@ export function getSignalRService(logger: Logger): SignalRService {
                         return Math.max(1000 + 1000 * retryContext.previousRetryCount, 5000);
                     },
                 })
-                .configureLogging(LogLevel.Warning)
+                .configureLogging(LogLevel.None)
                 .build();
             connection.onreconnecting(() => {
-                ready = false;
+                resetReadyPromise();
                 logger.warn('[signalr-service] Reconnecting ...');
-                readyPromise = new Promise<void>((resolve) => {
-                    readyPromiseResolve = resolve;
-                });
             });
             connection.onreconnected(async () => {
-                ready = true;
-                readyPromiseResolve?.call(this);
+                readyResolver?.call(this);
                 logger.warn('[signalr-service] Reconnected.');
                 await config.onReady();
             });
@@ -121,61 +127,58 @@ export function getSignalRService(logger: Logger): SignalRService {
                 }
                 try {
                     await config.onCall(payload);
-                } catch (error) {
-                    logger.error(`[signalr-service] Error while processing signalR call.`, error);
+                } catch (error: any) {
+                    logger.error(`[signalr-service] Error while processing signalR call.`, error.message);
                 }
             });
-            await connection
-                .start()
-                .then(async () => {
-                    ready = true;
+            async function startConnection(connection: HubConnection, signalRService: SignalRService, retryCount: number): Promise<void> {
+                try {
+                    await connection.start();
+                    readyResolver?.call(signalRService);
                     logger.debug('[signalr-service] SignalR is ready.');
                     await config.onReady();
-                })
-                .catch((err) => {
-                    logger.error('[signalr-service] SignalR connection error.', err);
-                    ready = false;
-                });
+                } catch (error: any) {
+                    logger.error('[signalr-service] SignalR connection error.', error.message);
+                    resetReadyPromise();
+                    const retryDelay = Math.min(1000 + 1000 * retryCount, 5000);
+                    setTimeout(() => startConnection(connection, signalRService, retryCount + 1), retryDelay);
+                }
+            }
+            startConnection(connection, this, 0);
         },
         get ready(): boolean {
-            return ready;
+            return !readyPromise;
         },
         async call<TypeData extends CallData, TypeResponse extends CallResponse>(
             request: CallRequest<TypeData>,
         ): Promise<TypeResponse> {
-            if (readyPromise !== undefined && readyPromise !== null) {
+            if (!this.ready) {
                 await readyPromise;
             }
-            return new Promise<TypeResponse>((resolve, reject) => {
-                if (!connection) {
-                    throw newError(logger, '[signalr-service] SignalR connection is not initialized.');
+            if (!connection) {
+                throw newError(logger, '[signalr-service] SignalR connection is not initialized.');
+            }
+            const method = request.a;
+            try {
+                const response = await connection.invoke<TypeResponse>('call', request);
+                if (!response) {
+                    const error = `[signalr-service] Unexpected answer on call ${method} from ${serverUrl}.`;
+                    logger.error(error);
+                    throw error;
                 }
-                const method = request.a;
-                connection
-                    .invoke<TypeResponse>('call', request)
-                    .then((response) => {
-                        if (!response) {
-                            const error = `[signalr-service] Unexpected answer on call ${method} from ${serverUrl}.`;
-                            logger.error(error);
-                            reject(error);
-                            return;
-                        }
-                        if (!response.ok) {
-                            const error = `[signalr-service] Request was not successful on call '${method}'. Reason: ${response.reason}; Response: ${JSON.stringify(response)}.`;
-                            logger.error(error, response);
-                            reject(error);
-                            return;
-                        }
-                        logger.debug(
-                            `[signalr-service] Call '${method}' successfully sent. Response: ${JSON.stringify(response)}`,
-                        );
-                        resolve(response);
-                    })
-                    .catch((err) => {
-                        logger.error(`[signalr-service] Error while sending request.`, err, request);
-                        reject(err);
-                    });
-            });
+                if (!response.ok) {
+                    const error = `[signalr-service] Request was not successful on call '${method}'. Reason: ${response.reason}; Response: ${JSON.stringify(response)}.`;
+                    logger.error(error, response);
+                    throw error;
+                }
+                logger.debug(
+                    `[signalr-service] Call '${method}' successfully sent. Response: ${JSON.stringify(response)}`,
+                );
+                return response;
+            } catch (error) {
+                logger.error(`[signalr-service] Error while sending request.`, error, request);
+                throw error;
+            }
         },
     };
 }
