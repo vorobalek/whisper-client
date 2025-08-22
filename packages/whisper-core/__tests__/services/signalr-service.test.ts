@@ -17,7 +17,7 @@ describe('SignalRService', () => {
     let mockLogger: Logger;
     let mockHubConnection: jest.Mocked<HubConnection>;
     let mockHubBuilder: any;
-    let mockConfig: SignalRServiceConfig & { onCall: jest.Mock; onReady: jest.Mock };
+    let mockConfig: SignalRServiceConfig & { onCall: jest.Mock; onReady: jest.Mock; initializationTimeout: number };
 
     beforeEach(() => {
         // Reset mocks
@@ -31,6 +31,7 @@ describe('SignalRService', () => {
             serverUrl: 'https://test-server.com',
             onCall: jest.fn().mockResolvedValue(undefined),
             onReady: jest.fn().mockResolvedValue(undefined),
+            initializationTimeout: 50,
         };
 
         // Create SignalR service
@@ -96,7 +97,12 @@ describe('SignalRService', () => {
             mockHubConnection.start.mockRejectedValueOnce(error);
 
             // When: initialize triggers first start attempt
-            await signalRService.initialize(mockConfig);
+            const initPromise = signalRService.initialize(mockConfig);
+            // Let any pending microtasks run
+            await Promise.resolve();
+            // Advance timers to resolve initialization timeout so initialize can complete
+            jest.advanceTimersByTime(mockConfig.initializationTimeout);
+            await initPromise;
 
             // Allow the rejected promise to be handled and the retry timeout to be scheduled
             await Promise.resolve();
@@ -163,6 +169,7 @@ describe('SignalRService', () => {
             const configWithoutOnCall = {
                 serverUrl: 'https://test-server.com',
                 onReady: jest.fn().mockResolvedValue(undefined),
+                initializationTimeout: 50,
             };
 
             await signalRService.initialize(configWithoutOnCall as any);

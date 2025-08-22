@@ -275,6 +275,7 @@ export function getPrototype(logger: Logger): WhisperPrototype {
                 onReady: async () => {
                     await callService.update(sessionService.signingPublicKeyBase64, subscription);
                 },
+                initializationTimeout: 5000,
             });
 
             workerService.controller?.postMessage({ type: 'CLIENT_READY' });

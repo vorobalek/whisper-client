@@ -12,7 +12,7 @@ export type SessionServiceConfig = {
      * Cryptographic key pair used for signing operations.
      * Essential for verifying the identity of the current user.
      */
-    signingKeyPair: CryptoKeyPair;
+    signingKeyPair?: CryptoKeyPair;
 };
 
 /**

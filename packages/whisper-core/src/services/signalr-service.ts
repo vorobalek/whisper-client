@@ -15,7 +15,7 @@ export type SignalRServiceConfig = {
      * URL of the SignalR server endpoint.
      * Used to establish the real-time communication channel.
      */
-    serverUrl: string;
+    serverUrl?: string;
 };
 
 /**
@@ -38,6 +38,12 @@ type SignalRServiceEffectiveConfig = {
      * @returns Promise that resolves when the ready operations are complete
      */
     onReady: () => Promise<void>;
+
+    /**
+     * Timeout for the initialization of the SignalR connection.
+     * If the connection is not established within this time, the initialization will be skipped.
+     */
+    initializationTimeout: number;
 } & SignalRServiceConfig;
 
 /**
@@ -131,7 +137,11 @@ export function getSignalRService(logger: Logger): SignalRService {
                     logger.error(`[signalr-service] Error while processing signalR call.`, error.message);
                 }
             });
-            async function startConnection(connection: HubConnection, signalRService: SignalRService, retryCount: number): Promise<void> {
+            async function startConnection(
+                connection: HubConnection,
+                signalRService: SignalRService,
+                retryCount: number,
+            ): Promise<void> {
                 try {
                     await connection.start();
                     readyResolver?.call(signalRService);
@@ -145,6 +155,10 @@ export function getSignalRService(logger: Logger): SignalRService {
                 }
             }
             startConnection(connection, this, 0);
+            await Promise.race([
+                new Promise((resolve) => setTimeout(resolve, config.initializationTimeout)),
+                readyPromise,
+            ]);
         },
         get ready(): boolean {
             return !readyPromise;

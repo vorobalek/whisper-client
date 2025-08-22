@@ -195,9 +195,7 @@ export function getCallService(
             }
         } else {
             tryApi = true;
-            logger.warn(
-                `[call-service] SignalR is not ready. Trying to use http API.`,
-            );
+            logger.warn(`[call-service] SignalR is not ready. Trying to use http API.`);
         }
 
         if (tryApi) {
@@ -207,10 +205,7 @@ export function getCallService(
             try {
                 response = await apiClient.call(serverUrl, request);
             } catch (error) {
-                logger.error(
-                    `[call-service] Error while sending call '${request.a}' via http API.`,
-                    error,
-                );
+                logger.error(`[call-service] Error while sending call '${request.a}' via http API.`, error);
             }
         }
 
