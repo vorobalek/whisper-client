@@ -9,7 +9,7 @@ export type WorkerServiceConfig = {
      * Version identifier for the service worker.
      * Used to trigger service worker updates when the version changes.
      */
-    version: string;
+    version?: string;
 
     /**
      * Optional callback triggered when a new version of the application is available.

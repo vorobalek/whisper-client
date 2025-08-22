@@ -196,13 +196,11 @@ describe('CallService', () => {
             service.initialize({ serverUrl: 'https://test-server.com', navigator: mockNavigator });
 
             // When & Then
-            await expect(service.update(publicKey)).rejects.toThrow(
-                "[call-service] Failed to send call 'update'.",
-            );
+            await expect(service.update(publicKey)).rejects.toThrow("[call-service] Failed to send call 'update'.");
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 '[call-service] SignalR is not ready. Trying to use http API.',
             );
-            expect((failingApiClient.call as jest.Mock)).toHaveBeenCalled();
+            expect(failingApiClient.call as jest.Mock).toHaveBeenCalled();
             // Ensure the API error was logged from the catch block (string + error)
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining("[call-service] Error while sending call 'update' via http API."),
