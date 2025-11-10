@@ -51,7 +51,7 @@
         "@whisper/core": "^0.0.1-beta"
     },
     "devDependencies": {
-        "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+        "@trivago/prettier-plugin-sort-imports": "^6.0.0",
         "css-minimizer-webpack-plugin": "^7.0.2",
         "jest-coverage-badges": "^1.0.0",
         "json-minimizer-webpack-plugin": "^5.0.1",
