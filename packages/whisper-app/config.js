@@ -33,7 +33,6 @@ function getTemplateParameters(env) {
         WHISPER_BUILD_TIMESTAMP: Date.now(),
         ...parameters,
     };
-    console.log(JSON.stringify(parameters, null, 2));
     return parameters;
 }
 
