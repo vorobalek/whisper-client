@@ -1,4 +1,6 @@
 name: Deploy to S3
+permissions:
+  contents: read
 
 on:
   push:
