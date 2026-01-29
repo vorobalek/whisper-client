@@ -22,7 +22,7 @@ function getTemplateParameters(env) {
             parameters = {
                 WHISPER_CONSOLE_LOG_LEVEL: 'trace',
                 WHISPER_DOCUMENT_LOG_LEVEL: 'info',
-                WHISPER_SERVER_URL: 'https://cluster.vorobalek.dev/whisper',
+                WHISPER_SERVER_URL: 'https://whisper-srv.vorobalek.dev',
                 WHISPER_CLIENT_URL: 'https://whisper.vorobalek.dev',
                 WHISPER_VAPID_KEY:
                     'BHAYDRAjMWXfg7dxFIOZYNLlxrVDohy_PbN7SXcrXapiZq0Jnt0VXsAx6ytkLArVVFDSfula4VRWm5HDvkVVRbA',
