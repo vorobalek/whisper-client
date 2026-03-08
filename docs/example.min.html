@@ -15,7 +15,7 @@
             i.onload = function () {
                 n = Whisper.getPrototype(console);
                 n.initialize({
-                    serverUrl: 'https://cluster.vorobalek.dev/whisper',
+                    serverUrl: 'https://whisper-srv.vorobalek.dev',
                     signingKeyPair: n.generateSigningKeyPair(),
                 }).then((x) => {
                     w[p] = x;

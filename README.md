@@ -155,7 +155,7 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
             i.onload = function () {
                 n = Whisper.getPrototype(console);
                 n.initialize({
-                    serverUrl: 'https://cluster.vorobalek.dev/whisper',
+                    serverUrl: 'https://whisper-srv.vorobalek.dev',
                     signingKeyPair: n.generateSigningKeyPair(),
                 }).then((x) => {
                     w[p] = x;
@@ -206,7 +206,7 @@ The protocol, implemented in [`whisper-core`](./packages/whisper-core/), provide
                     onError: (...args) => {
                         console.error(...args);
                     },
-                    serverUrl: 'https://cluster.vorobalek.dev/whisper',
+                    serverUrl: 'https://whisper-srv.vorobalek.dev',
                     version: `${m}`,
                     onNewVersion: () => {
                         console.warn('Update needed!');
