@@ -55,7 +55,7 @@
         "css-minimizer-webpack-plugin": "^8.0.0",
         "jest-coverage-badges": "^1.0.0",
         "json-minimizer-webpack-plugin": "^5.0.1",
-        "lint-staged": "^16.3.1",
+        "lint-staged": "^16.3.2",
         "mini-css-extract-plugin": "^2.10.0",
         "prettier": "^3.8.1",
         "terser-webpack-plugin": "^5.3.17",
