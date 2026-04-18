@@ -2,6 +2,9 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
     testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
+    transform: {
+        '^.+\\.tsx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+    },
     collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts', '!**/node_modules/**', '!**/dist/**'],
     coverageReporters: ['text', 'clover', 'lcov', 'html', 'json-summary'],
     moduleNameMapper: {
