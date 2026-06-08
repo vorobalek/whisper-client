@@ -19,6 +19,8 @@ jobs:
           node-version: 24
       - name: Install dependencies
         run: npm ci
+      - name: Build staging bundle
+        run: npx webpack --env environment=staging
       - name: Run tests and generate coverage
         id: test_cov
         run: |
@@ -44,4 +46,4 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           filePath: test.log
-          comment_tag: TEST_ERRORS 
+          comment_tag: TEST_ERRORS
