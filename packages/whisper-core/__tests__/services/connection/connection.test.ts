@@ -9,7 +9,7 @@ import {
 } from '../../../__mocks__/test-utils';
 import { CallService } from '../../../src/services/call-service';
 import { ConnectionState, getConnection, translateConnection } from '../../../src/services/connection/connection';
-import { ConnectionSagaState } from '../../../src/services/connection/connection-saga';
+import { ConnectionSagaState, getConnectionSaga } from '../../../src/services/connection/connection-saga';
 import { IceServer } from '../../../src/services/connection/ice-server';
 import { WebRTC } from '../../../src/services/connection/web-rtc';
 import { SessionService } from '../../../src/services/session-service';
@@ -19,27 +19,27 @@ import { Cryptography } from '../../../src/utils/cryptography';
 import { Logger } from '../../../src/utils/logger';
 import { Utf8 } from '../../../src/utils/utf8';
 
-const mockSagaOpen = jest.fn().mockImplementation(async (state) => {
+const mockSagaOpen = vi.fn().mockImplementation(async (state) => {
     return {
         type: 'mock',
         state,
     };
 });
 
-const mockSagaClose = jest.fn();
-const mockSagaContinue = jest.fn();
-const mockSagaAbort = jest.fn();
-const mockSagaSend = jest.fn();
-const mockSagaSetEncryption = jest.fn();
-const mockSagaSetDescription = jest.fn().mockResolvedValue(undefined);
-const mockSagaAddIceCandidate = jest.fn().mockResolvedValue(undefined);
+const mockSagaClose = vi.fn();
+const mockSagaContinue = vi.fn();
+const mockSagaAbort = vi.fn();
+const mockSagaSend = vi.fn();
+const mockSagaSetEncryption = vi.fn();
+const mockSagaSetDescription = vi.fn().mockResolvedValue(undefined);
+const mockSagaAddIceCandidate = vi.fn().mockResolvedValue(undefined);
 
-jest.mock('../../../src/services/connection/connection-saga', () => {
-    const originalModule = jest.requireActual('../../../src/services/connection/connection-saga');
+vi.mock('../../../src/services/connection/connection-saga', async (importOriginal) => {
+    const originalModule = await importOriginal<typeof import('../../../src/services/connection/connection-saga')>();
 
     return {
         ...originalModule,
-        getConnectionSaga: jest.fn().mockImplementation((publicKey, type) => ({
+        getConnectionSaga: vi.fn().mockImplementation((publicKey, type) => ({
             publicKey,
             type,
             state: originalModule.ConnectionSagaState.New,
@@ -57,6 +57,8 @@ jest.mock('../../../src/services/connection/connection-saga', () => {
     };
 });
 
+const mockGetConnectionSaga = getConnectionSaga as unknown as Mock;
+
 describe('Connection Tests', () => {
     let mockLogger: Logger;
     let mockCallService: CallService;
@@ -70,7 +72,7 @@ describe('Connection Tests', () => {
     let mockIceServers: IceServer[];
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         mockLogger = createMockLogger();
         mockPublicKey = 'test-public-key';
@@ -81,8 +83,8 @@ describe('Connection Tests', () => {
         mockUtf8 = createMockUtf8() as unknown as Utf8;
         mockCryptography = createMockCryptography() as unknown as Cryptography;
         mockWebRTC = {
-            PeerConnection: jest.fn(),
-            DataChannel: jest.fn(),
+            PeerConnection: vi.fn(),
+            DataChannel: vi.fn(),
         } as unknown as WebRTC;
         mockIceServers = [{ urls: 'stun:stun.example.com' }];
     });
@@ -161,7 +163,7 @@ describe('Connection Tests', () => {
                 mockIceServers,
             );
 
-            const onProgressMock = jest.fn();
+            const onProgressMock = vi.fn();
             connection.onProgress = onProgressMock;
 
             expect(connection.onProgress).toBe(onProgressMock);
@@ -169,11 +171,11 @@ describe('Connection Tests', () => {
 
         it('should handle onStateChanged callback', () => {
             // Create a connection with mocked sagas
-            const onStateChangedMock = jest.fn();
+            const onStateChangedMock = vi.fn();
 
             // Mock getConnectionSaga to return an object with mutable state
             let sagaState = ConnectionSagaState.New;
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => {
                     return {
                         publicKey,
@@ -212,7 +214,7 @@ describe('Connection Tests', () => {
             connection.onStateChanged = onStateChangedMock;
 
             // Get mock saga
-            const mockSaga = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const mockSaga = mockGetConnectionSaga.mock
                 .results[0].value;
 
             // Check initial state
@@ -240,7 +242,7 @@ describe('Connection Tests', () => {
                 mockIceServers,
             );
 
-            const onMessageMock = jest.fn();
+            const onMessageMock = vi.fn();
             connection.onMessage = onMessageMock;
 
             expect(connection.onMessage).toBe(onMessageMock);
@@ -259,7 +261,7 @@ describe('Connection Tests', () => {
                 mockWebRTC,
                 mockIceServers,
             );
-            const sagaResults = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const sagaResults = mockGetConnectionSaga.mock
                 .results;
             const mockSaga = sagaResults[sagaResults.length - 1].value;
             // simulate saga state change event
@@ -282,7 +284,7 @@ describe('Connection Tests', () => {
                 mockWebRTC,
                 mockIceServers,
             );
-            const sagaResults = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const sagaResults = mockGetConnectionSaga.mock
                 .results;
             const mockSaga = sagaResults[sagaResults.length - 1].value;
             // simulate saga state change event with same state
@@ -385,7 +387,7 @@ describe('Connection Tests', () => {
                 onStateChanged: null,
             };
 
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 () => mockSagaWithConnectedState,
             );
 
@@ -426,8 +428,8 @@ describe('Connection Tests', () => {
 
         it('should throw an error when sending message but connection is not ready', async () => {
             // Reset mock implementation to return non-Connected state
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -469,9 +471,6 @@ describe('Connection Tests', () => {
 
         // Add a test case for sending message through outgoing saga when it's in Connected state
         it('should send message through outgoing saga when it is connected', async () => {
-            // Access the mock module to manipulate internal saga state
-            const connectionSagaModule = require('../../../src/services/connection/connection-saga');
-
             // Create connection
             const connection = getConnection(
                 mockPublicKey,
@@ -487,13 +486,13 @@ describe('Connection Tests', () => {
             );
 
             // Directly modify the state of the saga objects
-            const sagas = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock.results;
+            const sagas = mockGetConnectionSaga.mock.results;
 
             // Set incoming saga to not connected
-            sagas[0].value.state = connectionSagaModule.ConnectionSagaState.AwaitConnection;
+            sagas[0].value.state = ConnectionSagaState.AwaitConnection;
 
             // Set outgoing saga to connected
-            sagas[1].value.state = connectionSagaModule.ConnectionSagaState.Connected;
+            sagas[1].value.state = ConnectionSagaState.Connected;
 
             // Send a message
             connection.send('test message');
@@ -651,14 +650,14 @@ describe('Connection Tests', () => {
 
     describe('Connection Callbacks', () => {
         beforeEach(() => {
-            jest.clearAllMocks();
+            vi.clearAllMocks();
         });
 
         it('should handle onProgress callback', () => {
             // Create a connection with mocked sagas
-            const onProgressMock = jest.fn();
+            const onProgressMock = vi.fn();
 
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -693,7 +692,7 @@ describe('Connection Tests', () => {
             connection.onProgress = onProgressMock;
 
             // Get the onStateChanged handler for the incoming saga
-            const mockSaga = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const mockSaga = mockGetConnectionSaga.mock
                 .results[0].value;
 
             // Trigger a state change that should update progress
@@ -707,9 +706,9 @@ describe('Connection Tests', () => {
 
         it('should handle onMessage callback', () => {
             // Create a connection with mocked sagas
-            const onMessageMock = jest.fn();
+            const onMessageMock = vi.fn();
 
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -744,9 +743,9 @@ describe('Connection Tests', () => {
             connection.onMessage = onMessageMock;
 
             // Get the onMessage handlers for both sagas
-            const incomingSaga = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const incomingSaga = mockGetConnectionSaga.mock
                 .results[0].value;
-            const outgoingSaga = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const outgoingSaga = mockGetConnectionSaga.mock
                 .results[1].value;
 
             // Trigger message from incoming saga
@@ -763,12 +762,12 @@ describe('Connection Tests', () => {
 
         it('should handle errors in callbacks gracefully', () => {
             // Create callbacks that throw errors
-            const errorCallback = jest.fn().mockImplementation(() => {
+            const errorCallback = vi.fn().mockImplementation(() => {
                 throw new Error('Test error');
             });
 
             // Mock sagas with state changes
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -805,7 +804,7 @@ describe('Connection Tests', () => {
             connection.onMessage = errorCallback;
 
             // Reference to the saga handlers
-            const mockSaga = require('../../../src/services/connection/connection-saga').getConnectionSaga.mock
+            const mockSaga = mockGetConnectionSaga.mock
                 .results[0].value;
 
             // 1. Test state change callback error handling
@@ -840,8 +839,8 @@ describe('Connection Tests', () => {
     describe('Connection Extended Operations', () => {
         it('should initialize with correct default values', () => {
             // Reset mock implementation to return New state
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -881,8 +880,8 @@ describe('Connection Tests', () => {
 
         it('should correctly translate an internal connection to external interface', () => {
             // Reset mock implementation to return New state
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -934,8 +933,8 @@ describe('Connection Tests', () => {
 
         it('should set openedAt timestamp when opening a connection', async () => {
             // Reset mock implementation
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1017,12 +1016,12 @@ describe('Connection Tests', () => {
 
     describe('Connection State Determination', () => {
         beforeEach(() => {
-            jest.clearAllMocks();
+            vi.clearAllMocks();
         });
 
         it('should return Closed state when either saga is Closed', () => {
             // First test with incoming saga Closed
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1055,8 +1054,8 @@ describe('Connection Tests', () => {
             expect(connection1.state).toBe(ConnectionState.Closed);
 
             // Now test with outgoing saga Closed
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1091,7 +1090,7 @@ describe('Connection Tests', () => {
 
         it('should return Open state when either saga is Connected', () => {
             // Test with incoming saga Connected
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1124,8 +1123,8 @@ describe('Connection Tests', () => {
             expect(connection1.state).toBe(ConnectionState.Open);
 
             // Test with outgoing saga Connected
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1160,7 +1159,7 @@ describe('Connection Tests', () => {
 
         it('should return New state when both sagas are New', () => {
             // Mock with both sagas in New state
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1195,7 +1194,7 @@ describe('Connection Tests', () => {
 
         it('should return Connecting state when in intermediate states', () => {
             // Test with first combination
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1228,8 +1227,8 @@ describe('Connection Tests', () => {
             expect(connection1.state).toBe(ConnectionState.Connecting);
 
             // Test with second combination
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1262,8 +1261,8 @@ describe('Connection Tests', () => {
             expect(connection2.state).toBe(ConnectionState.Connecting);
 
             // Test with third combination
-            jest.clearAllMocks();
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            vi.clearAllMocks();
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,
@@ -1320,21 +1319,21 @@ describe('Connection Tests', () => {
             const externalConnection = translateConnection(connection);
 
             // Test onProgress getter/setter
-            const onProgressMock = jest.fn();
+            const onProgressMock = vi.fn();
             expect(externalConnection.onProgress).toBeUndefined();
             externalConnection.onProgress = onProgressMock;
             expect(connection.onProgress).toBe(onProgressMock);
             expect(externalConnection.onProgress).toBe(onProgressMock);
 
             // Test onStateChanged getter/setter
-            const onStateChangedMock = jest.fn();
+            const onStateChangedMock = vi.fn();
             expect(externalConnection.onStateChanged).toBeUndefined();
             externalConnection.onStateChanged = onStateChangedMock;
             expect(connection.onStateChanged).toBe(onStateChangedMock);
             expect(externalConnection.onStateChanged).toBe(onStateChangedMock);
 
             // Test onMessage getter/setter
-            const onMessageMock = jest.fn();
+            const onMessageMock = vi.fn();
             expect(externalConnection.onMessage).toBeUndefined();
             externalConnection.onMessage = onMessageMock;
             expect(connection.onMessage).toBe(onMessageMock);
@@ -1342,7 +1341,7 @@ describe('Connection Tests', () => {
 
             // Test send method
             // Mock a connected saga
-            require('../../../src/services/connection/connection-saga').getConnectionSaga.mockImplementation(
+            mockGetConnectionSaga.mockImplementation(
                 (publicKey: string, type: string) => ({
                     publicKey,
                     type,

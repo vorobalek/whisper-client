@@ -2,19 +2,19 @@ import { Connection, ConnectionState, getPrototype, Whisper, WhisperPrototype } 
 import * as whisperModule from '../src/whisper';
 
 // Mock the connection module (where ConnectionState is actually defined)
-jest.mock('../src/services/connection/connection', () => ({
+vi.mock('../src/services/connection/connection', () => ({
     ConnectionState: {
         New: 'new',
         Connecting: 'connecting',
         Open: 'open',
         Closed: 'closed',
     },
-    Connection: jest.fn(),
+    Connection: vi.fn(),
 }));
 
 // Mock the whisper module
-jest.mock('../src/whisper', () => ({
-    getPrototype: jest.fn(),
+vi.mock('../src/whisper', () => ({
+    getPrototype: vi.fn(),
     WhisperPrototype: {},
     Whisper: {},
 }));
@@ -24,7 +24,7 @@ jest.mock('../src/whisper', () => ({
 
 describe('index', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should export getPrototype function', () => {

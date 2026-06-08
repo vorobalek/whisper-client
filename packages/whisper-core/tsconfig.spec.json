@@ -1,8 +1,9 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
+        "ignoreDeprecations": "6.0",
         "noEmit": true,
-        "types": ["jest", "node"]
+        "types": ["vitest/globals", "node"]
     },
     "include": ["src", "__tests__", "__mocks__"],
     "exclude": ["dist", "node_modules"]

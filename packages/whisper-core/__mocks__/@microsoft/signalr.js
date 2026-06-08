@@ -1,22 +1,22 @@
-// Centralized Jest mock for @microsoft/signalr
+// Centralized Vitest mock for @microsoft/signalr
 const mockConnectionInstance = {
-    start: jest.fn().mockResolvedValue(undefined),
-    onreconnecting: jest.fn(),
-    onreconnected: jest.fn(),
-    on: jest.fn(),
-    invoke: jest.fn(),
+    start: vi.fn().mockResolvedValue(undefined),
+    onreconnecting: vi.fn(),
+    onreconnected: vi.fn(),
+    on: vi.fn(),
+    invoke: vi.fn(),
 };
 
 const mockConnectionBuilder = {
-    withUrl: jest.fn().mockReturnThis(),
-    withAutomaticReconnect: jest.fn().mockReturnThis(),
-    configureLogging: jest.fn().mockReturnThis(),
-    build: jest.fn().mockReturnValue(mockConnectionInstance),
+    withUrl: vi.fn().mockReturnThis(),
+    withAutomaticReconnect: vi.fn().mockReturnThis(),
+    configureLogging: vi.fn().mockReturnThis(),
+    build: vi.fn().mockReturnValue(mockConnectionInstance),
 };
 
 module.exports = {
-    HubConnection: jest.fn(),
-    HubConnectionBuilder: jest.fn().mockImplementation(() => mockConnectionBuilder),
+    HubConnection: vi.fn(),
+    HubConnectionBuilder: vi.fn().mockImplementation(() => mockConnectionBuilder),
     LogLevel: {
         Warning: 'Warning',
     },

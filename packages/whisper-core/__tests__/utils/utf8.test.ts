@@ -1,17 +1,18 @@
 import { createMockUtf8 } from '../../__mocks__/test-utils';
 import { getUtf8 } from '../../src/utils/utf8';
+import { TextEncoder } from 'node:util';
 
 // Mock nacl-util-wrapper
-jest.mock('../../src/utils/nacl-util-wrapper', () => ({
-    encodeUTF8: jest.fn().mockImplementation(() => 'encoded-utf8'),
-    decodeUTF8: jest.fn().mockImplementation(() => new Uint8Array([1, 2, 3, 4])),
+vi.mock('../../src/utils/nacl-util-wrapper', () => ({
+    encodeUTF8: vi.fn().mockImplementation(() => 'encoded-utf8'),
+    decodeUTF8: vi.fn().mockImplementation(() => new Uint8Array([1, 2, 3, 4])),
 }));
 
 describe('UTF8 utility', () => {
     let utf8: ReturnType<typeof getUtf8>;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         utf8 = createMockUtf8();
     });
 
@@ -45,18 +46,17 @@ describe('UTF8 utility', () => {
 
     // Integration test with real implementation
     describe('integration', () => {
-        beforeEach(() => {
-            jest.resetModules();
-            jest.dontMock('../../src/utils/nacl-util-wrapper');
+        beforeEach(async () => {
+            vi.resetModules();
+            vi.doUnmock('../../src/utils/nacl-util-wrapper');
 
             // Get the real implementation
-            const { getUtf8: getRealUtf8 } = require('../../src/utils/utf8');
+            const { getUtf8: getRealUtf8 } = await import('../../src/utils/utf8');
             utf8 = getRealUtf8();
         });
 
         it('should correctly encode and decode data', () => {
             // Given
-            const TextEncoder = require('util').TextEncoder;
             const testString = 'Hello, world!';
             const testData = new TextEncoder().encode(testString);
 

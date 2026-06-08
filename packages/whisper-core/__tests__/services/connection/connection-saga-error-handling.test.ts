@@ -15,11 +15,11 @@ import { newError } from '../../../src/utils/new-error';
 describe('ConnectionSaga (Error Handling and Cleanup)', () => {
     // Mock all the required dependencies
     const mockLogger = {
-        debug: jest.fn(),
-        log: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        trace: jest.fn(),
+        debug: vi.fn(),
+        log: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        trace: vi.fn(),
     };
 
     const mockTimeService = {
@@ -29,13 +29,13 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
     };
 
     const mockCallService = {
-        dial: jest.fn().mockResolvedValue(undefined),
-        offer: jest.fn().mockResolvedValue(undefined),
-        answer: jest.fn().mockResolvedValue(undefined),
-        ice: jest.fn().mockResolvedValue(undefined),
-        initialize: jest.fn().mockResolvedValue(undefined),
-        update: jest.fn().mockResolvedValue(undefined),
-        close: jest.fn().mockResolvedValue(undefined),
+        dial: vi.fn().mockResolvedValue(undefined),
+        offer: vi.fn().mockResolvedValue(undefined),
+        answer: vi.fn().mockResolvedValue(undefined),
+        ice: vi.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
+        update: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
     };
 
     const mockSessionService = {
@@ -45,12 +45,12 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             publicKey: new Uint8Array([1, 2, 3]),
             secretKey: new Uint8Array([4, 5, 6]),
         },
-        initialize: jest.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
     };
 
     const mockBase64 = {
-        encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
-        decode: jest.fn((str) => {
+        encode: vi.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
+        decode: vi.fn((str) => {
             if (str.startsWith('encoded-')) {
                 return Buffer.from(str.substring(8), 'hex');
             }
@@ -59,29 +59,34 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
     };
 
     const mockUtf8 = {
-        encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
-        decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
+        encode: vi.fn((data) => Buffer.from(data).toString('utf-8')),
+        decode: vi.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
     };
 
     // Mock cryptography methods with simple implementations
     const mockCryptography = {
-        generateEncryptionKeyPair: jest.fn(() => ({
+        generateEncryptionKeyPair: vi.fn(() => ({
             publicKey: new Uint8Array([1, 2, 3]),
             secretKey: new Uint8Array([4, 5, 6]),
         })),
-        generateSharedSymmetricKey: jest.fn(() => new Uint8Array([7, 8, 9])),
-        encrypt: jest.fn((data) => data),
-        decrypt: jest.fn((data) => data),
-        sign: jest.fn(() => new Uint8Array([10, 11, 12])),
-        verifySignature: jest.fn(() => true),
-        generateSigningKeyPair: jest.fn(() => ({
+        generateSharedSymmetricKey: vi.fn(() => new Uint8Array([7, 8, 9])),
+        encrypt: vi.fn((data) => data),
+        decrypt: vi.fn((data) => data),
+        sign: vi.fn(() => new Uint8Array([10, 11, 12])),
+        verifySignature: vi.fn(() => true),
+        generateSigningKeyPair: vi.fn(() => ({
             publicKey: new Uint8Array([13, 14, 15]),
             secretKey: new Uint8Array([16, 17, 18]),
         })),
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        mockLogger.debug = vi.fn();
+        mockLogger.log = vi.fn();
+        mockLogger.warn = vi.fn();
+        mockLogger.error = vi.fn();
+        mockLogger.trace = vi.fn();
+        vi.clearAllMocks();
     });
 
     it('should handle errors when closing peer connection during abort', async () => {
@@ -91,14 +96,14 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
         // Create a peer connection that throws when closed
         const mockPeerConnection = createMockPeerConnection({
-            close: jest.fn().mockImplementation(() => {
+            close: vi.fn().mockImplementation(() => {
                 throw new Error('Error closing peer connection');
             }),
             remoteDescription: { type: 'offer', sdp: 'mock-sdp' },
         });
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         const saga = getConnectionSaga(
@@ -117,7 +122,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         );
 
         // Spy on the error logger
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Initialize the saga, which will set up the RTCPeerConnection
         await saga.open(ConnectionSagaState.New);
@@ -138,16 +143,16 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         errorSpy.mockRestore();
     });
 
-    it('should try to decode invalid SDP in setDescription and throw', () => {
+    it('should try to decode invalid SDP in setDescription and throw', async () => {
         // Create a simplified test that just tests the error handling in setDescription
         // without having to initialize the whole saga
 
         // Create a mock logger to verify the error is logged
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Mock crypto functions to return deterministic values
         const mockSymmetricKey = new Uint8Array([1, 2, 3]);
-        const mockDecrypt = jest.fn().mockReturnValue(
+        const mockDecrypt = vi.fn().mockReturnValue(
             mockUtf8.decode(
                 JSON.stringify({
                     not_a_valid_description: true,
@@ -194,7 +199,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         };
 
         // Execute the test
-        expect(testSetDescription()).rejects.toThrow('Wrong remote WebRTC description format');
+        await expect(testSetDescription()).rejects.toThrow('Wrong remote WebRTC description format');
 
         // Clean up
         errorSpy.mockRestore();
@@ -204,14 +209,14 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         // Arrange
         const publicKey = 'mock-key';
         const connectionType = 'incoming';
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Мокаем PeerConnection, чтобы не было реального WebRTC
         const mockPeerConnection = createMockPeerConnection({
             remoteDescription: { type: 'offer', sdp: 'mock-sdp' },
         });
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Создаём saga
@@ -255,7 +260,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the connection saga for the test
@@ -300,7 +305,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
     it('should handle error cases and edge conditions', async () => {
         // Setup mocks
         const mockDataChannel = createMockDataChannel({
-            send: jest.fn(() => {
+            send: vi.fn(() => {
                 throw new Error('Send error');
             }),
         });
@@ -308,7 +313,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the saga with outgoing type to test different paths
@@ -392,7 +397,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             // @ts-ignore - Accessing private method for testing
             saga.onStateChanged?.(saga.state, state);
             Object.defineProperty(saga, 'state', {
-                get: jest.fn().mockReturnValue(state),
+                get: vi.fn().mockReturnValue(state),
             });
         }
 
@@ -402,11 +407,11 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
     it('should handle error when sending data', () => {
         // Create a spy on logger.error to capture the error log
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Setup mocks that will trigger an error condition
         const mockBrokenDataChannel: any = createMockDataChannel({
-            send: jest.fn().mockImplementation(() => {
+            send: vi.fn().mockImplementation(() => {
                 throw new Error('Test error sending data');
             }),
         });
@@ -448,11 +453,11 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const connectionType = 'outgoing';
 
         // Spy on logger.error to track calls
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Set up the data channel with a mock that throws on send
         const mockDataChannel: any = createMockDataChannel({
-            send: jest.fn().mockImplementation(() => {
+            send: vi.fn().mockImplementation(() => {
                 throw new Error('Test error sending data');
             }),
         });
@@ -462,12 +467,12 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             publicKey,
             type: connectionType,
             state: ConnectionSagaState.Connected,
-            continue: jest.fn(),
-            abort: jest.fn(),
-            open: jest.fn().mockResolvedValue(null),
-            setEncryption: jest.fn(),
-            setDescription: jest.fn(),
-            addIceCandidate: jest.fn(),
+            continue: vi.fn(),
+            abort: vi.fn(),
+            open: vi.fn().mockResolvedValue(null),
+            setEncryption: vi.fn(),
+            setDescription: vi.fn(),
+            addIceCandidate: vi.fn(),
             send: (message) => {
                 try {
                     mockDataChannel.send(message);
@@ -503,7 +508,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         const saga = getConnectionSaga(
@@ -545,7 +550,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const connectionType = 'incoming';
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(),
+            PeerConnection: vi.fn(),
         };
 
         const saga = getConnectionSaga(
@@ -585,7 +590,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create saga but don't open it
@@ -625,7 +630,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         const saga = getConnectionSaga(
@@ -670,7 +675,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         const saga = getConnectionSaga(
@@ -689,7 +694,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         );
 
         // Spy on the error logger
-        const errorSpy = jest.spyOn(mockLogger, 'error');
+        const errorSpy = vi.spyOn(mockLogger, 'error');
 
         // Don't call open() since it initializes RTC and we don't need that
         // We just want to test the continue() method directly when no callback is set
@@ -705,7 +710,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
                 expect(error.message).toContain('Expected to have continue callback initialized');
             } else {
                 // This is unlikely but we need to handle it for TypeScript
-                fail('Expected error to be an instance of Error');
+                assert.fail('Expected error to be an instance of Error');
             }
             expect(errorSpy).toHaveBeenCalled();
         }
@@ -721,7 +726,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the connection saga
@@ -744,8 +749,8 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             1000, // Use shorter timeout
         );
 
-        // Set up message handler that throws an error - but with jest.fn() wrapped around it
-        const errorFn = jest.fn().mockImplementation(() => {
+        // Set up message handler that throws an error - but with vi.fn() wrapped around it
+        const errorFn = vi.fn().mockImplementation(() => {
             throw new Error('Test message handler error');
         });
 
@@ -790,7 +795,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the saga
@@ -824,7 +829,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
         try {
             await saga.setDescription(invalidFormatEncryptedOfferDataBase64);
-            fail('Expected an error for invalid description format');
+            assert.fail('Expected an error for invalid description format');
         } catch (error) {
             expect(error).toBeDefined();
         }
@@ -834,7 +839,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
         try {
             await saga.addIceCandidate(invalidFormatEncryptedIceDataBase64);
-            fail('Expected an error for invalid ICE candidate format');
+            assert.fail('Expected an error for invalid ICE candidate format');
         } catch (error) {
             expect(error).toBeDefined();
         }
@@ -851,7 +856,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             // @ts-ignore - Accessing private method for testing
             saga.onStateChanged?.(saga.state, state);
             Object.defineProperty(saga, 'state', {
-                get: jest.fn().mockReturnValue(state),
+                get: vi.fn().mockReturnValue(state),
             });
         }
     }, 10000); // Increase timeout to 10 seconds
@@ -866,7 +871,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create saga with a very short timeout
@@ -911,7 +916,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create saga with a very short timeout
@@ -1012,7 +1017,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
 
         const mockError = new Error('Failed to close sending DataChannel');
         const mockDataChannel = createMockDataChannel({
-            close: jest.fn().mockImplementation(() => {
+            close: vi.fn().mockImplementation(() => {
                 throw mockError;
             }),
         });
@@ -1020,7 +1025,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create saga with a very short timeout
@@ -1107,7 +1112,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             id: 'receive-data-channel-id',
             label: 'mock-receive-data-channel',
             readyState: 'connecting',
-            close: jest.fn().mockImplementation(() => {
+            close: vi.fn().mockImplementation(() => {
                 throw mockError;
             }),
         });
@@ -1115,7 +1120,7 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create saga with a very short timeout

@@ -6,6 +6,8 @@ import { getSignalRService, SignalRServiceConfig } from '../../src/services/sign
 import { Logger } from '../../src/utils/logger';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
+vi.mock('@microsoft/signalr');
+
 // Create a test CallData implementation
 interface TestCallData extends CallData {
     a: string; // Required by CallData
@@ -15,13 +17,13 @@ interface TestCallData extends CallData {
 describe('SignalRService', () => {
     let signalRService: ReturnType<typeof getSignalRService>;
     let mockLogger: Logger;
-    let mockHubConnection: jest.Mocked<HubConnection>;
+    let mockHubConnection: Mocked<HubConnection>;
     let mockHubBuilder: any;
-    let mockConfig: SignalRServiceConfig & { onCall: jest.Mock; onReady: jest.Mock; initializationTimeout: number };
+    let mockConfig: SignalRServiceConfig & { onCall: Mock; onReady: Mock; initializationTimeout: number };
 
     beforeEach(() => {
         // Reset mocks
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         // Mock logger
         mockLogger = createMockLogger();
@@ -29,8 +31,8 @@ describe('SignalRService', () => {
         // Setup mock config
         mockConfig = {
             serverUrl: 'https://test-server.com',
-            onCall: jest.fn().mockResolvedValue(undefined),
-            onReady: jest.fn().mockResolvedValue(undefined),
+            onCall: vi.fn().mockResolvedValue(undefined),
+            onReady: vi.fn().mockResolvedValue(undefined),
             initializationTimeout: 50,
         };
 
@@ -38,7 +40,7 @@ describe('SignalRService', () => {
         signalRService = getSignalRService(mockLogger);
 
         // Get references to mocked HubConnection
-        mockHubConnection = new HubConnectionBuilder().build() as jest.Mocked<HubConnection>;
+        mockHubConnection = new HubConnectionBuilder().build() as Mocked<HubConnection>;
         mockHubBuilder = new HubConnectionBuilder();
     });
 
@@ -92,7 +94,7 @@ describe('SignalRService', () => {
 
         it('should retry connection via setTimeout and increment retryCount', async () => {
             // Given: first start fails, subsequent starts succeed
-            jest.useFakeTimers();
+            vi.useFakeTimers();
             const error = new Error('Connection error');
             mockHubConnection.start.mockRejectedValueOnce(error);
 
@@ -101,7 +103,7 @@ describe('SignalRService', () => {
             // Let any pending microtasks run
             await Promise.resolve();
             // Advance timers to resolve initialization timeout so initialize can complete
-            jest.advanceTimersByTime(mockConfig.initializationTimeout);
+            vi.advanceTimersByTime(mockConfig.initializationTimeout);
             await initPromise;
 
             // Allow the rejected promise to be handled and the retry timeout to be scheduled
@@ -111,7 +113,7 @@ describe('SignalRService', () => {
             expect(mockHubConnection.start).toHaveBeenCalledTimes(1);
 
             // Advance timers to trigger the scheduled retry (initial retryDelay = 1000ms)
-            jest.advanceTimersByTime(1000);
+            vi.advanceTimersByTime(1000);
 
             // Allow any microtasks kicked off by the retry to run
             await Promise.resolve();
@@ -119,7 +121,7 @@ describe('SignalRService', () => {
             // Then: second start attempt should have been made via the setTimeout callback
             expect(mockHubConnection.start).toHaveBeenCalledTimes(2);
 
-            jest.useRealTimers();
+            vi.useRealTimers();
         });
 
         it('should setup reconnect handlers correctly', async () => {
@@ -168,7 +170,7 @@ describe('SignalRService', () => {
             // Given
             const configWithoutOnCall = {
                 serverUrl: 'https://test-server.com',
-                onReady: jest.fn().mockResolvedValue(undefined),
+                onReady: vi.fn().mockResolvedValue(undefined),
                 initializationTimeout: 50,
             };
 

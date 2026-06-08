@@ -19,35 +19,35 @@ import { Cryptography } from '../../../src/utils/cryptography';
 import { Logger } from '../../../src/utils/logger';
 import { Utf8 } from '../../../src/utils/utf8';
 
-jest.mock('../../../src/services/time-service');
-jest.mock('../../../src/services/session-service');
-jest.mock('../../../src/utils/base64');
-jest.mock('../../../src/utils/utf8');
-jest.mock('../../../src/utils/cryptography');
-jest.mock('../../../src/services/connection-service');
+vi.mock('../../../src/services/time-service');
+vi.mock('../../../src/services/session-service');
+vi.mock('../../../src/utils/base64');
+vi.mock('../../../src/utils/utf8');
+vi.mock('../../../src/utils/cryptography');
+vi.mock('../../../src/services/connection-service');
 
 describe('AnswerCallHandler', () => {
     let mockLogger: Logger;
-    let mockTimeService: jest.Mocked<TimeService>;
-    let mockSessionService: jest.Mocked<SessionService>;
-    let mockBase64: jest.Mocked<Base64>;
-    let mockUtf8: jest.Mocked<Utf8>;
-    let mockCryptography: jest.Mocked<Cryptography>;
-    let mockConnectionService: jest.Mocked<ConnectionService>;
+    let mockTimeService: Mocked<TimeService>;
+    let mockSessionService: Mocked<SessionService>;
+    let mockBase64: Mocked<Base64>;
+    let mockUtf8: Mocked<Utf8>;
+    let mockCryptography: Mocked<Cryptography>;
+    let mockConnectionService: Mocked<ConnectionService>;
     let answerCallHandler: AnswerCallHandler;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         mockLogger = createMockLogger();
-        mockTimeService = createMockTimeService() as unknown as jest.Mocked<TimeService>;
-        mockSessionService = createMockSessionService() as unknown as jest.Mocked<SessionService>;
-        mockBase64 = createMockBase64() as unknown as jest.Mocked<Base64>;
-        mockUtf8 = createMockUtf8() as unknown as jest.Mocked<Utf8>;
-        mockCryptography = createMockCryptography() as unknown as jest.Mocked<Cryptography>;
+        mockTimeService = createMockTimeService() as unknown as Mocked<TimeService>;
+        mockSessionService = createMockSessionService() as unknown as Mocked<SessionService>;
+        mockBase64 = createMockBase64() as unknown as Mocked<Base64>;
+        mockUtf8 = createMockUtf8() as unknown as Mocked<Utf8>;
+        mockCryptography = createMockCryptography() as unknown as Mocked<Cryptography>;
         mockConnectionService = {
-            getConnection: jest.fn(),
-        } as unknown as jest.Mocked<ConnectionService>;
+            getConnection: vi.fn(),
+        } as unknown as Mocked<ConnectionService>;
 
         answerCallHandler = getAnswerCallHandler(
             mockLogger,
@@ -89,9 +89,9 @@ describe('AnswerCallHandler', () => {
                 get publicKey() {
                     return 'peerPublicKey';
                 },
-                setIncomingEncryption: jest.fn(),
-                setIncomingDescription: jest.fn().mockResolvedValue(undefined),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                setIncomingDescription: vi.fn().mockResolvedValue(undefined),
+                continueIncoming: vi.fn(),
             };
 
             mockConnectionService.getConnection.mockReturnValue(mockConnection as ConnectionInternal);
@@ -129,9 +129,9 @@ describe('AnswerCallHandler', () => {
                 get publicKey() {
                     return 'peerPublicKey';
                 },
-                setIncomingEncryption: jest.fn(),
-                setIncomingDescription: jest.fn(),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                setIncomingDescription: vi.fn(),
+                continueIncoming: vi.fn(),
             };
 
             mockConnectionService.getConnection.mockReturnValue(mockConnection as ConnectionInternal);

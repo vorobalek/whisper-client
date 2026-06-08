@@ -23,11 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Generate coverage badges
-        run: |
-          cd packages/whisper-core
-          npm install --no-save jest-coverage-badges
-          npm run test:badges
-          cd ../..
+        run: npm run test:badges --workspace @whisper/core
       - name: Copy coverage badges to .github/badges/coverage
         run: |
           mkdir -p .github/badges/coverage
@@ -42,4 +38,4 @@ jobs:
           branch: badges/update-${{ github.run_id }}
           title: "chore: [skip ci] update coverage badges"
           body: "Automatic update of coverage badges."
-          base: main 
+          base: main

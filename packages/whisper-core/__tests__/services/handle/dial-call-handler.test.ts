@@ -22,42 +22,42 @@ import { Cryptography } from '../../../src/utils/cryptography';
 import { Logger } from '../../../src/utils/logger';
 import { Utf8 } from '../../../src/utils/utf8';
 
-jest.mock('../../../src/services/time-service');
-jest.mock('../../../src/services/session-service');
-jest.mock('../../../src/utils/base64');
-jest.mock('../../../src/utils/utf8');
-jest.mock('../../../src/utils/cryptography');
-jest.mock('../../../src/services/connection-service');
+vi.mock('../../../src/services/time-service');
+vi.mock('../../../src/services/session-service');
+vi.mock('../../../src/utils/base64');
+vi.mock('../../../src/utils/utf8');
+vi.mock('../../../src/utils/cryptography');
+vi.mock('../../../src/services/connection-service');
 
 describe('DialCallHandler', () => {
     let mockLogger: Logger;
-    let mockTimeService: jest.Mocked<TimeService>;
-    let mockSessionService: jest.Mocked<SessionService>;
-    let mockBase64: jest.Mocked<Base64>;
-    let mockUtf8: jest.Mocked<Utf8>;
-    let mockCryptography: jest.Mocked<Cryptography>;
-    let mockConnectionService: jest.Mocked<ConnectionService>;
+    let mockTimeService: Mocked<TimeService>;
+    let mockSessionService: Mocked<SessionService>;
+    let mockBase64: Mocked<Base64>;
+    let mockUtf8: Mocked<Utf8>;
+    let mockCryptography: Mocked<Cryptography>;
+    let mockConnectionService: Mocked<ConnectionService>;
     let dialCallHandler: DialCallHandler;
     let mockConfig: DialCallHandlerConfig;
-    let mockFocusOnDial: jest.Mock;
-    let mockRequestDial: jest.Mock;
+    let mockFocusOnDial: Mock;
+    let mockRequestDial: Mock;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         mockLogger = createMockLogger();
-        mockTimeService = createMockTimeService() as unknown as jest.Mocked<TimeService>;
-        mockSessionService = createMockSessionService() as unknown as jest.Mocked<SessionService>;
-        mockBase64 = createMockBase64() as unknown as jest.Mocked<Base64>;
-        mockUtf8 = createMockUtf8() as unknown as jest.Mocked<Utf8>;
-        mockCryptography = createMockCryptography() as unknown as jest.Mocked<Cryptography>;
+        mockTimeService = createMockTimeService() as unknown as Mocked<TimeService>;
+        mockSessionService = createMockSessionService() as unknown as Mocked<SessionService>;
+        mockBase64 = createMockBase64() as unknown as Mocked<Base64>;
+        mockUtf8 = createMockUtf8() as unknown as Mocked<Utf8>;
+        mockCryptography = createMockCryptography() as unknown as Mocked<Cryptography>;
         mockConnectionService = {
-            getConnection: jest.fn(),
-            createIncoming: jest.fn(),
-            createOutgoing: jest.fn(),
-            deleteConnection: jest.fn(),
-            initialize: jest.fn(),
-        } as unknown as jest.Mocked<ConnectionService>;
+            getConnection: vi.fn(),
+            createIncoming: vi.fn(),
+            createOutgoing: vi.fn(),
+            deleteConnection: vi.fn(),
+            initialize: vi.fn(),
+        } as unknown as Mocked<ConnectionService>;
 
         dialCallHandler = getDialCallHandler(
             mockLogger,
@@ -69,8 +69,8 @@ describe('DialCallHandler', () => {
             mockConnectionService,
         );
 
-        mockFocusOnDial = jest.fn().mockImplementation(async () => true);
-        mockRequestDial = jest.fn().mockImplementation(async () => true);
+        mockFocusOnDial = vi.fn().mockImplementation(async () => true);
+        mockRequestDial = vi.fn().mockImplementation(async () => true);
 
         mockConfig = {
             focusOnDial: mockFocusOnDial,
@@ -116,14 +116,14 @@ describe('DialCallHandler', () => {
 
         it('should continue existing connection when in AwaitingDial state', async () => {
             const connectionMock = {
-                setIncomingEncryption: jest.fn(),
-                openIncoming: jest.fn().mockResolvedValue(undefined),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                openIncoming: vi.fn().mockResolvedValue(undefined),
+                continueIncoming: vi.fn(),
                 get incomingState() {
                     return ConnectionSagaState.AwaitingDial;
                 },
             };
-            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock);
+            mockConnectionService.getConnection = vi.fn().mockReturnValue(connectionMock);
 
             const result = await dialCallHandler.handle(request);
 
@@ -136,11 +136,11 @@ describe('DialCallHandler', () => {
 
         it('should reopen connection when not in suitable state', async () => {
             const connectionMock = {
-                setIncomingEncryption: jest.fn(),
-                openIncoming: jest.fn().mockResolvedValue(undefined),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                openIncoming: vi.fn().mockResolvedValue(undefined),
+                continueIncoming: vi.fn(),
             };
-            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock);
+            mockConnectionService.getConnection = vi.fn().mockReturnValue(connectionMock);
 
             const result = await dialCallHandler.handle(request);
 
@@ -153,12 +153,12 @@ describe('DialCallHandler', () => {
         });
 
         it('should create new connection when none exists', async () => {
-            mockConnectionService.getConnection = jest.fn().mockReturnValueOnce(undefined);
+            mockConnectionService.getConnection = vi.fn().mockReturnValueOnce(undefined);
             const connectionMock = {
-                setIncomingEncryption: jest.fn(),
-                openIncoming: jest.fn().mockResolvedValue(undefined),
+                setIncomingEncryption: vi.fn(),
+                openIncoming: vi.fn().mockResolvedValue(undefined),
             };
-            mockConnectionService.createIncoming = jest.fn().mockReturnValue(connectionMock);
+            mockConnectionService.createIncoming = vi.fn().mockReturnValue(connectionMock);
 
             const result = await dialCallHandler.handle(request);
 
@@ -172,7 +172,7 @@ describe('DialCallHandler', () => {
         });
 
         it('should return false if focusOnDial returns false', async () => {
-            mockConnectionService.getConnection = jest.fn().mockReturnValueOnce(undefined);
+            mockConnectionService.getConnection = vi.fn().mockReturnValueOnce(undefined);
             mockFocusOnDial.mockImplementation(async () => false);
 
             const result = await dialCallHandler.handle(request);
@@ -184,7 +184,7 @@ describe('DialCallHandler', () => {
         });
 
         it('should log and return true if request is declined', async () => {
-            mockConnectionService.getConnection = jest.fn().mockReturnValueOnce(undefined);
+            mockConnectionService.getConnection = vi.fn().mockReturnValueOnce(undefined);
             mockRequestDial.mockImplementation(async () => false);
 
             const result = await dialCallHandler.handle(request);
@@ -200,14 +200,14 @@ describe('DialCallHandler', () => {
 
         it('should skip reconnect logic when incomingState is AwaitingAnswer', async () => {
             const connectionMock = {
-                setIncomingEncryption: jest.fn(),
-                openIncoming: jest.fn().mockResolvedValue(undefined),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                openIncoming: vi.fn().mockResolvedValue(undefined),
+                continueIncoming: vi.fn(),
                 get incomingState() {
                     return ConnectionSagaState.AwaitingAnswer;
                 },
             };
-            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock as any);
+            mockConnectionService.getConnection = vi.fn().mockReturnValue(connectionMock as any);
             const result = await dialCallHandler.handle(request);
             expect(result).toBe(true);
             expect(connectionMock.setIncomingEncryption).toHaveBeenCalledWith('encryptionKey');
@@ -220,11 +220,11 @@ describe('DialCallHandler', () => {
             // reinitialize handler without focusOnDial
             dialCallHandler.initialize({ requestDial: mockRequestDial });
             const connectionMock = {
-                setIncomingEncryption: jest.fn(),
-                openIncoming: jest.fn().mockResolvedValue(undefined),
-                continueIncoming: jest.fn(),
+                setIncomingEncryption: vi.fn(),
+                openIncoming: vi.fn().mockResolvedValue(undefined),
+                continueIncoming: vi.fn(),
             };
-            mockConnectionService.getConnection = jest.fn().mockReturnValue(connectionMock as any);
+            mockConnectionService.getConnection = vi.fn().mockReturnValue(connectionMock as any);
             const result = await dialCallHandler.handle(request);
             expect(result).toBe(true);
             expect(connectionMock.openIncoming).toHaveBeenCalled();

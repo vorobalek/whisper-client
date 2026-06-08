@@ -6,11 +6,11 @@ describe('LoggerService', () => {
 
     beforeEach(() => {
         mockConfig = {
-            onTrace: jest.fn(),
-            onDebug: jest.fn(),
-            onLog: jest.fn(),
-            onWarn: jest.fn(),
-            onError: jest.fn(),
+            onTrace: vi.fn(),
+            onDebug: vi.fn(),
+            onLog: vi.fn(),
+            onWarn: vi.fn(),
+            onError: vi.fn(),
         };
         loggerService = getLoggerService();
     });
@@ -86,10 +86,10 @@ describe('LoggerService', () => {
     it('should not throw if onTrace is not provided', () => {
         // Given
         const partialConfig: LoggerServiceConfig = {
-            onDebug: jest.fn(),
-            onLog: jest.fn(),
-            onWarn: jest.fn(),
-            onError: jest.fn(),
+            onDebug: vi.fn(),
+            onLog: vi.fn(),
+            onWarn: vi.fn(),
+            onError: vi.fn(),
         };
         loggerService.initialize(partialConfig);
 
@@ -100,10 +100,10 @@ describe('LoggerService', () => {
     it('should not throw if onDebug is not provided', () => {
         // Given
         const partialConfig: LoggerServiceConfig = {
-            onTrace: jest.fn(),
-            onLog: jest.fn(),
-            onWarn: jest.fn(),
-            onError: jest.fn(),
+            onTrace: vi.fn(),
+            onLog: vi.fn(),
+            onWarn: vi.fn(),
+            onError: vi.fn(),
         };
         loggerService.initialize(partialConfig);
 
@@ -114,10 +114,10 @@ describe('LoggerService', () => {
     it('should not throw if onLog is not provided', () => {
         // Given
         const partialConfig: LoggerServiceConfig = {
-            onTrace: jest.fn(),
-            onDebug: jest.fn(),
-            onWarn: jest.fn(),
-            onError: jest.fn(),
+            onTrace: vi.fn(),
+            onDebug: vi.fn(),
+            onWarn: vi.fn(),
+            onError: vi.fn(),
         };
         loggerService.initialize(partialConfig);
 
@@ -128,10 +128,10 @@ describe('LoggerService', () => {
     it('should not throw if onWarn is not provided', () => {
         // Given
         const partialConfig: LoggerServiceConfig = {
-            onTrace: jest.fn(),
-            onDebug: jest.fn(),
-            onLog: jest.fn(),
-            onError: jest.fn(),
+            onTrace: vi.fn(),
+            onDebug: vi.fn(),
+            onLog: vi.fn(),
+            onError: vi.fn(),
         };
         loggerService.initialize(partialConfig);
 
@@ -142,10 +142,10 @@ describe('LoggerService', () => {
     it('should not throw if onError is not provided', () => {
         // Given
         const partialConfig: LoggerServiceConfig = {
-            onTrace: jest.fn(),
-            onDebug: jest.fn(),
-            onLog: jest.fn(),
-            onWarn: jest.fn(),
+            onTrace: vi.fn(),
+            onDebug: vi.fn(),
+            onLog: vi.fn(),
+            onWarn: vi.fn(),
         };
         loggerService.initialize(partialConfig);
 

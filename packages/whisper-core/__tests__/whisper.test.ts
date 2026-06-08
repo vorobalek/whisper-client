@@ -6,10 +6,21 @@ import {
     setupWhisperBrowserMocks,
     teardownWhisperBrowserMocks,
 } from '../__mocks__/test-utils';
-import { ConnectionState, Whisper, WhisperPrototype } from '../src';
+import { ConnectionState } from '../src/services/connection/connection';
+import type { Whisper, WhisperPrototype } from '../src/whisper';
 import { Logger } from '../src/utils/logger';
 
 const mockNavigator = { serviceWorker: {} };
+let getWorkerService: any;
+let getSessionService: any;
+let getPushService: any;
+let getSignalRService: any;
+let getHandleService: any;
+let getConnectionService: any;
+let getCallService: any;
+let getCryptography: any;
+let translateConnection: any;
+let serviceMocks: ReturnType<typeof mockWhisperCoreServices>;
 
 // Centralized mocks for all services and browser APIs
 mockWhisperCoreServices();
@@ -19,15 +30,25 @@ describe('Whisper', () => {
     let whisperPrototype: WhisperPrototype;
     let mockLogger: Logger;
 
-    beforeEach(() => {
-        jest.resetModules();
-        mockWhisperCoreServices();
-        jest.clearAllMocks();
+    beforeEach(async () => {
+        vi.resetModules();
+        serviceMocks = mockWhisperCoreServices();
+        vi.clearAllMocks();
 
         mockLogger = createMockLogger();
 
-        // Re-require whisper after mocks are set up
-        const { getPrototype } = require('../src/whisper');
+        // Re-import whisper after mocks are set up
+        const whisperModule = await import('../src/whisper');
+        const { getPrototype } = whisperModule;
+        getWorkerService = () => serviceMocks.workerServiceMock;
+        getSessionService = () => serviceMocks.sessionServiceMock;
+        getPushService = () => serviceMocks.pushServiceMock;
+        getSignalRService = () => serviceMocks.signalRServiceMock;
+        getHandleService = () => serviceMocks.handleServiceMock;
+        getConnectionService = () => serviceMocks.connectionServiceMock;
+        getCallService = () => serviceMocks.callServiceMock;
+        getCryptography = () => serviceMocks.cryptographyMock;
+        translateConnection = serviceMocks.translateConnectionMock;
         whisperPrototype = getPrototype(mockLogger);
     });
 
@@ -49,15 +70,6 @@ describe('Whisper', () => {
 
         it('should initialize all services in the correct order', async () => {
             const whisper = await whisperPrototype.initialize(mockConfig);
-
-            // All required services should be initialized
-            const { getWorkerService } = require('../src/services/worker-service');
-            const { getSessionService } = require('../src/services/session-service');
-            const { getPushService } = require('../src/services/push-service');
-            const { getSignalRService } = require('../src/services/signalr-service');
-            const { getHandleService } = require('../src/services/handle-service');
-            const { getConnectionService } = require('../src/services/connection-service');
-            const { getCallService } = require('../src/services/call-service');
 
             // For services that don't directly use webRTC
             expect(getWorkerService().initialize).toHaveBeenCalledWith(
@@ -147,14 +159,13 @@ describe('Whisper', () => {
         it('should set up a periodic update call', async () => {
             const whisper = await whisperPrototype.initialize(mockConfig);
 
-            const { getCallService } = require('../src/services/call-service');
             const callService = getCallService();
 
             // Reset the mocks after initialization
             callService.update.mockClear();
 
             // Fast-forward time to trigger the interval
-            jest.advanceTimersByTime(60 * 1000);
+            vi.advanceTimersByTime(60 * 1000);
 
             // Check that update was called at least once (don't test exact count)
             expect(callService.update).toHaveBeenCalledWith('test-public-key', expect.anything());
@@ -162,10 +173,9 @@ describe('Whisper', () => {
 
         it('should handle case when push subscription is not available', async () => {
             // Mock a missing subscription
-            const { getPushService } = require('../src/services/push-service');
             getPushService().getSubscription.mockResolvedValueOnce(undefined);
 
-            const mockOnMayWorkUnstably = jest.fn().mockResolvedValue(undefined);
+            const mockOnMayWorkUnstably = vi.fn().mockResolvedValue(undefined);
             const configWithCallback = {
                 ...mockConfig,
                 onMayWorkUnstably: mockOnMayWorkUnstably,
@@ -180,10 +190,9 @@ describe('Whisper', () => {
 
         it('should not call onMayWorkUnstably when push subscription is available', async () => {
             // Mock an available subscription
-            const { getPushService } = require('../src/services/push-service');
             getPushService().getSubscription.mockResolvedValueOnce({ endpoint: 'test-endpoint' });
 
-            const mockOnMayWorkUnstably = jest.fn().mockResolvedValue(undefined);
+            const mockOnMayWorkUnstably = vi.fn().mockResolvedValue(undefined);
             const configWithCallback = {
                 ...mockConfig,
                 onMayWorkUnstably: mockOnMayWorkUnstably,
@@ -195,7 +204,6 @@ describe('Whisper', () => {
         });
 
         it('should not throw if push subscription is not available and onMayWorkUnstably is not provided', async () => {
-            const { getPushService } = require('../src/services/push-service');
             getPushService().getSubscription.mockResolvedValueOnce(undefined);
 
             const whisper = await whisperPrototype.initialize(mockConfig);
@@ -206,7 +214,6 @@ describe('Whisper', () => {
 
     describe('generateSigningKeyPair', () => {
         it('should call cryptography.generateSigningKeyPair', () => {
-            const { getCryptography } = require('../src/utils/cryptography');
             const cryptography = getCryptography();
 
             const result = whisperPrototype.generateSigningKeyPair();
@@ -227,7 +234,6 @@ describe('Whisper', () => {
 
         describe('get', () => {
             it('should return existing connection if found', () => {
-                const { getConnectionService } = require('../src/services/connection-service');
                 const mockConnection = { publicKey: 'test-key', state: ConnectionState.Open };
                 getConnectionService().getConnection.mockReturnValueOnce(mockConnection);
 
@@ -243,7 +249,6 @@ describe('Whisper', () => {
             });
 
             it('should create new outgoing connection if not found', () => {
-                const { getConnectionService } = require('../src/services/connection-service');
                 getConnectionService().getConnection.mockReturnValueOnce(undefined);
                 const mockNewConnection = { publicKey: 'test-key', state: ConnectionState.New };
                 getConnectionService().createOutgoing.mockReturnValueOnce(mockNewConnection);
@@ -263,8 +268,6 @@ describe('Whisper', () => {
 
         describe('delete', () => {
             it('should call connectionService.deleteConnection', () => {
-                const { getConnectionService } = require('../src/services/connection-service');
-
                 whisper.delete('test-key');
 
                 expect(getConnectionService().deleteConnection).toHaveBeenCalledWith('test-key');
@@ -273,8 +276,6 @@ describe('Whisper', () => {
 
         describe('showNotification', () => {
             it('should call pushService.showNotification', () => {
-                const { getPushService } = require('../src/services/push-service');
-
                 const options = { body: 'Test notification body' };
                 const result = whisper.showNotification('Test Title', options);
 
@@ -285,9 +286,6 @@ describe('Whisper', () => {
 
         describe('connections', () => {
             it('should return translated connections from connectionService', () => {
-                const { getConnectionService } = require('../src/services/connection-service');
-                const { translateConnection } = require('../src/services/connection/connection');
-
                 const mockConnections = [
                     { publicKey: 'key1', state: ConnectionState.Open },
                     { publicKey: 'key2', state: ConnectionState.New },

@@ -36,8 +36,8 @@ describe('ConnectionSaga', () => {
         mockUtf8 = createMockUtf8();
         mockCryptography = createMockCryptography();
         mockDataChannel = createMockDataChannel();
-        mockWebRTC = { PeerConnection: jest.fn(() => createMockPeerConnection({}, mockDataChannel)) };
-        jest.clearAllMocks();
+        mockWebRTC = { PeerConnection: vi.fn(() => createMockPeerConnection({}, mockDataChannel)) };
+        vi.clearAllMocks();
     });
 
     it('should initialize and send offer for outgoing connection, verifying encryption and state transitions', async () => {

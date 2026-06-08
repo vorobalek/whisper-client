@@ -6,34 +6,34 @@ interface MockRTCDataChannel {
     id: string;
     label: string;
     readyState: string;
-    onopen: jest.Mock<any, any>;
-    onmessage: jest.Mock<any, any>;
-    close: jest.Mock<any, any>;
-    send: jest.Mock<any, any>;
+    onopen: Mock;
+    onmessage: Mock;
+    close: Mock;
+    send: Mock;
 }
 
 interface MockRTCPeerConnection {
-    createDataChannel: jest.Mock<any, any>;
-    createOffer: jest.Mock<any, any>;
-    createAnswer: jest.Mock<any, any>;
-    setLocalDescription: jest.Mock<any, any>;
-    setRemoteDescription: jest.Mock<any, any>;
-    addIceCandidate: jest.Mock<any, any>;
-    onicecandidate: jest.Mock<any, any>;
-    ondatachannel: jest.Mock<any, any>;
-    onconnectionstatechange: jest.Mock<any, any>;
-    close: jest.Mock<any, any>;
-    getStats: jest.Mock<any, any>;
+    createDataChannel: Mock;
+    createOffer: Mock;
+    createAnswer: Mock;
+    setLocalDescription: Mock;
+    setRemoteDescription: Mock;
+    addIceCandidate: Mock;
+    onicecandidate: Mock;
+    ondatachannel: Mock;
+    onconnectionstatechange: Mock;
+    close: Mock;
+    getStats: Mock;
     remoteDescription: any;
 }
 
 export function createMockLogger() {
     return {
-        trace: jest.fn(),
-        debug: jest.fn(),
-        log: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
+        trace: vi.fn(),
+        debug: vi.fn(),
+        log: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
     };
 }
 
@@ -48,7 +48,7 @@ export function createMockTimeService() {
 
 export function createMockSessionService() {
     return {
-        initialize: jest.fn(),
+        initialize: vi.fn(),
         get signingKeyPair() {
             return { publicKey: new Uint8Array([1, 2, 3]), secretKey: new Uint8Array([4, 5, 6]) };
         },
@@ -66,25 +66,25 @@ export function createMockBase64(arg: any = {}) {
     if (typeof arg === 'object' && arg !== null && !('encode' in arg) && !('decode' in arg)) {
         const encodeMap = arg;
         return {
-            encode: jest.fn((data: Uint8Array) => {
+            encode: vi.fn((data: Uint8Array) => {
                 const key = Array.from(data).join(',');
                 if (encodeMap[key]) return encodeMap[key];
                 return 'encoded-data';
             }),
-            decode: jest.fn(),
+            decode: vi.fn(),
         };
     }
     // New API
     return {
-        encode: arg.encode || jest.fn((data: Uint8Array) => 'encoded-data'),
-        decode: arg.decode || jest.fn(),
+        encode: arg.encode || vi.fn((data: Uint8Array) => 'encoded-data'),
+        decode: arg.decode || vi.fn(),
     };
 }
 
 export function createMockUtf8({ encode, decode }: { encode?: any; decode?: any } = {}) {
     return {
-        encode: encode || jest.fn(),
-        decode: decode || jest.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
+        encode: encode || vi.fn(),
+        decode: decode || vi.fn().mockReturnValue(new Uint8Array([7, 8, 9])),
     };
 }
 
@@ -102,18 +102,18 @@ export function createMockCryptography(
     return {
         generateEncryptionKeyPair:
             overrides.generateEncryptionKeyPair ||
-            jest.fn(() => ({
+            vi.fn(() => ({
                 publicKey: new Uint8Array([1, 2, 3]),
                 secretKey: new Uint8Array([4, 5, 6]),
             })),
-        generateSharedSymmetricKey: overrides.generateSharedSymmetricKey || jest.fn(() => new Uint8Array([7, 8, 9])),
-        encrypt: overrides.encrypt || jest.fn((data) => data),
-        decrypt: overrides.decrypt || jest.fn((data) => data),
-        sign: overrides.sign || jest.fn(() => new Uint8Array([10, 11, 12])),
-        verifySignature: overrides.verifySignature || jest.fn(() => true),
+        generateSharedSymmetricKey: overrides.generateSharedSymmetricKey || vi.fn(() => new Uint8Array([7, 8, 9])),
+        encrypt: overrides.encrypt || vi.fn((data) => data),
+        decrypt: overrides.decrypt || vi.fn((data) => data),
+        sign: overrides.sign || vi.fn(() => new Uint8Array([10, 11, 12])),
+        verifySignature: overrides.verifySignature || vi.fn(() => true),
         generateSigningKeyPair:
             overrides.generateSigningKeyPair ||
-            jest.fn(() => ({
+            vi.fn(() => ({
                 publicKey: new Uint8Array([13, 14, 15]),
                 secretKey: new Uint8Array([16, 17, 18]),
             })),
@@ -122,13 +122,13 @@ export function createMockCryptography(
 
 export function createMockCallService() {
     return {
-        initialize: jest.fn(),
-        update: jest.fn(),
-        dial: jest.fn(),
-        offer: jest.fn(),
-        answer: jest.fn(),
-        ice: jest.fn(),
-        close: jest.fn(),
+        initialize: vi.fn(),
+        update: vi.fn(),
+        dial: vi.fn(),
+        offer: vi.fn(),
+        answer: vi.fn(),
+        ice: vi.fn(),
+        close: vi.fn(),
     };
 }
 
@@ -136,19 +136,19 @@ export function createMockCallService() {
 export function createMockPushConfig(overrides = {}) {
     const TEST_WHISPER_VAPID_KEY =
         'BDuixZ_tK0mDQPXYYuT1zWcql3BKy_y_dJmUVd9M5hTpCkE-BCvqeXGKyKqX2YRxLQIw1x_SZTHxY7MNwUx4hI0';
-    const notificationMock = jest.fn() as unknown as typeof Notification;
+    const notificationMock = vi.fn() as unknown as typeof Notification;
     (notificationMock as any).permission = 'granted';
-    notificationMock.requestPermission = jest.fn().mockResolvedValue('granted');
+    notificationMock.requestPermission = vi.fn().mockResolvedValue('granted');
     const basePushManager = {
-        getSubscription: jest.fn().mockResolvedValue(undefined),
-        subscribe: jest.fn().mockResolvedValue(undefined),
+        getSubscription: vi.fn().mockResolvedValue(undefined),
+        subscribe: vi.fn().mockResolvedValue(undefined),
     } as unknown as typeof PushManager;
     return {
         vapidKey: TEST_WHISPER_VAPID_KEY,
-        onCall: jest.fn().mockResolvedValue(undefined),
-        onPermissionDefault: jest.fn().mockResolvedValue(undefined),
-        onPermissionGranted: jest.fn().mockResolvedValue(undefined),
-        onPermissionDenied: jest.fn().mockResolvedValue(undefined),
+        onCall: vi.fn().mockResolvedValue(undefined),
+        onPermissionDefault: vi.fn().mockResolvedValue(undefined),
+        onPermissionGranted: vi.fn().mockResolvedValue(undefined),
+        onPermissionDenied: vi.fn().mockResolvedValue(undefined),
         notification: notificationMock,
         urlBase64ToUint8Array: () => new Uint8Array([1, 2, 3]),
         pushManager: basePushManager,
@@ -158,55 +158,55 @@ export function createMockPushConfig(overrides = {}) {
 
 export function createMockWebRTC(): any {
     class MockPeerConnection {
-        static generateCertificate = jest.fn().mockResolvedValue({});
+        static generateCertificate = vi.fn().mockResolvedValue({});
 
         constructor(_config?: any) {}
     }
 
     return {
         PeerConnection: MockPeerConnection as any,
-        DataChannel: jest.fn() as any,
+        DataChannel: vi.fn() as any,
     };
 }
 
 export function createMockDialCallHandler() {
     return {
-        initialize: jest.fn(),
-        parse: jest.fn(),
-        validate: jest.fn(),
-        handle: jest.fn(),
+        initialize: vi.fn(),
+        parse: vi.fn(),
+        validate: vi.fn(),
+        handle: vi.fn(),
     };
 }
 
 export function createMockOfferCallHandler() {
     return {
-        parse: jest.fn(),
-        validate: jest.fn(),
-        handle: jest.fn(),
+        parse: vi.fn(),
+        validate: vi.fn(),
+        handle: vi.fn(),
     };
 }
 
 export function createMockAnswerCallHandler() {
     return {
-        parse: jest.fn(),
-        validate: jest.fn(),
-        handle: jest.fn(),
+        parse: vi.fn(),
+        validate: vi.fn(),
+        handle: vi.fn(),
     };
 }
 
 export function createMockIceCallHandler() {
     return {
-        parse: jest.fn(),
-        validate: jest.fn(),
-        handle: jest.fn(),
+        parse: vi.fn(),
+        validate: vi.fn(),
+        handle: vi.fn(),
     };
 }
 
 export function createMockCloseCallHandler() {
     return {
-        parse: jest.fn(),
-        validate: jest.fn(),
-        handle: jest.fn(),
+        parse: vi.fn(),
+        validate: vi.fn(),
+        handle: vi.fn(),
     };
 }
 
@@ -236,9 +236,9 @@ export function createMockWorkerService({
 }
 
 export function createMockServiceWorker({
-    register = jest.fn(),
+    register = vi.fn(),
     ready = Promise.resolve({ scope: 'http://localhost/' }),
-    addEventListener = jest.fn(),
+    addEventListener = vi.fn(),
     controller = { state: 'activated' },
 } = {}) {
     return {
@@ -262,12 +262,12 @@ export function createMockNotification({
 
         MockNotification.calls = [] as any[];
         (MockNotification as any).permission = permission;
-        (MockNotification as any).requestPermission = jest.fn().mockResolvedValue(requestPermissionResult);
+        (MockNotification as any).requestPermission = vi.fn().mockResolvedValue(requestPermissionResult);
         return MockNotification as any;
     }
     return {
         permission,
-        requestPermission: jest.fn().mockResolvedValue(requestPermissionResult),
+        requestPermission: vi.fn().mockResolvedValue(requestPermissionResult),
     } as any;
 }
 
@@ -275,7 +275,7 @@ export function createMockNotification({
 
 // Utility to mock Date.now in tests
 export function mockDateNow(value: number) {
-    Date.now = jest.fn().mockReturnValue(value);
+    Date.now = vi.fn().mockReturnValue(value);
 }
 
 // Utility to restore Date.now in tests
@@ -287,117 +287,131 @@ export function restoreDateNow(original: typeof Date.now) {
 export function mockWhisperCoreServices() {
     // Singletons for all service mocks
     const callServiceMock = {
-        initialize: jest.fn(),
-        update: jest.fn().mockResolvedValue(undefined),
+        initialize: vi.fn(),
+        update: vi.fn().mockResolvedValue(undefined),
     };
     const connectionServiceMock = {
-        initialize: jest.fn(),
+        initialize: vi.fn(),
         connections: [] as any[],
-        getConnection: jest.fn(),
-        createOutgoing: jest.fn(),
-        deleteConnection: jest.fn(),
+        getConnection: vi.fn(),
+        createOutgoing: vi.fn(),
+        deleteConnection: vi.fn(),
     };
     const handleServiceMock = {
-        initialize: jest.fn(),
-        call: jest.fn(),
+        initialize: vi.fn(),
+        call: vi.fn(),
     };
     const pushServiceMock = {
-        initialize: jest.fn().mockResolvedValue(undefined),
-        getSubscription: jest
+        initialize: vi.fn().mockResolvedValue(undefined),
+        getSubscription: vi
             .fn()
             .mockResolvedValue({ endpoint: 'test-endpoint', keys: { p256dh: 'key1', auth: 'key2' } }),
-        showNotification: jest.fn().mockReturnValue(true),
+        showNotification: vi.fn().mockReturnValue(true),
     };
     const sessionServiceMock = {
-        initialize: jest.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
         signingKeyPair: {} as any,
         signingPublicKeyBase64: 'test-public-key',
         signingPublicKeyBase64Safe: 'test-public-key-safe',
     };
     const signalRServiceMock = {
-        initialize: jest.fn().mockImplementation(async (config) => {
+        initialize: vi.fn().mockImplementation(async (config) => {
             if (config.onReady) {
                 await config.onReady();
             }
         }),
     };
     const workerServiceMock = {
-        initialize: jest.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
         controller: {
-            postMessage: jest.fn(),
+            postMessage: vi.fn(),
         },
     };
     const timeServiceMock = {
         serverTime: 12345,
     };
-    let translateConnectionMock = jest.fn((conn) =>
+    const translateConnectionMock = vi.fn((conn) =>
         conn ? { publicKey: conn.publicKey || 'mock-key', state: conn.state || 0 } : conn,
     );
-    jest.mock('../src/services/call-service', () => ({
-        getCallService: jest.fn(() => callServiceMock),
+    const cryptographyMock = {
+        generateSigningKeyPair: vi.fn().mockReturnValue({
+            publicKey: new Uint8Array(),
+            secretKey: new Uint8Array(),
+        }),
+    };
+    vi.doMock('../src/services/call-service', () => ({
+        getCallService: vi.fn(() => callServiceMock),
     }));
-    jest.mock('../src/services/connection-service', () => ({
-        getConnectionService: jest.fn(() => connectionServiceMock),
+    vi.doMock('../src/services/connection-service', () => ({
+        getConnectionService: vi.fn(() => connectionServiceMock),
     }));
-    jest.mock('../src/services/handle-service', () => ({
-        getHandleService: jest.fn(() => handleServiceMock),
+    vi.doMock('../src/services/handle-service', () => ({
+        getHandleService: vi.fn(() => handleServiceMock),
     }));
-    jest.mock('../src/services/push-service', () => ({
-        getPushService: jest.fn(() => pushServiceMock),
+    vi.doMock('../src/services/push-service', () => ({
+        getPushService: vi.fn(() => pushServiceMock),
     }));
-    jest.mock('../src/services/session-service', () => ({
-        getSessionService: jest.fn(() => sessionServiceMock),
+    vi.doMock('../src/services/session-service', () => ({
+        getSessionService: vi.fn(() => sessionServiceMock),
     }));
-    jest.mock('../src/services/signalr-service', () => ({
-        getSignalRService: jest.fn(() => signalRServiceMock),
+    vi.doMock('../src/services/signalr-service', () => ({
+        getSignalRService: vi.fn(() => signalRServiceMock),
     }));
-    jest.mock('../src/services/worker-service', () => ({
-        getWorkerService: jest.fn(() => workerServiceMock),
+    vi.doMock('../src/services/worker-service', () => ({
+        getWorkerService: vi.fn(() => workerServiceMock),
     }));
-    jest.mock('../src/services/time-service', () => ({
-        getTimeService: jest.fn(() => timeServiceMock),
+    vi.doMock('../src/services/time-service', () => ({
+        getTimeService: vi.fn(() => timeServiceMock),
     }));
-    jest.mock('../src/services/connection/connection', () => {
-        const original = jest.requireActual('../src/services/connection/connection');
+    vi.doMock('../src/services/connection/connection', async (importOriginal) => {
+        const original = await importOriginal<typeof import('../src/services/connection/connection')>();
         return {
             ...original,
             translateConnection: translateConnectionMock,
         };
     });
 
-    jest.mock('../src/utils/api-client', () => ({
-        getApiClient: jest.fn().mockReturnValue({}),
+    vi.doMock('../src/utils/api-client', () => ({
+        getApiClient: vi.fn().mockReturnValue({}),
     }));
-    jest.mock('../src/utils/base64', () => ({
-        getBase64: jest.fn().mockReturnValue({}),
+    vi.doMock('../src/utils/base64', () => ({
+        getBase64: vi.fn().mockReturnValue({}),
     }));
-    jest.mock('../src/utils/cryptography', () => ({
-        getCryptography: jest.fn().mockReturnValue({
-            generateSigningKeyPair: jest.fn().mockReturnValue({
-                publicKey: new Uint8Array(),
-                secretKey: new Uint8Array(),
-            }),
-        }),
+    vi.doMock('../src/utils/cryptography', () => ({
+        getCryptography: vi.fn().mockReturnValue(cryptographyMock),
     }));
-    jest.mock('../src/utils/utf8', () => ({
-        getUtf8: jest.fn().mockReturnValue({}),
+    vi.doMock('../src/utils/utf8', () => ({
+        getUtf8: vi.fn().mockReturnValue({}),
     }));
+
+    return {
+        callServiceMock,
+        connectionServiceMock,
+        cryptographyMock,
+        handleServiceMock,
+        pushServiceMock,
+        sessionServiceMock,
+        signalRServiceMock,
+        timeServiceMock,
+        translateConnectionMock,
+        workerServiceMock,
+    };
 }
 
 // Centralized browser API mocks for Whisper tests
 export function setupWhisperBrowserMocks() {
-    jest.useFakeTimers();
-    (global as any).RTCPeerConnection = jest.fn();
-    (global as any).RTCDataChannel = jest.fn();
+    vi.useFakeTimers();
+    (global as any).RTCPeerConnection = vi.fn();
+    (global as any).RTCDataChannel = vi.fn();
     (global as any).window = {
-        Notification: jest.fn(),
-        PushManager: jest.fn(),
-        urlBase64ToUint8Array: jest.fn(() => new Uint8Array([1, 2, 3])),
+        Notification: vi.fn(),
+        PushManager: vi.fn(),
+        urlBase64ToUint8Array: vi.fn(() => new Uint8Array([1, 2, 3])),
     };
 }
 
 export function teardownWhisperBrowserMocks() {
-    jest.useRealTimers();
+    vi.useRealTimers();
     delete (global as any).RTCPeerConnection;
     delete (global as any).RTCDataChannel;
     delete (global as any).window;
@@ -416,12 +430,12 @@ export function createMockPushSubscription(overrides: Partial<PushSubscription> 
         endpoint: 'https://fcm.googleapis.com/fcm/send/test-endpoint',
         expirationTime: null,
         options: { applicationServerKey: new Uint8Array([1, 2, 3]) },
-        getKey: jest.fn().mockImplementation((key) => {
+        getKey: vi.fn().mockImplementation((key) => {
             if (key === 'p256dh') return new Uint8Array([4, 5, 6]);
             if (key === 'auth') return new Uint8Array([7, 8, 9]);
             return null;
         }),
-        unsubscribe: jest.fn().mockResolvedValue(true),
+        unsubscribe: vi.fn().mockResolvedValue(true),
         ...overrides,
     } as unknown as PushSubscription;
 }
@@ -433,8 +447,8 @@ export function createMockPushManager(
 ): PushManager {
     const mockSubscription = subscription || createMockPushSubscription();
     return {
-        getSubscription: jest.fn().mockResolvedValue(mockSubscription),
-        subscribe: jest.fn().mockResolvedValue(mockSubscription),
+        getSubscription: vi.fn().mockResolvedValue(mockSubscription),
+        subscribe: vi.fn().mockResolvedValue(mockSubscription),
         ...overrides,
     } as unknown as PushManager;
 }
@@ -447,21 +461,21 @@ export function createMockServiceWorkerContainer(
 ): ServiceWorkerContainer {
     const eventListeners: Record<string, Function[]> = {};
     return {
-        addEventListener: jest.fn().mockImplementation((event, handler) => {
+        addEventListener: vi.fn().mockImplementation((event, handler) => {
             if (!eventListeners[event]) eventListeners[event] = [];
             eventListeners[event].push(handler);
         }),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-        controller: controller || { postMessage: jest.fn() },
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        controller: controller || { postMessage: vi.fn() },
         oncontrollerchange: null,
         onmessage: null,
         onmessageerror: null,
         ready: Promise.resolve(registration),
-        getRegistration: jest.fn(),
-        getRegistrations: jest.fn(),
-        register: jest.fn(),
-        startMessages: jest.fn(),
+        getRegistration: vi.fn(),
+        getRegistrations: vi.fn(),
+        register: vi.fn(),
+        startMessages: vi.fn(),
         ...overrides,
     } as unknown as ServiceWorkerContainer;
 }
@@ -471,7 +485,7 @@ export function createMockConnection(overrides: Partial<any> = {}) {
     return {
         publicKey: 'test-public-key',
         state: 'new',
-        close: jest.fn(),
+        close: vi.fn(),
         ...overrides,
     };
 }
@@ -481,10 +495,10 @@ export function createMockDataChannel(overrides: Partial<MockRTCDataChannel> = {
         id: 'data-channel-id',
         label: 'mock-data-channel',
         readyState: 'connecting',
-        onopen: jest.fn(),
-        onmessage: jest.fn(),
-        close: jest.fn(),
-        send: jest.fn(),
+        onopen: vi.fn(),
+        onmessage: vi.fn(),
+        close: vi.fn(),
+        send: vi.fn(),
         ...overrides,
     };
 }
@@ -494,17 +508,17 @@ export function createMockPeerConnection(
     mockDataChannel?: MockRTCDataChannel,
 ): MockRTCPeerConnection {
     return {
-        createDataChannel: jest.fn(() => mockDataChannel || createMockDataChannel()),
-        createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-        createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-        setLocalDescription: jest.fn().mockResolvedValue(undefined),
-        setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-        addIceCandidate: jest.fn().mockResolvedValue(undefined),
-        onicecandidate: jest.fn(),
-        ondatachannel: jest.fn(),
-        onconnectionstatechange: jest.fn(),
-        close: jest.fn(),
-        getStats: jest.fn().mockResolvedValue(
+        createDataChannel: vi.fn(() => mockDataChannel || createMockDataChannel()),
+        createOffer: vi.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
+        createAnswer: vi.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
+        setLocalDescription: vi.fn().mockResolvedValue(undefined),
+        setRemoteDescription: vi.fn().mockResolvedValue(undefined),
+        addIceCandidate: vi.fn().mockResolvedValue(undefined),
+        onicecandidate: vi.fn(),
+        ondatachannel: vi.fn(),
+        onconnectionstatechange: vi.fn(),
+        close: vi.fn(),
+        getStats: vi.fn().mockResolvedValue(
             new Map([
                 [
                     'candidate-pair-id',
@@ -541,10 +555,10 @@ export function createMockKeyPair(overrides = {}) {
 export function createMockWhisperConfig(overrides = {}) {
     return {
         serverUrl: 'https://test-server.com',
-        onCall: jest.fn(),
-        onReady: jest.fn(),
-        focusOnDial: jest.fn(),
-        requestDial: jest.fn(),
+        onCall: vi.fn(),
+        onReady: vi.fn(),
+        focusOnDial: vi.fn(),
+        requestDial: vi.fn(),
         version: '1.0.0',
         signingKeyPair: createMockKeyPair(),
         vapidKey: 'test-vapid-key',

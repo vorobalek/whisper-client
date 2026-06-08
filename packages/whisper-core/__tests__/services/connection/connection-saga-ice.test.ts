@@ -12,11 +12,11 @@ import {
 describe('ConnectionSaga (ICE handling)', () => {
     // Mock all the required dependencies
     const mockLogger = {
-        debug: jest.fn(),
-        log: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        trace: jest.fn(),
+        debug: vi.fn(),
+        log: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        trace: vi.fn(),
     };
 
     const mockTimeService = {
@@ -26,13 +26,13 @@ describe('ConnectionSaga (ICE handling)', () => {
     };
 
     const mockCallService = {
-        dial: jest.fn().mockResolvedValue(undefined),
-        offer: jest.fn().mockResolvedValue(undefined),
-        answer: jest.fn().mockResolvedValue(undefined),
-        ice: jest.fn().mockResolvedValue(undefined),
-        initialize: jest.fn().mockResolvedValue(undefined),
-        update: jest.fn().mockResolvedValue(undefined),
-        close: jest.fn().mockResolvedValue(undefined),
+        dial: vi.fn().mockResolvedValue(undefined),
+        offer: vi.fn().mockResolvedValue(undefined),
+        answer: vi.fn().mockResolvedValue(undefined),
+        ice: vi.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
+        update: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
     };
 
     const mockSessionService = {
@@ -42,12 +42,12 @@ describe('ConnectionSaga (ICE handling)', () => {
             publicKey: new Uint8Array([1, 2, 3]),
             secretKey: new Uint8Array([4, 5, 6]),
         },
-        initialize: jest.fn().mockResolvedValue(undefined),
+        initialize: vi.fn().mockResolvedValue(undefined),
     };
 
     const mockBase64 = {
-        encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
-        decode: jest.fn((str) => {
+        encode: vi.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
+        decode: vi.fn((str) => {
             if (str.startsWith('encoded-')) {
                 return Buffer.from(str.substring(8), 'hex');
             }
@@ -56,29 +56,29 @@ describe('ConnectionSaga (ICE handling)', () => {
     };
 
     const mockUtf8 = {
-        encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
-        decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
+        encode: vi.fn((data) => Buffer.from(data).toString('utf-8')),
+        decode: vi.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
     };
 
     // Mock cryptography methods with simple implementations
     const mockCryptography = {
-        generateEncryptionKeyPair: jest.fn(() => ({
+        generateEncryptionKeyPair: vi.fn(() => ({
             publicKey: new Uint8Array([1, 2, 3]),
             secretKey: new Uint8Array([4, 5, 6]),
         })),
-        generateSharedSymmetricKey: jest.fn(() => new Uint8Array([7, 8, 9])),
-        encrypt: jest.fn((data) => data),
-        decrypt: jest.fn((data) => data),
-        sign: jest.fn(() => new Uint8Array([10, 11, 12])),
-        verifySignature: jest.fn(() => true),
-        generateSigningKeyPair: jest.fn(() => ({
+        generateSharedSymmetricKey: vi.fn(() => new Uint8Array([7, 8, 9])),
+        encrypt: vi.fn((data) => data),
+        decrypt: vi.fn((data) => data),
+        sign: vi.fn(() => new Uint8Array([10, 11, 12])),
+        verifySignature: vi.fn(() => true),
+        generateSigningKeyPair: vi.fn(() => ({
             publicKey: new Uint8Array([13, 14, 15]),
             secretKey: new Uint8Array([16, 17, 18]),
         })),
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     it('should handle ICE candidates correctly', async () => {
@@ -87,24 +87,24 @@ describe('ConnectionSaga (ICE handling)', () => {
             id: 'data-channel-id',
             label: 'mock-data-channel',
             readyState: 'connecting',
-            onopen: jest.fn(),
-            onmessage: jest.fn(),
-            close: jest.fn(),
-            send: jest.fn(),
+            onopen: vi.fn(),
+            onmessage: vi.fn(),
+            close: vi.fn(),
+            send: vi.fn(),
         };
 
         const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            onicecandidate: jest.fn(),
-            ondatachannel: jest.fn(),
-            onconnectionstatechange: jest.fn(),
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
+            createDataChannel: vi.fn(() => mockDataChannel),
+            createOffer: vi.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
+            createAnswer: vi.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
+            setLocalDescription: vi.fn().mockResolvedValue(undefined),
+            setRemoteDescription: vi.fn().mockResolvedValue(undefined),
+            addIceCandidate: vi.fn().mockResolvedValue(undefined),
+            onicecandidate: vi.fn(),
+            ondatachannel: vi.fn(),
+            onconnectionstatechange: vi.fn(),
+            close: vi.fn(),
+            getStats: vi.fn().mockResolvedValue(
                 new Map([
                     [
                         'candidate-pair-id',
@@ -127,7 +127,7 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the connection saga for the test
@@ -235,7 +235,7 @@ describe('ConnectionSaga (ICE handling)', () => {
         const iceCandidates: any[] = [];
 
         // Mock debug logger to verify it's called
-        const debugSpy = jest.spyOn(mockLogger, 'debug');
+        const debugSpy = vi.spyOn(mockLogger, 'debug');
 
         // Create a simplified mock of the addIceCandidate method
         const mockAddIceCandidate = function (encryptedDataBase64: string) {
@@ -249,7 +249,7 @@ describe('ConnectionSaga (ICE handling)', () => {
             // Mock that remoteDescription is not set
             const mockPeerConnection = {
                 remoteDescription: null,
-                addIceCandidate: jest.fn(),
+                addIceCandidate: vi.fn(),
             };
 
             // This is the branch we want to test (when remoteDescription is null)
@@ -294,22 +294,22 @@ describe('ConnectionSaga (ICE handling)', () => {
             readyState: 'connecting',
             onopen: null,
             onmessage: null,
-            close: jest.fn(),
-            send: jest.fn(),
+            close: vi.fn(),
+            send: vi.fn(),
         };
 
         const mockPeerConnection = {
-            createDataChannel: jest.fn(() => mockDataChannel),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            createAnswer: jest.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
+            createDataChannel: vi.fn(() => mockDataChannel),
+            createOffer: vi.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
+            createAnswer: vi.fn().mockResolvedValue({ type: 'answer', sdp: 'mock-sdp' }),
+            setLocalDescription: vi.fn().mockResolvedValue(undefined),
+            setRemoteDescription: vi.fn().mockResolvedValue(undefined),
+            addIceCandidate: vi.fn().mockResolvedValue(undefined),
             onicecandidate: null,
             ondatachannel: null,
             onconnectionstatechange: null,
-            close: jest.fn(),
-            getStats: jest.fn().mockResolvedValue(
+            close: vi.fn(),
+            getStats: vi.fn().mockResolvedValue(
                 new Map([
                     [
                         'candidate-pair-id',
@@ -332,7 +332,7 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the connection saga for the test
@@ -389,24 +389,24 @@ describe('ConnectionSaga (ICE handling)', () => {
             readyState: 'connecting',
             onopen: null,
             onmessage: null,
-            close: jest.fn(),
-            send: jest.fn(),
+            close: vi.fn(),
+            send: vi.fn(),
         };
 
         mockPeerConnection = {
-            createDataChannel: jest.fn(() => {
+            createDataChannel: vi.fn(() => {
                 rtcSendDataChannel = { ...mockDataChannel };
                 return rtcSendDataChannel;
             }),
-            createOffer: jest.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
-            setLocalDescription: jest.fn().mockResolvedValue(undefined),
-            setRemoteDescription: jest.fn().mockResolvedValue(undefined),
-            addIceCandidate: jest.fn().mockResolvedValue(undefined),
-            close: jest.fn(),
+            createOffer: vi.fn().mockResolvedValue({ type: 'offer', sdp: 'mock-sdp' }),
+            setLocalDescription: vi.fn().mockResolvedValue(undefined),
+            setRemoteDescription: vi.fn().mockResolvedValue(undefined),
+            addIceCandidate: vi.fn().mockResolvedValue(undefined),
+            close: vi.fn(),
             onicecandidate: null,
             ondatachannel: null,
             remoteDescription: { type: 'offer', sdp: 'mock-sdp-offer' } as unknown as RTCSessionDescription,
-            getStats: jest.fn().mockResolvedValue(
+            getStats: vi.fn().mockResolvedValue(
                 new Map([
                     [
                         'candidate-pair-id',
@@ -428,7 +428,7 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: jest.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(() => mockPeerConnection),
         };
 
         // Create the connection saga for the test

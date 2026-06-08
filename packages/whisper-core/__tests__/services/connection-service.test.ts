@@ -24,7 +24,7 @@ import { Utf8 } from '../../src/utils/utf8';
 const mockConnections: Record<string, any> = {};
 
 // Mock the imported functions and modules
-jest.mock('../../src/services/connection/connection', () => {
+vi.mock('../../src/services/connection/connection', () => {
     return {
         ConnectionState: {
             New: 'new',
@@ -32,8 +32,8 @@ jest.mock('../../src/services/connection/connection', () => {
             Open: 'open',
             Closed: 'closed',
         },
-        getConnection: jest.fn().mockImplementation((publicKey) => mockConnections[publicKey]),
-        translateConnection: jest.fn().mockImplementation((conn) => conn),
+        getConnection: vi.fn().mockImplementation((publicKey) => mockConnections[publicKey]),
+        translateConnection: vi.fn().mockImplementation((conn) => conn),
     };
 });
 
@@ -46,7 +46,7 @@ describe('ConnectionService', () => {
     let mockBase64: Base64;
     let mockUtf8: Utf8;
     let mockCryptography: Cryptography;
-    let mockOnIncomingConnection: jest.Mock;
+    let mockOnIncomingConnection: Mock;
 
     beforeEach(() => {
         // Reset mock connections map
@@ -62,7 +62,7 @@ describe('ConnectionService', () => {
         mockBase64 = createMockBase64();
         mockUtf8 = createMockUtf8();
         mockCryptography = createMockCryptography();
-        mockOnIncomingConnection = jest.fn();
+        mockOnIncomingConnection = vi.fn();
 
         // Create the service
         connectionService = getConnectionService(
@@ -111,7 +111,7 @@ describe('ConnectionService', () => {
         it('should handle errors in onIncomingConnection callback', async () => {
             // Given
             const errorMessage = 'Test callback error';
-            const callbackWithError = jest.fn().mockImplementation(() => {
+            const callbackWithError = vi.fn().mockImplementation(() => {
                 throw new Error(errorMessage);
             });
 
