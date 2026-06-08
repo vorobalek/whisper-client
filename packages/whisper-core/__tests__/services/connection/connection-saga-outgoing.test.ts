@@ -132,7 +132,9 @@ describe('ConnectionSaga (outgoing)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
             DataChannel: createMockDataChannel(),
         };
 

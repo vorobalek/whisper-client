@@ -400,7 +400,7 @@ export function mockWhisperCoreServices() {
 
 // Centralized browser API mocks for Whisper tests
 export function setupWhisperBrowserMocks() {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     (global as any).RTCPeerConnection = vi.fn();
     (global as any).RTCDataChannel = vi.fn();
     (global as any).window = {

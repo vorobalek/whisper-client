@@ -66,7 +66,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
         );
         const mockWebRTC = createMockWebRTC();
         // Override PeerConnection to use our mockPeerConnection
-        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(function () {
+            return mockPeerConnection;
+        });
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -159,7 +161,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel({ readyState: 'open' });
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
         const mockWebRTC = createMockWebRTC();
-        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(function () {
+            return mockPeerConnection;
+        });
 
         const saga: any = getConnectionSaga(
             publicKey,
@@ -242,7 +246,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
         const webRTC = createMockWebRTC();
-        webRTC.PeerConnection = vi.fn(() => mockPeerConnection);
+        webRTC.PeerConnection = vi.fn(function () {
+            return mockPeerConnection;
+        });
 
         const saga: any = getConnectionSaga(
             publicKey,
@@ -367,7 +373,9 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel(dataChannelOverrides);
         const mockPeerConnection = createMockPeerConnection(peerConnectionOverrides, mockDataChannel);
         const mockWebRTC = { ...createMockWebRTC(), ...webRTCOverrides };
-        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(function () {
+            return mockPeerConnection;
+        });
         const saga = getConnectionSaga(
             publicKey,
             connectionType,

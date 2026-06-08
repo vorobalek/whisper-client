@@ -127,7 +127,9 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the connection saga for the test
@@ -332,7 +334,9 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the connection saga for the test
@@ -428,7 +432,9 @@ describe('ConnectionSaga (ICE handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the connection saga for the test
