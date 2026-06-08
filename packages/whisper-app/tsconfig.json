@@ -6,7 +6,8 @@
         "paths": {
             "@whisper/core": ["../whisper-core/src"]
         },
-        "outDir": "dist"
+        "outDir": "dist",
+        "rootDir": ".."
     },
     "include": ["src"],
     "exclude": ["node_modules", "public/scripts"]

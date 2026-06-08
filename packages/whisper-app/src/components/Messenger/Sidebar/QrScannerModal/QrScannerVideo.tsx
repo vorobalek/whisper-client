@@ -13,7 +13,7 @@ interface QrScannerVideoProps {
 const QrScannerVideo: React.FC<QrScannerVideoProps> = ({ paused, hidden, onPlay, onClose, onResult }) => {
     const { ref } = useZxing({
         onDecodeResult(result) {
-            onResult(result.getText());
+            onResult(result.rawValue);
             onClose();
         },
         paused: paused,

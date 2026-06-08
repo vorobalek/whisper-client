@@ -4,6 +4,9 @@
         "module": "esnext",
         "esModuleInterop": true,
         "strict": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "ignoreDeprecations": "6.0",
+        "noUncheckedSideEffectImports": false,
+        "types": ["node"]
     }
 }
