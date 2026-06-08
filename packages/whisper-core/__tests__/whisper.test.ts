@@ -7,8 +7,8 @@ import {
     teardownWhisperBrowserMocks,
 } from '../__mocks__/test-utils';
 import { ConnectionState } from '../src/services/connection/connection';
-import type { Whisper, WhisperPrototype } from '../src/whisper';
 import { Logger } from '../src/utils/logger';
+import type { Whisper, WhisperPrototype } from '../src/whisper';
 
 const mockNavigator = { serviceWorker: {} };
 let getWorkerService: any;
@@ -165,7 +165,7 @@ describe('Whisper', () => {
             callService.update.mockClear();
 
             // Fast-forward time to trigger the interval
-            vi.advanceTimersByTime(60 * 1000);
+            await vi.advanceTimersByTimeAsync(60 * 1000);
 
             // Check that update was called at least once (don't test exact count)
             expect(callService.update).toHaveBeenCalledWith('test-public-key', expect.anything());

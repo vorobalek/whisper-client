@@ -16,7 +16,9 @@ const mockConnectionBuilder = {
 
 module.exports = {
     HubConnection: vi.fn(),
-    HubConnectionBuilder: vi.fn().mockImplementation(() => mockConnectionBuilder),
+    HubConnectionBuilder: vi.fn().mockImplementation(function () {
+        return mockConnectionBuilder;
+    }),
     LogLevel: {
         Warning: 'Warning',
     },

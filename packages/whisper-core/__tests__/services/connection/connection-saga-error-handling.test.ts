@@ -103,7 +103,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         });
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         const saga = getConnectionSaga(
@@ -216,7 +218,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
             remoteDescription: { type: 'offer', sdp: 'mock-sdp' },
         });
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Создаём saga
@@ -260,7 +264,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the connection saga for the test
@@ -313,7 +319,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the saga with outgoing type to test different paths
@@ -508,7 +516,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         const saga = getConnectionSaga(
@@ -590,7 +600,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga but don't open it
@@ -630,7 +642,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         const saga = getConnectionSaga(
@@ -675,7 +689,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection();
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         const saga = getConnectionSaga(
@@ -726,7 +742,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the connection saga
@@ -795,7 +813,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create the saga
@@ -871,7 +891,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -916,7 +938,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -1025,7 +1049,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -1120,7 +1146,9 @@ describe('ConnectionSaga (Error Handling and Cleanup)', () => {
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout

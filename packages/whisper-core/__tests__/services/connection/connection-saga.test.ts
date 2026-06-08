@@ -36,7 +36,11 @@ describe('ConnectionSaga', () => {
         mockUtf8 = createMockUtf8();
         mockCryptography = createMockCryptography();
         mockDataChannel = createMockDataChannel();
-        mockWebRTC = { PeerConnection: vi.fn(() => createMockPeerConnection({}, mockDataChannel)) };
+        mockWebRTC = {
+            PeerConnection: vi.fn(function () {
+                return createMockPeerConnection({}, mockDataChannel);
+            }),
+        };
         vi.clearAllMocks();
     });
 

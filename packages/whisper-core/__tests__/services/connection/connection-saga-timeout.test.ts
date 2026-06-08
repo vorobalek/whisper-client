@@ -104,7 +104,9 @@ describe('ConnectionSaga (Timeout handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -179,7 +181,9 @@ describe('ConnectionSaga (Timeout handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -254,7 +258,9 @@ describe('ConnectionSaga (Timeout handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout
@@ -332,7 +338,9 @@ describe('ConnectionSaga (Timeout handling)', () => {
         };
 
         const mockWebRTC = {
-            PeerConnection: vi.fn(() => mockPeerConnection),
+            PeerConnection: vi.fn(function () {
+                return mockPeerConnection;
+            }),
         };
 
         // Create saga with a very short timeout

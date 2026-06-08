@@ -345,7 +345,9 @@ describe('CallService', () => {
         it('should use sendBeacon for close requests', () => {
             // Given
             mockNavigator.sendBeacon = vi.fn();
-            global.Blob = vi.fn().mockImplementation(() => ({})) as any;
+            global.Blob = vi.fn().mockImplementation(function () {
+                return {};
+            }) as any;
             global.JSON.stringify = vi.fn().mockReturnValue('{"test":"data"}');
 
             // When

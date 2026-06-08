@@ -21,12 +21,12 @@
     "devDependencies": {
         "@types/jsdom": "^28.0.3",
         "@types/pako": "^2.0.4",
-        "@vitest/coverage-v8": "^3.2.4",
+        "@vitest/coverage-v8": "^4.1.8",
         "coverage-badges-cli": "^1.2.5",
         "jsdom": "^26.1.0",
         "ts-loader": "^9.6.0",
         "typescript": "^6.0.3",
-        "vitest": "^3.2.4",
+        "vitest": "^4.1.8",
         "webpack": "^5.107.2",
         "webpack-cli": "^7.0.2"
     }
