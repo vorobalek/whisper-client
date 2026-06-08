@@ -7,7 +7,7 @@ import { getApiClient } from '../../src/utils/api-client';
 import { Logger } from '../../src/utils/logger';
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Interface for test data
@@ -56,7 +56,7 @@ describe('ApiClient', () => {
             // Mock successful response
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: jest.fn().mockResolvedValueOnce(mockResponse),
+                json: vi.fn().mockResolvedValueOnce(mockResponse),
             });
 
             // When
@@ -92,7 +92,7 @@ describe('ApiClient', () => {
             mockFetch.mockResolvedValueOnce({
                 ok: false,
                 status: 400,
-                text: jest.fn().mockResolvedValueOnce('Bad Request'),
+                text: vi.fn().mockResolvedValueOnce('Bad Request'),
             });
 
             // When/Then
@@ -127,7 +127,7 @@ describe('ApiClient', () => {
             // Mock successful HTTP response but business failure
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: jest.fn().mockResolvedValueOnce(mockResponse),
+                json: vi.fn().mockResolvedValueOnce(mockResponse),
             });
 
             // When/Then
@@ -156,7 +156,7 @@ describe('ApiClient', () => {
             // Mock successful HTTP response but null response body
             mockFetch.mockResolvedValueOnce({
                 ok: true,
-                json: jest.fn().mockResolvedValueOnce(null),
+                json: vi.fn().mockResolvedValueOnce(null),
             });
 
             // When/Then

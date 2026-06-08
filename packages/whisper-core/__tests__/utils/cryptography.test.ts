@@ -8,7 +8,7 @@ describe('Cryptography utility', () => {
     let mockLogger: Logger;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockLogger = createMockLogger();
         cryptography = getCryptography(mockLogger);
     });
@@ -151,13 +151,13 @@ describe('Cryptography utility', () => {
             expect(decrypted).toEqual(originalData);
         });
 
-        it('should throw an error when encryption fails', () => {
-            jest.resetModules();
-            jest.doMock('../../src/utils/nacl-wrapper', () => ({
-                ...jest.requireActual('../../src/utils/nacl-wrapper'),
-                secretbox: jest.fn(() => null),
+        it('should throw an error when encryption fails', async () => {
+            vi.resetModules();
+            vi.doMock('../../src/utils/nacl-wrapper', async (importOriginal) => ({
+                ...(await importOriginal<typeof import('../../src/utils/nacl-wrapper')>()),
+                secretbox: vi.fn(() => null),
             }));
-            const { getCryptography } = require('../../src/utils/cryptography');
+            const { getCryptography } = await import('../../src/utils/cryptography');
             const cryptographyWithMock = getCryptography(mockLogger);
             const originalData = new Uint8Array([1, 2, 3, 4, 5]);
             const secretKey = new Uint8Array(32);

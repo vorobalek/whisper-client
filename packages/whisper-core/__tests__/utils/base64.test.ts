@@ -2,16 +2,16 @@ import { createMockBase64 } from '../../__mocks__/test-utils';
 import { getBase64 } from '../../src/utils/base64';
 
 // Mock nacl-util-wrapper
-jest.mock('../../src/utils/nacl-util-wrapper', () => ({
-    encodeBase64: jest.fn().mockImplementation(() => 'encoded-base64'),
-    decodeBase64: jest.fn().mockImplementation(() => new Uint8Array([1, 2, 3, 4])),
+vi.mock('../../src/utils/nacl-util-wrapper', () => ({
+    encodeBase64: vi.fn().mockImplementation(() => 'encoded-base64'),
+    decodeBase64: vi.fn().mockImplementation(() => new Uint8Array([1, 2, 3, 4])),
 }));
 
 describe('Base64 utility', () => {
     let base64: ReturnType<typeof getBase64>;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         base64 = createMockBase64();
     });
 
@@ -46,12 +46,12 @@ describe('Base64 utility', () => {
 
     // Integration test with real implementation
     describe('integration', () => {
-        beforeEach(() => {
-            jest.resetModules();
-            jest.dontMock('../../src/utils/nacl-util-wrapper');
+        beforeEach(async () => {
+            vi.resetModules();
+            vi.doUnmock('../../src/utils/nacl-util-wrapper');
 
             // Get the real implementation
-            const { getBase64: getRealBase64 } = require('../../src/utils/base64');
+            const { getBase64: getRealBase64 } = await import('../../src/utils/base64');
             base64 = getRealBase64();
         });
 

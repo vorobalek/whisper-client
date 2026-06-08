@@ -6,8 +6,8 @@ import { Logger } from '../../src/utils/logger';
 import { newError } from '../../src/utils/new-error';
 
 // Mock the dependencies
-jest.mock('../../src/utils/new-error', () => ({
-    newError: jest.fn().mockImplementation((logger, message) => new Error(message)),
+vi.mock('../../src/utils/new-error', () => ({
+    newError: vi.fn().mockImplementation((logger, message) => new Error(message)),
 }));
 
 describe('SessionService', () => {

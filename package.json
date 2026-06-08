@@ -53,7 +53,6 @@
     "devDependencies": {
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "css-minimizer-webpack-plugin": "^8.0.0",
-        "jest-coverage-badges": "^1.0.0",
         "json-minimizer-webpack-plugin": "^5.0.1",
         "lint-staged": "^17.0.7",
         "mini-css-extract-plugin": "^2.10.2",

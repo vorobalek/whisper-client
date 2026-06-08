@@ -20,18 +20,18 @@ import { urlBase64ToUint8Array } from '../../src/utils/web-push-helpers';
 
 // Create a full ServiceWorkerContainer mock type
 interface MockServiceWorkerContainer {
-    addEventListener: jest.Mock;
-    removeEventListener: jest.Mock;
-    dispatchEvent: jest.Mock;
+    addEventListener: Mock;
+    removeEventListener: Mock;
+    dispatchEvent: Mock;
     controller: any;
     oncontrollerchange: null;
     onmessage: null;
     onmessageerror: null;
     ready: Promise<any>;
-    getRegistration: jest.Mock;
-    getRegistrations: jest.Mock;
-    register: jest.Mock;
-    startMessages: jest.Mock;
+    getRegistration: Mock;
+    getRegistrations: Mock;
+    register: Mock;
+    startMessages: Mock;
 }
 
 describe('PushService', () => {
@@ -40,7 +40,7 @@ describe('PushService', () => {
     let mockWorkerService: WorkerService;
     let mockBase64: Base64;
     let mockConfig: PushServiceConfig & {
-        onCall: jest.Mock;
+        onCall: Mock;
         notification?: typeof Notification;
         pushManager?: typeof PushManager;
         urlBase64ToUint8Array: (base64String: string) => Uint8Array;
@@ -56,7 +56,7 @@ describe('PushService', () => {
 
     beforeEach(() => {
         // Mock worker controller
-        mockController = { postMessage: jest.fn() };
+        mockController = { postMessage: vi.fn() };
 
         // Mock subscription
         mockPushSubscription = createMockPushSubscription();
@@ -85,7 +85,7 @@ describe('PushService', () => {
         });
 
         // Create the mock Base64 service
-        const encodeMock = jest.fn().mockImplementation((data) => {
+        const encodeMock = vi.fn().mockImplementation((data) => {
             // Return a predictable value based on first byte for testing
             return data && data.length > 0 ? `encoded-${data[0]}` : 'encoded-empty';
         });
@@ -313,14 +313,14 @@ describe('PushService', () => {
             // Given
             const mockLogger = createMockLogger();
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
                 get container() {
                     return {
-                        addEventListener: jest.fn(),
-                        removeEventListener: jest.fn(),
+                        addEventListener: vi.fn(),
+                        removeEventListener: vi.fn(),
                     };
                 },
                 get controller() {
@@ -336,7 +336,7 @@ describe('PushService', () => {
 
         it('should call onPermissionDenied if permission is denied', async () => {
             const mockLogger = createMockLogger();
-            const mockOnPermissionDenied = jest.fn().mockResolvedValue(undefined);
+            const mockOnPermissionDenied = vi.fn().mockResolvedValue(undefined);
             const config = createMockPushConfig({
                 notification: createMockNotification({ permission: 'denied', requestPermissionResult: 'denied' }),
                 onPermissionDenied: mockOnPermissionDenied,
@@ -359,7 +359,7 @@ describe('PushService', () => {
 
             // Initialize with mocks
             await pushService.initialize(mockConfig);
-            jest.clearAllMocks();
+            vi.clearAllMocks();
         });
 
         it('should return a valid subscription', async () => {
@@ -371,12 +371,12 @@ describe('PushService', () => {
                 options: {
                     applicationServerKey: new Uint8Array([1, 2, 3]),
                 },
-                getKey: jest.fn().mockImplementation((key) => {
+                getKey: vi.fn().mockImplementation((key) => {
                     if (key === 'p256dh') return new Uint8Array([4, 5, 6]);
                     if (key === 'auth') return new Uint8Array([7, 8, 9]);
                     return null;
                 }),
-                unsubscribe: jest.fn().mockResolvedValue(true),
+                unsubscribe: vi.fn().mockResolvedValue(true),
             };
 
             // Make sure mockConfig has the necessary vapidKey
@@ -441,7 +441,7 @@ describe('PushService', () => {
             const logger = createMockLogger();
             const pushSubscription = createMockPushSubscription({
                 endpoint: 'test-endpoint',
-                getKey: jest.fn().mockImplementation((key) => (key === 'p256dh' ? null : new Uint8Array([1, 2, 3]))),
+                getKey: vi.fn().mockImplementation((key) => (key === 'p256dh' ? null : new Uint8Array([1, 2, 3]))),
             });
             const pushManager = createMockPushManager({}, pushSubscription);
             const registration = { pushManager, scope: 'scope' };
@@ -467,7 +467,7 @@ describe('PushService', () => {
             const logger = createMockLogger();
             const pushSubscription = createMockPushSubscription({
                 endpoint: 'test-endpoint',
-                getKey: jest.fn().mockImplementation((key) => (key === 'auth' ? null : new Uint8Array([1, 2, 3]))),
+                getKey: vi.fn().mockImplementation((key) => (key === 'auth' ? null : new Uint8Array([1, 2, 3]))),
             });
             const pushManager = createMockPushManager({}, pushSubscription);
             const registration = { pushManager, scope: 'scope' };
@@ -495,8 +495,8 @@ describe('PushService', () => {
             const pushSubscription = createMockPushSubscription({ endpoint: 'test-endpoint' });
             const pushManager = createMockPushManager(
                 {
-                    getSubscription: jest.fn().mockResolvedValue(undefined),
-                    subscribe: jest.fn().mockRejectedValue(error),
+                    getSubscription: vi.fn().mockResolvedValue(undefined),
+                    subscribe: vi.fn().mockRejectedValue(error),
                 },
                 pushSubscription,
             );
@@ -529,22 +529,22 @@ describe('PushService', () => {
                 endpoint: 'test-endpoint',
                 expirationTime: null,
                 options: { applicationServerKey: new Uint8Array([9, 9, 9]) },
-                getKey: jest.fn().mockImplementation((key) => new Uint8Array([1, 2, 3])),
-                unsubscribe: jest.fn().mockRejectedValue(unsubscribeError),
+                getKey: vi.fn().mockImplementation((key) => new Uint8Array([1, 2, 3])),
+                unsubscribe: vi.fn().mockRejectedValue(unsubscribeError),
             };
             const mockPushManager = {
-                getSubscription: jest.fn().mockResolvedValue(mockPushSubscription),
-                subscribe: jest.fn().mockResolvedValue(mockPushSubscription),
+                getSubscription: vi.fn().mockResolvedValue(mockPushSubscription),
+                subscribe: vi.fn().mockResolvedValue(mockPushSubscription),
             };
             const mockRegistration = { pushManager: mockPushManager, scope: 'scope' };
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
-                controller: { postMessage: jest.fn() },
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                controller: { postMessage: vi.fn() },
             };
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return mockRegistration;
                 },
@@ -578,13 +578,13 @@ describe('PushService', () => {
 
             // Create a more comprehensive worker service mock
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
             };
 
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -597,14 +597,14 @@ describe('PushService', () => {
             } as unknown as WorkerService;
 
             const mockBase64 = {
-                encode: jest.fn(),
-                decode: jest.fn(),
+                encode: vi.fn(),
+                decode: vi.fn(),
             };
 
             // Create a mock Notification with denied permission
             const mockConfig = {
                 vapidKey: 'test-vapid-key',
-                onCall: jest.fn().mockResolvedValue(undefined),
+                onCall: vi.fn().mockResolvedValue(undefined),
                 notification: createMockNotification({ permission: 'denied' }),
             };
 
@@ -615,7 +615,7 @@ describe('PushService', () => {
             await pushService.initialize(mockConfig);
 
             // Reset mocks to clean state after initialization
-            jest.clearAllMocks();
+            vi.clearAllMocks();
 
             // When
             const result = await pushService.getSubscription();
@@ -642,7 +642,7 @@ describe('PushService', () => {
             });
 
             // Reset mocks
-            jest.clearAllMocks();
+            vi.clearAllMocks();
 
             // When - try to get subscription with PushManager undefined
             const result = await pushService.getSubscription();
@@ -657,14 +657,14 @@ describe('PushService', () => {
             const mockLogger = createMockLogger();
 
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
             };
 
             // Create worker service with proper registration
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -677,14 +677,14 @@ describe('PushService', () => {
             } as unknown as WorkerService;
 
             const mockBase64 = {
-                encode: jest.fn(),
-                decode: jest.fn(),
+                encode: vi.fn(),
+                decode: vi.fn(),
             };
 
             // Create config with undefined notification
             const mockConfig = {
                 vapidKey: 'test-vapid-key',
-                onCall: jest.fn().mockResolvedValue(undefined),
+                onCall: vi.fn().mockResolvedValue(undefined),
                 notification: undefined,
             };
 
@@ -695,7 +695,7 @@ describe('PushService', () => {
             await pushService.initialize(mockConfig);
 
             // Reset mocks after initialization
-            jest.clearAllMocks();
+            vi.clearAllMocks();
 
             // When
             const result = await pushService.getSubscription();
@@ -711,14 +711,14 @@ describe('PushService', () => {
             const mockLogger = createMockLogger();
 
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
             };
 
             // Create worker service WITHOUT controller
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -731,14 +731,14 @@ describe('PushService', () => {
             } as unknown as WorkerService;
 
             const mockBase64 = {
-                encode: jest.fn(),
-                decode: jest.fn(),
+                encode: vi.fn(),
+                decode: vi.fn(),
             };
 
             // Create notification mock (constructor)
             const mockConfig = {
                 vapidKey: 'test-vapid-key',
-                onCall: jest.fn().mockResolvedValue(undefined),
+                onCall: vi.fn().mockResolvedValue(undefined),
                 notification: createMockNotification({ permission: 'granted', asConstructor: true }),
             };
 
@@ -756,7 +756,7 @@ describe('PushService', () => {
             };
 
             // Reset mocks after initialization
-            jest.clearAllMocks();
+            vi.clearAllMocks();
 
             // When - directly call showNotification
             const result = pushService.showNotification('Test notification', { body: 'Test body' });
@@ -776,17 +776,17 @@ describe('PushService', () => {
             const mockLogger = createMockLogger();
 
             const mockController = {
-                postMessage: jest.fn(),
+                postMessage: vi.fn(),
             };
 
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
             };
 
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -799,14 +799,14 @@ describe('PushService', () => {
             } as unknown as WorkerService;
 
             const mockBase64 = {
-                encode: jest.fn(),
-                decode: jest.fn(),
+                encode: vi.fn(),
+                decode: vi.fn(),
             };
 
             // Create notification mock (constructor)
             const mockConfig = {
                 vapidKey: 'test-vapid-key',
-                onCall: jest.fn().mockResolvedValue(undefined),
+                onCall: vi.fn().mockResolvedValue(undefined),
                 notification: createMockNotification({ permission: 'granted', asConstructor: true }),
             };
 
@@ -837,26 +837,26 @@ describe('PushService', () => {
             endpoint: 'endpoint',
             expirationTime: null,
             options: { applicationServerKey: new Uint8Array([9, 9, 9]) },
-            getKey: jest.fn().mockImplementation((key) => {
+            getKey: vi.fn().mockImplementation((key) => {
                 if (key === 'p256dh') return new Uint8Array([4, 5, 6]);
                 if (key === 'auth') return new Uint8Array([7, 8, 9]);
                 return null;
             }),
-            unsubscribe: jest.fn().mockResolvedValue(true),
+            unsubscribe: vi.fn().mockResolvedValue(true),
         };
         const mockPushManager = {
-            getSubscription: jest.fn().mockResolvedValue(mockPushSubscription),
-            subscribe: jest.fn().mockResolvedValue(mockPushSubscription),
+            getSubscription: vi.fn().mockResolvedValue(mockPushSubscription),
+            subscribe: vi.fn().mockResolvedValue(mockPushSubscription),
         };
         const mockRegistration = { pushManager: mockPushManager, scope: 'scope' };
         const mockContainer = {
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-            controller: { postMessage: jest.fn() },
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+            controller: { postMessage: vi.fn() },
         };
         const mockWorkerService = {
-            initialize: jest.fn(),
+            initialize: vi.fn(),
             get registration() {
                 return mockRegistration;
             },
@@ -868,12 +868,12 @@ describe('PushService', () => {
             },
         } as unknown as WorkerService;
         const mockBase64 = {
-            encode: jest.fn((input) => {
+            encode: vi.fn((input) => {
                 if (input[0] === 9) return 'key1';
                 if (input[0] === 1) return 'key2';
                 return 'other';
             }),
-            decode: jest.fn(),
+            decode: vi.fn(),
         };
         const config = createMockPushConfig({
             pushManager: mockPushManager,
@@ -916,16 +916,16 @@ describe('PushService', () => {
 
     it('should call postMessage and return true in showNotification when all present', async () => {
         // Create controller and workerService explicitly
-        const mockController = { postMessage: jest.fn() };
+        const mockController = { postMessage: vi.fn() };
         const mockWorkerService = {
-            initialize: jest.fn(),
+            initialize: vi.fn(),
             get registration() {
                 return { pushManager: mockPushManager };
             },
             get container() {
                 return {
-                    addEventListener: jest.fn(),
-                    removeEventListener: jest.fn(),
+                    addEventListener: vi.fn(),
+                    removeEventListener: vi.fn(),
                 };
             },
             get controller() {
@@ -963,13 +963,13 @@ describe('PushService', () => {
             // Isolated mocks
             const mockLogger = createMockLogger();
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
-                controller: { postMessage: jest.fn() },
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                controller: { postMessage: vi.fn() },
             };
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -985,8 +985,9 @@ describe('PushService', () => {
             const pushService = getPushService(mockLogger, mockWorkerService, mockBase64);
             await pushService.initialize(config);
             // Get processMessage via hack (trigger message event directly)
-            const handler = mockContainer.addEventListener.mock.calls.find(([event]: [any]) => event === 'message')[1];
-            await handler({ data: { type: 'PUSH_NOTIFICATION', payload: {} } });
+            const handler = mockContainer.addEventListener.mock.calls.find((call) => call[0] === 'message')?.[1];
+            expect(handler).toBeDefined();
+            await (handler as Function)({ data: { type: 'PUSH_NOTIFICATION', payload: {} } });
             expect(mockLogger.error).toHaveBeenCalledWith('[push-service] Invalid payload data.');
         });
 
@@ -994,13 +995,13 @@ describe('PushService', () => {
             // Isolated mocks
             const mockLogger = createMockLogger();
             const mockContainer = {
-                addEventListener: jest.fn(),
-                removeEventListener: jest.fn(),
-                dispatchEvent: jest.fn(),
-                controller: { postMessage: jest.fn() },
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                controller: { postMessage: vi.fn() },
             };
             const mockWorkerService = {
-                initialize: jest.fn(),
+                initialize: vi.fn(),
                 get registration() {
                     return { pushManager: {} };
                 },
@@ -1016,8 +1017,9 @@ describe('PushService', () => {
             const pushService = getPushService(mockLogger, mockWorkerService, mockBase64);
             await pushService.initialize(config);
             // Get processMessage via hack (trigger message event directly)
-            const handler = mockContainer.addEventListener.mock.calls.find(([event]: [any]) => event === 'message')[1];
-            await handler({ data: { type: 'PUSH_NOTIFICATION', payload: { data: { b: 123 } } } });
+            const handler = mockContainer.addEventListener.mock.calls.find((call) => call[0] === 'message')?.[1];
+            expect(handler).toBeDefined();
+            await (handler as Function)({ data: { type: 'PUSH_NOTIFICATION', payload: { data: { b: 123 } } } });
             expect(mockLogger.error).toHaveBeenCalledWith('[push-service] Invalid payload data.');
         });
     });
@@ -1026,7 +1028,7 @@ describe('PushService', () => {
     it('should handle invalid payload with no required property and log error', async () => {
         await pushService.initialize(mockConfig);
         const container = mockWorkerService.container!;
-        const handler = (container.addEventListener as jest.Mock).mock.calls.find(
+        const handler = (container.addEventListener as Mock).mock.calls.find(
             ([event]) => event === 'message',
         )?.[1];
         expect(handler).toBeDefined();
@@ -1052,8 +1054,8 @@ describe('PushService', () => {
     it('should ignore non-push message events', async () => {
         await pushService.initialize(mockConfig);
         const container = mockWorkerService.container!;
-        const handler = (container.addEventListener as jest.Mock).mock.calls.find(
-            ([event]: [any]) => event === 'message',
+        const handler = (container.addEventListener as Mock).mock.calls.find(
+            (call) => call[0] === 'message',
         )?.[1];
         expect(handler).toBeDefined();
         await (handler as Function)({}); // no data

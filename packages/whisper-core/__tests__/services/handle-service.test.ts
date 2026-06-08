@@ -21,27 +21,27 @@ import { IceCallHandler } from '../../src/services/handle/ice-call-handler';
 import { OfferCallHandler } from '../../src/services/handle/offer-call-handler';
 import { Logger } from '../../src/utils/logger';
 
-jest.mock('../../src/services/handle/dial-call-handler');
-jest.mock('../../src/services/handle/offer-call-handler');
-jest.mock('../../src/services/handle/answer-call-handler');
-jest.mock('../../src/services/handle/ice-call-handler');
-jest.mock('../../src/services/handle/close-call-handler');
+vi.mock('../../src/services/handle/dial-call-handler');
+vi.mock('../../src/services/handle/offer-call-handler');
+vi.mock('../../src/services/handle/answer-call-handler');
+vi.mock('../../src/services/handle/ice-call-handler');
+vi.mock('../../src/services/handle/close-call-handler');
 
 describe('HandleService', () => {
     let handleService: HandleService;
     let mockLogger: Logger;
-    let mockDialHandler: jest.Mocked<DialCallHandler>;
-    let mockOfferHandler: jest.Mocked<OfferCallHandler>;
-    let mockAnswerHandler: jest.Mocked<AnswerCallHandler>;
-    let mockIceHandler: jest.Mocked<IceCallHandler>;
-    let mockCloseHandler: jest.Mocked<CloseCallHandler>;
+    let mockDialHandler: Mocked<DialCallHandler>;
+    let mockOfferHandler: Mocked<OfferCallHandler>;
+    let mockAnswerHandler: Mocked<AnswerCallHandler>;
+    let mockIceHandler: Mocked<IceCallHandler>;
+    let mockCloseHandler: Mocked<CloseCallHandler>;
     let mockConfig: HandleServiceConfig;
 
     // Mock the setTimeout to avoid waiting in tests
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
         mockLogger = createMockLogger();
 
@@ -52,8 +52,8 @@ describe('HandleService', () => {
         mockCloseHandler = createMockCloseCallHandler();
 
         mockConfig = {
-            focusOnDial: jest.fn(),
-            requestDial: jest.fn(),
+            focusOnDial: vi.fn(),
+            requestDial: vi.fn(),
         };
 
         handleService = getHandleService(
@@ -288,7 +288,7 @@ describe('HandleService', () => {
             mockDialHandler.handle.mockResolvedValue(true);
 
             // Fast-forward timers to process the queue
-            jest.advanceTimersByTime(500);
+            vi.advanceTimersByTime(500);
 
             // Verify that both queued calls were processed
             expect(mockDialHandler.handle).toHaveBeenCalledTimes(3); // Initial + 2 queued calls

@@ -22,14 +22,14 @@ describe('ConnectionSaga (Edge Cases)', () => {
     let mockCryptography: any;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockLogger = createMockLogger();
         mockTimeService = createMockTimeService();
         mockCallService = createMockCallService();
         mockSessionService = createMockSessionService();
         mockBase64 = createMockBase64({
-            encode: jest.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
-            decode: jest.fn((str) => {
+            encode: vi.fn((data) => 'encoded-' + Buffer.from(data).toString('hex')),
+            decode: vi.fn((str) => {
                 if (str.startsWith('encoded-')) {
                     return Buffer.from(str.substring(8), 'hex');
                 }
@@ -37,20 +37,20 @@ describe('ConnectionSaga (Edge Cases)', () => {
             }),
         });
         mockUtf8 = createMockUtf8({
-            encode: jest.fn((data) => Buffer.from(data).toString('utf-8')),
-            decode: jest.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
+            encode: vi.fn((data) => Buffer.from(data).toString('utf-8')),
+            decode: vi.fn((str) => new Uint8Array(Buffer.from(str, 'utf-8'))),
         });
         mockCryptography = createMockCryptography({
-            generateEncryptionKeyPair: jest.fn(() => ({
+            generateEncryptionKeyPair: vi.fn(() => ({
                 publicKey: new Uint8Array([1, 2, 3]),
                 secretKey: new Uint8Array([4, 5, 6]),
             })),
-            generateSharedSymmetricKey: jest.fn(() => new Uint8Array([7, 8, 9])),
-            encrypt: jest.fn((data) => data),
-            decrypt: jest.fn((data) => data),
-            sign: jest.fn(() => new Uint8Array([10, 11, 12])),
-            verifySignature: jest.fn(() => true),
-            generateSigningKeyPair: jest.fn(() => ({
+            generateSharedSymmetricKey: vi.fn(() => new Uint8Array([7, 8, 9])),
+            encrypt: vi.fn((data) => data),
+            decrypt: vi.fn((data) => data),
+            sign: vi.fn(() => new Uint8Array([10, 11, 12])),
+            verifySignature: vi.fn(() => true),
+            generateSigningKeyPair: vi.fn(() => ({
                 publicKey: new Uint8Array([13, 14, 15]),
                 secretKey: new Uint8Array([16, 17, 18]),
             })),
@@ -61,12 +61,12 @@ describe('ConnectionSaga (Edge Cases)', () => {
         // Setup mocks using test-utils factories
         const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
         const mockPeerConnection = createMockPeerConnection(
-            { getStats: jest.fn().mockResolvedValue(new Map()) },
+            { getStats: vi.fn().mockResolvedValue(new Map()) },
             mockDataChannel,
         );
         const mockWebRTC = createMockWebRTC();
         // Override PeerConnection to use our mockPeerConnection
-        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
 
         // Create the connection saga for the test
         const publicKey = 'mock-remote-public-key';
@@ -123,7 +123,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
     }, 10000);
 
     it('should not send empty outgoing messages and log debug', () => {
-        const mockDataChannel = { send: jest.fn() };
+        const mockDataChannel = { send: vi.fn() };
         const mockWebRTC = createMockWebRTC();
 
         const saga: any = getConnectionSaga(
@@ -159,7 +159,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel({ readyState: 'open' });
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
         const mockWebRTC = createMockWebRTC();
-        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
 
         const saga: any = getConnectionSaga(
             publicKey,
@@ -174,7 +174,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             mockWebRTC,
             [],
         );
-        saga.onMessage = jest.fn();
+        saga.onMessage = vi.fn();
 
         // Act: open saga to Connected state and simulate data channel open + empty message
         await saga.open(ConnectionSagaState.Connected);
@@ -189,7 +189,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
     it('should log relay server address when relay candidate is used', async () => {
         const { saga, mockPeerConnection } = createTestSaga({
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(
+                getStats: vi.fn().mockResolvedValue(
                     new Map([
                         [
                             'candidate-pair-id',
@@ -242,7 +242,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel({ readyState: 'connecting' });
         const mockPeerConnection = createMockPeerConnection({}, mockDataChannel);
         const webRTC = createMockWebRTC();
-        webRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        webRTC.PeerConnection = vi.fn(() => mockPeerConnection);
 
         const saga: any = getConnectionSaga(
             publicKey,
@@ -267,7 +267,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
     it('should log relay server address if relay candidate is used (alternative path)', async () => {
         const { saga, mockPeerConnection } = createTestSaga({
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(
+                getStats: vi.fn().mockResolvedValue(
                     new Map([
                         [
                             'candidate-pair-id',
@@ -290,7 +290,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const { saga, mockDataChannel, mockPeerConnection } = createTestSaga({
             dataChannelOverrides: { readyState: 'connecting' },
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(
+                getStats: vi.fn().mockResolvedValue(
                     new Map([
                         [
                             'candidate-pair-id',
@@ -367,7 +367,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
         const mockDataChannel = createMockDataChannel(dataChannelOverrides);
         const mockPeerConnection = createMockPeerConnection(peerConnectionOverrides, mockDataChannel);
         const mockWebRTC = { ...createMockWebRTC(), ...webRTCOverrides };
-        mockWebRTC.PeerConnection = jest.fn(() => mockPeerConnection);
+        mockWebRTC.PeerConnection = vi.fn(() => mockPeerConnection);
         const saga = getConnectionSaga(
             publicKey,
             connectionType,
@@ -392,7 +392,7 @@ describe('ConnectionSaga (Edge Cases)', () => {
             connectionType: 'outgoing',
             dataChannelOverrides: { readyState: 'open' },
             peerConnectionOverrides: {
-                getStats: jest.fn().mockResolvedValue(
+                getStats: vi.fn().mockResolvedValue(
                     new Map([
                         [
                             'candidate-pair-id',

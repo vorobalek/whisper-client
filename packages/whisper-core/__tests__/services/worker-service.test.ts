@@ -12,8 +12,8 @@ type WorkerServiceEffectiveConfig = {
 describe('WorkerService', () => {
     let workerService: ReturnType<typeof getWorkerService>;
     let mockLogger: Logger;
-    let mockRegister: jest.Mock;
-    let mockAddEventListener: jest.Mock;
+    let mockRegister: Mock;
+    let mockAddEventListener: Mock;
     let mockServiceWorker: any;
     let mockNavigator: any;
 
@@ -22,8 +22,8 @@ describe('WorkerService', () => {
         mockLogger = createMockLogger();
 
         // Create service worker mocks
-        mockRegister = jest.fn();
-        mockAddEventListener = jest.fn();
+        mockRegister = vi.fn();
+        mockAddEventListener = vi.fn();
         mockServiceWorker = createMockServiceWorker({
             register: mockRegister,
             addEventListener: mockAddEventListener,
@@ -100,7 +100,7 @@ describe('WorkerService', () => {
 
         it('should call onNewVersion callback when receiving message', async () => {
             // Given
-            const mockCallback = jest.fn();
+            const mockCallback = vi.fn();
             const config: WorkerServiceEffectiveConfig = {
                 version: '1.0.0',
                 navigator: mockNavigator,
@@ -124,7 +124,7 @@ describe('WorkerService', () => {
 
         it('should not call onNewVersion callback when receiving message with different type', async () => {
             // Given
-            const mockCallback = jest.fn();
+            const mockCallback = vi.fn();
             const config: WorkerServiceEffectiveConfig = {
                 version: '1.0.0',
                 navigator: mockNavigator,

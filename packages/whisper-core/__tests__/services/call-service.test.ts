@@ -18,7 +18,7 @@ import { Cryptography } from '../../src/utils/cryptography';
 import { Logger } from '../../src/utils/logger';
 import { Utf8 } from '../../src/utils/utf8';
 
-let mockNavigator: any = { sendBeacon: jest.fn() };
+let mockNavigator: any = { sendBeacon: vi.fn() };
 type CallServiceEffectiveConfig = {
     serverUrl?: string;
     navigator: Navigator;
@@ -55,14 +55,14 @@ describe('CallService', () => {
         mockTimeService = createMockTimeService();
         mockSessionService = createMockSessionService();
         mockApiClient = {
-            call: jest.fn().mockResolvedValue(mockResponse),
+            call: vi.fn().mockResolvedValue(mockResponse),
         };
         mockSignalRService = {
-            initialize: jest.fn().mockResolvedValue(undefined),
+            initialize: vi.fn().mockResolvedValue(undefined),
             get ready() {
                 return true;
             },
-            call: jest.fn().mockResolvedValue(mockResponse),
+            call: vi.fn().mockResolvedValue(mockResponse),
         };
         mockBase64 = createMockBase64({ '1,2,3,4': 'AQIDBA==' });
         mockUtf8 = createMockUtf8();
@@ -112,7 +112,7 @@ describe('CallService', () => {
 
         it('should fall back to API client if SignalR fails', async () => {
             // Given
-            mockSignalRService.call = jest.fn().mockRejectedValue(new Error('SignalR error'));
+            mockSignalRService.call = vi.fn().mockRejectedValue(new Error('SignalR error'));
 
             // When
             const response = await callService.update(publicKey);
@@ -127,7 +127,7 @@ describe('CallService', () => {
         it('should throw error when server URL is missing', async () => {
             // Given
             callService.initialize({ navigator: mockNavigator }); // Initialize without serverUrl
-            mockSignalRService.call = jest.fn().mockRejectedValue(new Error('SignalR error'));
+            mockSignalRService.call = vi.fn().mockRejectedValue(new Error('SignalR error'));
 
             // When & Then
             await expect(callService.update(publicKey)).rejects.toThrow('[call-service] Server URL is missing.');
@@ -137,11 +137,11 @@ describe('CallService', () => {
         it('should warn and use API client when SignalR is not ready', async () => {
             // Given: a SignalR service that is not ready
             const notReadySignalRService: SignalRService = {
-                initialize: jest.fn().mockResolvedValue(undefined),
+                initialize: vi.fn().mockResolvedValue(undefined),
                 get ready() {
                     return false;
                 },
-                call: jest.fn().mockResolvedValue(mockResponse),
+                call: vi.fn().mockResolvedValue(mockResponse),
             };
 
             const service = getCallService(
@@ -172,15 +172,15 @@ describe('CallService', () => {
         it('should log error for API failure and then throw when no response is received', async () => {
             // Given: SignalR not ready and API call fails
             const notReadySignalRService: SignalRService = {
-                initialize: jest.fn().mockResolvedValue(undefined),
+                initialize: vi.fn().mockResolvedValue(undefined),
                 get ready() {
                     return false;
                 },
-                call: jest.fn(),
+                call: vi.fn(),
             };
 
             const failingApiClient: ApiClient = {
-                call: jest.fn().mockRejectedValue(new Error('API error')),
+                call: vi.fn().mockRejectedValue(new Error('API error')),
             };
 
             const service = getCallService(
@@ -200,7 +200,7 @@ describe('CallService', () => {
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 '[call-service] SignalR is not ready. Trying to use http API.',
             );
-            expect(failingApiClient.call as jest.Mock).toHaveBeenCalled();
+            expect(failingApiClient.call as Mock).toHaveBeenCalled();
             // Ensure the API error was logged from the catch block (string + error)
             expect(mockLogger.error).toHaveBeenCalledWith(
                 expect.stringContaining("[call-service] Error while sending call 'update' via http API."),
@@ -344,9 +344,9 @@ describe('CallService', () => {
     describe('close', () => {
         it('should use sendBeacon for close requests', () => {
             // Given
-            mockNavigator.sendBeacon = jest.fn();
-            global.Blob = jest.fn().mockImplementation(() => ({})) as any;
-            global.JSON.stringify = jest.fn().mockReturnValue('{"test":"data"}');
+            mockNavigator.sendBeacon = vi.fn();
+            global.Blob = vi.fn().mockImplementation(() => ({})) as any;
+            global.JSON.stringify = vi.fn().mockReturnValue('{"test":"data"}');
 
             // When
             callService.close(publicKey, peerPublicKey);
