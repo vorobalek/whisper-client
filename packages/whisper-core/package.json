@@ -26,7 +26,7 @@
         "jsdom": "^29.1.1",
         "ts-loader": "^9.6.0",
         "typescript": "^6.0.3",
-        "vitest": "^4.1.8",
+        "vitest": "^4.1.9",
         "webpack": "^5.107.2",
         "webpack-cli": "^7.0.2"
     }
