@@ -468,18 +468,18 @@ export function useWhisper(
                         },
                         {
                             urls: 'turn:coturn.sfo3.do.vorobalek.dev:3478',
-                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
-                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
+                            username: 'b2vKdbNyBGvTBZi28ALDp7sZw58lCquPTjNCkP5O',
+                            credential: 'CUCijSIiw0hm6nqzgpEGcl6dAOm60cXmNniWrG5m',
                         },
                         {
                             urls: 'turn:coturn.ams3.do.vorobalek.dev:3478',
-                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
-                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
+                            username: 'b2vKdbNyBGvTBZi28ALDp7sZw58lCquPTjNCkP5O',
+                            credential: 'CUCijSIiw0hm6nqzgpEGcl6dAOm60cXmNniWrG5m',
                         },
                         {
                             urls: 'turn:coturn.fra1.do.vorobalek.dev:3478',
-                            username: 'XFfmA6Lyk7hPlee8TNfNy2VpG1uYpI9aTEHCJDcn',
-                            credential: 'HbvT9SZAtyguggMJjKQBdcYJB6azxVcXyh3ZvVy2',
+                            username: 'b2vKdbNyBGvTBZi28ALDp7sZw58lCquPTjNCkP5O',
+                            credential: 'CUCijSIiw0hm6nqzgpEGcl6dAOm60cXmNniWrG5m',
                         },
                     ],
 
